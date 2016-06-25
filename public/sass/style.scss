@@ -22,6 +22,17 @@ body {
   font-size: 1em;
 }
 
+// PAGE GENERATED
+.page{
+  width: $widthPage;
+  height: $heightPage;
+  border: 1px solid #000;
+    .cell{
+      height: $heightPage / 4;
+      border: 1px solid #000;
+    }
+}
+
 
 // C A P T U R E
 body.capture{

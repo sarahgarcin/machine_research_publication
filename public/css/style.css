@@ -6756,6 +6756,14 @@ body {
   color: #000;
   font-size: 1em; }
 
+.page {
+  width: 21cm;
+  height: 29.7cm;
+  border: 1px solid #000; }
+  .page .cell {
+    height: 7.425cm;
+    border: 1px solid #000; }
+
 body.capture .mainContent {
   max-width: none;
   height: calc( 100vh - 70px);

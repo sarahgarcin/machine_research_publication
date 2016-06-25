@@ -9,6 +9,9 @@ module.exports = function(app, io){
 
 	io.on("connection", function(socket){
 
+		//INDEX
+		socket.on( 'listData', function (data){ onListData( socket); });
+
 		// DODOC part
 		socket.on("newMedia", onNewMedia);
 		socket.on("deleteMedia", onDeleteMedia);
@@ -18,6 +21,32 @@ module.exports = function(app, io){
 
 // ------------- F U N C T I O N S -------------------
 
+	// ------------- I N D E X  -------------------
+	 function onListData(socket){
+			fs.readdir( 'content/', function (err, dir) {
+	      if (err) return console.log( 'Couldn\'t read content dir : ' + err);
+		 		dir.forEach(function(folder) {
+		 			fs.readdir('content/'+folder, function (err, files){
+		 				if (err) return console.log( 'Couldn\'t read content dir : ' + err);
+		 				files.forEach(function(file){
+		 					if(file.split('.')[1] == 'txt'){
+		 						fs.readFile('content/'+folder+'/'+file, 'utf8', function(err, data) {
+								  if (err) return console.log( 'Couldn\'t read content file : ' + err);
+								  console.log('OK: ' + file);
+								  console.log(data)
+								  socket.emit('sendText', data);
+								});
+		 					}
+		 					if(file.split('.')[1] == 'jpg'){
+								socket.emit('sendImages', file);
+		 					}
+		 				});
+		 			});
+		 		});
+		 	});
+		}
+
+	// ------------- D O D O C -------------------
 	function onNewMedia( mediaData) {
 		// console.log(mediaData)
 		var newFileName = getCurrentDate();
