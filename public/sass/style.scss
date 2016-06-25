@@ -1,0 +1,467 @@
+// I M P O R T
+@import "../bower_components/foundation/scss/normalize.scss";
+@import "../bower_components/foundation/scss/foundation.scss";
+
+
+@import "_variables.scss";
+
+
+html {
+	margin:0;
+}
+
+body,html {
+	height:100%;
+}
+
+li{list-style: none;}
+
+body {
+  margin: 0;
+  color: #000;
+  font-size: 1em;
+}
+
+
+// C A P T U R E
+body.capture{
+  .mainContent {
+    max-width: none;
+    height: calc( 100vh - 70px);
+    overflow-x: hidden;
+  }
+
+  .container-inner{
+    position: relative;
+    margin:auto;
+    height: 100%;
+  }
+
+  .content-wrapper {
+    @include clearfix();
+  }
+}
+
+$buttonBar: $margin + 64px;
+$t-decalageDuCentre: 4%;
+
+.captureLeft {
+
+  margin: auto;
+  position: absolute;
+  background-color: #FFF;
+  z-index:2;
+  margin-bottom:  25px;
+
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+  height: auto;
+  max-width: 50% - $t-decalageDuCentre;
+  width: 80vh;
+
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+
+  transition: transform .4s ease-out;
+
+  body[data-state="expanded"] & {
+    transform: translate3d(-100%  - $t-decalageDuCentre,0,0);
+  }
+
+  body.is--fullscreen & {
+    width: 100%;
+    left: 0 !important;
+    top: 0;
+    height: 100%;
+    padding: 2vh;
+
+    max-width: none;
+    transform: translate3d( 0%, 0, 0);
+  }
+
+  body.is--fullscreen[data-justcaptured="yes"] & {
+    background-color: #FF4246;
+  }
+
+
+  .video-view {
+    position: relative;
+    padding-bottom:  $buttonBar;
+    height: 100%;
+    width: 100%;
+
+    body.is--fullscreen & {
+      padding-bottom:   0;
+    }
+  }
+
+
+
+  video {
+    height: auto;
+    max-height: 100%;
+  }
+
+  .btn-capture-wrapper{
+    z-index: 1000;
+
+    text-align: center;
+
+    position: absolute;
+    padding-top: $margin / 2;
+    padding-bottom: $margin / 2;
+    height: $buttonBar;
+
+    bottom: 0;
+    width: 100%;
+
+    overflow: hidden;
+
+    &>div{
+      button{
+        outline: none !important;
+        border:none !important;
+        background: none !important;
+        margin: auto;
+
+        width: 64px;
+        height: 64px;
+
+
+
+      }
+    }
+
+    .btn.icon {
+
+        transform-origin: center center;
+        transition: transform .4s ease-out;
+
+        &:hover {
+          transform: scale( 1.1);
+          transition: transform .1s ease-out;
+        }
+
+        svg {
+          overflow: visible;
+
+          #FOND {
+
+            transform-origin: center;
+            transform: scale(1);
+            transition: transform .6s ease-out, fill .4s;
+          }
+
+          body:not(.is--fullscreen)[data-justcaptured="yes"] &
+          {
+            #FOND {
+              transform: scale(15);
+              fill: #FF4246;
+              transition: transform .2s ease-out, fill .3s;
+
+            }
+          }
+          body:not(.is--fullscreen)[data-justcaptured="yes"][data-mode="stopmotion"] &
+          {
+            #FOND {
+              fill: $c-anim;
+            }
+          }
+
+          body:not(.is--fullscreen)[data-videorecording="yes"] &,
+          body:not(.is--fullscreen)[data-audiorecording="yes"] &
+          {
+            #FOND {
+              transform: scale(15);
+              fill: #FF4246;
+              transition: transform .2s ease-out, fill .3s;
+            }
+            #CENTRE {
+              fill: $c-images;
+            }
+          }
+        }
+
+
+    }
+
+    .video-capture{
+      .video-save{
+        #stop-record-btn{
+          display: none;
+        }
+      }
+    }
+    .stopmotion-capture{
+      button {
+        display: inline-block;
+      }
+      #capture-sm-btn{
+        display:none;
+      }
+    }
+    .audio-capture{
+      #stop-recording-btn{
+        display: none;
+      }
+    }
+  }
+
+  .display-choice{
+    position: absolute;
+    height:100%;
+    top: 0;
+    left: 0;
+    pointer-events:none;
+
+    .choices {
+      position: absolute;
+      height:100%;
+      width:100%;
+      top: 0;
+      left: 0;
+      display:none;
+      &.image-choice {
+        background-color: $c-images;
+      }
+      &.video-choice {
+        background-color: $c-videos;
+      }
+      &.stopmotion-choice {
+        background-color: $c-anim;
+      }
+      &.audio-choice {
+        background-color: $c-sons;
+      }
+
+      .caption {
+        font-size: 3em;
+        text-align: center;
+        padding: 30px;
+        color: white;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        transform: translate(-50%,-58%);
+        position: absolute;
+        word-wrap: break-word;
+      }
+    }
+
+  }
+  #canvas-audio{
+    display: none;
+    width: 100%;
+  }
+
+  .full-screen-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .button-wrapper_gofullscreen, .button-wrapper_leavefullscreen {
+
+    .btn.icon {
+      border: 4px solid #EFEFEF;
+      padding: 0;
+    }
+    &:hover {
+      .btn.icon {
+        border: 0px solid transparent !important;
+      }
+    }
+
+  }
+
+  .button-wrapper_gofullscreen {
+
+    margin-right: -20px;
+    margin-top: -20px;
+
+    body.is--fullscreen & {
+      display: none;
+    }
+    body[data-mode="audio"] & {
+      display: none;
+    }
+  }
+
+
+  .button-wrapper_leavefullscreen {
+
+    margin-right: 20px;
+    margin-top: 20px;
+
+    body:not([class*=is--fullscreen]) & {
+      display: none;
+    }
+  }
+
+  .recording-feedback{
+    position:absolute;
+    z-index: 100;
+    top: 10px;
+    left: 10px;
+
+    .record-feedback{
+      width:15px;
+      height:15px;
+      background-color: $rouge;
+      border-radius: 50%;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .time-feedback {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 2px;
+      margin-left: 10px;
+      color: #fff;
+      text-shadow: 0px 0px 2px #999;
+    }
+  }
+}
+
+.captureRight {
+  background-color: #FFF;
+  position: absolute;
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+
+  opacity: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  padding: 10px;
+
+  height: auto;
+  max-width: 45% - $t-decalageDuCentre;
+  width: 80vh;
+
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+
+  transition: transform .4s ease-out, opacity .6s ease-out;
+
+  body[data-state="expanded"] & {
+    opacity: 1;
+    transform: translate3d( 0% + $t-decalageDuCentre,0,0);
+  }
+
+  .flash{
+    height:100%;
+    background-color: #FFF;
+    display: none;
+    position: absolute;
+    top: 0; left: 0;
+    z-index:  150;
+
+
+    body[data-mode="photo"] & {
+      background-color: $c-images;
+    }
+    body[data-mode="video"] & {
+      background-color: $c-videos;
+    }
+    body[data-mode="stopmotion"] & {
+      background-color: $c-anim;
+    }
+    body[data-mode="audio"] & {
+      background-color: $c-sons;
+    }
+  }
+
+  .mode-instructions {
+    width:  100%;
+    padding: 40px;
+    display: none;
+
+    .icone-stopmotion {
+      min-width: 0;
+      width: 70%;
+      margin: 0 auto 40px;
+    }
+    h4 {
+      font-size:1em;
+    }
+  }
+
+
+  .output[src=''] {
+    display: none;
+  }
+
+  .preview {
+    position: relative;
+
+    .output {
+      padding-bottom:   10px;
+    }
+  }
+
+  .preview_stopmotion {
+
+    // if we have a stopmotion preview active
+    video.output:not([src='']) ~ {
+      .mode-instructions {
+        display: none;
+      }
+    }
+
+    .preview_stopmotion--container:empty ~ {
+
+      .mode-instructions {
+        // only show instructions if container is empty
+        display: block;
+      }
+
+      .button-wrapper_finishStopmotion {
+        display: none;
+      }
+    }
+
+    .button-wrapper_finishStopmotion {
+      display: block;
+      float: right;
+    }
+
+    .stopmotion_lastImagePreview {
+
+      padding: $margin;
+      background-color: #fff;
+
+      &:not(:first-of-type) {
+        position: absolute;
+        top: 0; left: 0;
+      }
+
+    }
+    .meta-stopmotion {
+      margin-top: 10px;
+
+      .count-image{
+        display: inline-block;
+        vertical-align: top;
+      }
+    }
+  }
+
+
+  .son {
+    display: none;
+    padding-left:27px;
+    margin-top: 60px;
+    margin-bottom: 40px;
+  }
+
+  #video-stream {
+    display: none;
+    width: 100%;
+  }
+  #stop-sm{
+    display: none;
+    float: right;
+    width: 48px;
+  }
+}
