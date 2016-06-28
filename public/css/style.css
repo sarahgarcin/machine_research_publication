@@ -6759,14 +6759,19 @@ body {
 .page {
   width: 21cm;
   height: 29.7cm;
-  border: 1px solid #000; }
+  border: 1px solid #000;
+  margin: 50px auto; }
   .page .cell {
-    height: 7.425cm;
-    border: 1px solid #000;
+    height: 14.85cm;
     overflow: hidden;
-    padding: 0; }
+    padding: 0;
+    width: 50%;
+    display: inline-block; }
     .page .cell img {
-      width: 100%; }
+      width: auto;
+      max-width: none;
+      margin-left: -50%;
+      height: 14.85cm; }
 
 body.capture .mainContent {
   max-width: none;
