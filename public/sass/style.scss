@@ -27,21 +27,21 @@ body {
   width: $widthPage;
   height: $heightPage;
   border: 1px solid #000;
-  margin: 50px auto;
-    .cell{
-      height: $heightPage / 2;
-      // border: 1px solid #000;
-      overflow:hidden;
-      padding:0;
-      width: 50%;
-      display:inline-block;
-      img{
-        width: auto;
-        max-width: none;
-        margin-left: -50%;
-        height:$heightPage / 2;
-      }
-    }
+  margin: 0px auto;
+    // .cell{
+    //   height: $heightPage / 2;
+    //   // border: 1px solid #000;
+    //   overflow:hidden;
+    //   padding:0;
+    //   width: 50%;
+    //   display:inline-block;
+    //   img{
+    //     width: auto;
+    //     max-width: none;
+    //     margin-left: -50%;
+    //     height:$heightPage / 2;
+    //   }
+    // }
 }
 
 

@@ -5,16 +5,19 @@ html
     title #{title}
   body
 
+
     div.content-wrapper
-      div#page-content.page.row
-          div.cell
-          div.cell
-          div.cell
-          div.cell
-          //- div.cell.small-6.columns
-          //- div.cell.small-6.columns
-          //- div.cell.small-6.columns
-          //- div.cell.small-6.columns
+      div#page-content.page
+        div.left
+          div.text-content
+        div.right
+          div.image-content
+          div.small-text-content
+      //- div#page-content.page.row
+      //-     div.cell
+      //-     div.cell
+      //-     div.cell
+      //-     div.cell
 
 
     script(src='/socket.io/socket.io.js')

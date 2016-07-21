@@ -6757,21 +6757,10 @@ body {
   font-size: 1em; }
 
 .page {
-  width: 21cm;
-  height: 29.7cm;
+  width: 29.7cm;
+  height: 21cm;
   border: 1px solid #000;
-  margin: 50px auto; }
-  .page .cell {
-    height: 14.85cm;
-    overflow: hidden;
-    padding: 0;
-    width: 50%;
-    display: inline-block; }
-    .page .cell img {
-      width: auto;
-      max-width: none;
-      margin-left: -50%;
-      height: 14.85cm; }
+  margin: 0px auto; }
 
 body.capture .mainContent {
   max-width: none;
