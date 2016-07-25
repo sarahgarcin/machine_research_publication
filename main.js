@@ -14,7 +14,7 @@ module.exports = function(app, io){
 	io.on("connection", function(socket){
 
 		//INDEX
-		socket.on( 'listData', function (data){ onListImages( socket); });
+		socket.on( 'listData', function (data){ onListData( socket); });
 		socket.on('savePDF', createPDF);
 
 		// DODOC part
@@ -27,20 +27,40 @@ module.exports = function(app, io){
 // ------------- F U N C T I O N S -------------------
 
 	// ------------- I N D E X  -------------------
-	function onListImages(socket){
+	function onListData(socket){
+		// List images
 		fs.readdir( 'content/images', function (err, images) {
-			console.log(images);
+			// console.log(images);
 		 	if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-		 	images.forEach(function(file){
-		 		if(file.split('.')[1] == 'jpg'){
-			 		socket.emit('sendImages', file);
-			 		console.log(file);
-			 	}
-	 		});
+		 	else{socket.emit('sendImages', images);}
 	 	});
+
+	 	// List text longs
+	 	var textArray = [];
+	 	var arrayOfFiles = fs.readdirSync('content/long');
+
+	 	arrayOfFiles.forEach( function (file) {
+		    var textInFile = fs.readFileSync('content/long/'+file, 'utf8');
+		    textArray.push(textInFile)
+		});
+
+		console.log(textArray);
+		socket.emit('sendText', textArray);
+
+		// List short texts
+	 	var shortTextArray = [];
+	 	var arrayOfShort = fs.readdirSync('content/short');
+
+	 	arrayOfShort.forEach( function (file) {
+		    var shortText = fs.readFileSync('content/short/'+file, 'utf8');
+		    shortTextArray.push(shortText)
+		});
+
+		console.log(shortTextArray);
+		socket.emit('sendShortText', shortTextArray);
 	}
 
-	function onListData(socket){
+	function onListTest(socket){
 		fs.readdir( 'content/', function (err, dir) {
       if (err) return console.log( 'Couldn\'t read content dir : ' + err);
 	 		dir.forEach(function(folder) {

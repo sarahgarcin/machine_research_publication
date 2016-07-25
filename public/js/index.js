@@ -1,6 +1,7 @@
 /* VARIABLES */
 var socket = io.connect();
-var dataArray = [];
+var dataTextLong;
+var dataImages= [];
 
 /* sockets */
 function onSocketConnect() {
@@ -17,6 +18,7 @@ function onSocketError(reason) {
 socket.on('connect', onSocketConnect);
 socket.on('error', onSocketError);
 socket.on('sendText', onTextData);
+socket.on('sendShortText', onShortTextData);
 socket.on('sendImages', onImagesData);
 
 
@@ -29,11 +31,11 @@ jQuery(document).ready(function($) {
 
 function init(){
 	
-	setTimeout(function(){
-		var randomIndex = Math.floor(Math.random() * dataArray.length);
-		var randomFile = dataArray[randomIndex];
+	// setTimeout(function(){
+	// 	var randomIndex = Math.floor(Math.random() * dataArray.length);
+	// 	var randomFile = dataArray[randomIndex];
 		
-	}, 3000);
+	// }, 3000);
 
 
 	// var scaleCount = 1;
@@ -197,12 +199,94 @@ function init(){
 
 }
 
+function onShortTextData(text){
+	console.log(text);
+	addTextShort();
+	
+	// add short text in the right place	
+	function addTextShort(){
+
+		var randomIndex = Math.floor(Math.random() * text.length);
+		var randomFile = text[randomIndex];
+
+		$('.page-wrapper .right .small-text-content').append('<p>'+randomFile+'</p>');
+	}
+}
+
 function onTextData(text){
-	dataArray.push(text);
+	console.log(text);
+	addTextLong();
+	
+	// add long text in the right place	
+	function addTextLong(){
+
+		var randomIndex = Math.floor(Math.random() * text.length);
+		var randomFile = text[randomIndex];
+
+		$('.page-wrapper .left .text-content').append('<p>'+randomFile+'</p>');
+	}
 }
 
 function onImagesData(images){
-	dataArray.push(images);
+	// dataImages.push(images);
+	console.log(images);
+	addImages();
+	changeImages();
+	
+	// add Images in the right place	
+	function addImages(){
+
+		var randomIndex = Math.floor(Math.random() * images.length);
+		var randomFile = images[randomIndex];
+		var ext = randomFile.split('.')[1];
+		var $el = $('.page-wrapper .right .image-content');
+		$el.attr('data-index', randomIndex);
+
+		if(ext == 'jpg'){
+			console.log('Yes jpg image');
+			$el.append('<img src="images/'+randomFile+'">');
+		}
+		else{
+			console.log('Not a jpg image');
+			addImages();
+		}
+
+	}
+
+	function changeImages(){
+		$(document).on('keypress',function(e){
+			var code = e.keyCode;
+			console.log(code);
+			var $el = $('.page-wrapper .right .image-content');
+			// on "a" press go to prev image
+			if(e.keyCode == 97){
+				var dataIndex = $el.attr('data-index');
+				var prevIndex = parseInt((dataIndex)-1);
+
+				if(prevIndex > 0){
+					$el.attr('data-index', prevIndex);
+					var prevFile = images[prevIndex];
+					$el.html('<img src="images/'+prevFile+'">');
+				}
+			}
+
+			// on "e" press go to next image
+			if(e.keyCode == 101){
+
+				var dataIndex = $el.attr('data-index');
+				var nextIndex = (parseInt(dataIndex)+1);
+				
+				if(nextIndex < (images.length - 1)){
+					console.log('images are there');
+					$el.attr('data-index', nextIndex);
+					var nextFile = images[nextIndex];
+					$el.html('<img src="images/'+nextFile+'">');
+				}
+			}
+
+		});
+	}
+
 }
 
 

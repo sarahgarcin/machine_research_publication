@@ -6761,6 +6761,21 @@ body {
   height: 21cm;
   border: 1px solid #000;
   margin: 0px auto; }
+  .page .page-wrapper {
+    margin: 1cm 2cm;
+    width: 25.7cm;
+    height: 19cm;
+    border: 1px solid #E100B6; }
+    .page .page-wrapper .left {
+      width: 12.85cm;
+      height: 19cm;
+      border-right: 1px solid #0022E1;
+      display: inline-block; }
+    .page .page-wrapper .right {
+      width: 12.79cm;
+      height: 19cm;
+      border-left: 1px solid #00E17B;
+      display: inline-block; }
 
 body.capture .mainContent {
   max-width: none;
