@@ -30,6 +30,157 @@ jQuery(document).ready(function($) {
 
 
 function init(){
+
+	var $cell = $("div.right div.image-content");
+	var count = 1;
+	var posX = (29.7/2) + 1.6;
+	var posY= 1;
+	var space= 0;
+	var countRegex = 0;
+	var html = $('p').html();
+	var $text = $(".text-content");
+
+	$(document).on('keypress', function(e){
+		// console.log(e.keyCode);
+		var code = e.keyCode;
+
+		switch(code){
+			//zoom press "z"
+			case 122:
+				if(count > 2){
+					count = 1
+				}
+				else{
+					count += 0.1;
+					$cell.css({
+						'transform':'scale('+count+')',
+					}); 
+				}
+				break;
+			//zoomout press "-"
+			case 45:
+				if(count < 0.4){
+					count = 1;
+				}
+				else{
+					count -= 0.1;
+					$cell.css({
+						'transform':'scale('+count+')',
+					});
+				}
+				break;
+		  //press "x" to move image on the right
+			case 120:
+				if(posX < 25){
+					console.log(posX);
+					posX += 0.5;
+	        $cell.css({
+						'left': posX+'cm',
+						'top':posY+'cm',
+					})
+	      }
+				break;
+			//press "w" to move image on the left
+			case 119:
+				if(posX >= 0){
+					posX -= 0.5;
+	        $cell.css({
+							'left': posX+'cm',
+							'top':posY+'cm',
+					})
+			}
+				break;
+			//press "y" to move image down
+			case 121:
+				if(posY < 15){
+					posY += 0.5;
+	        $cell.css({
+							'left': posX+'cm',
+							'top':posY+'cm',
+					})
+				}
+				break;
+			//press "h" to move image up
+			case 104:
+				if(posY >= 0){
+					posY -= 0.5;
+	        $cell.css({
+							'left': posX+'cm',
+							'top':posY+'cm',
+					})
+			}
+			break;
+
+			//change font-family
+			// case 99:
+				countRegex ++;
+				console.log(countRegex);
+				if(countRegex >= 1){
+      		$('p').wrapInTag({
+					  tag: 'span',
+					  class: 'change',
+					  words: ['horreur']
+					});
+				}
+				if (countRegex >= 2){
+					$('p').wrapInTag({
+					  tag: 'span',
+					  class: 'change',
+					  words: ['horreur', 'nuit']
+					});
+				}
+
+				if (countRegex >= 3){
+					$('p').wrapInTag({
+					  tag: 'span',
+					  class: 'change',
+					  words: ['horreur', 'nuit', 'lit']
+					});
+				}
+				if (countRegex >= 4){
+					$text.find('.change').attr("class","dataface");
+					countRegex = 0;
+				}
+				break;
+		  //press "s" to add space between each words
+			case 115:
+				space += 5;
+				$text.css({ 
+					'word-spacing': ''+space +'px',
+				})
+			//press "q" to decrease space between each words
+			case 113:
+				space -= 3;
+				$text.css({ 
+					'word-spacing': ''+space +'px',
+				})
+		    console.log(space)
+				break;
+			//press "n" to mix images in a "glitch" 
+      // case 110:
+      // 	clonecount ++;
+      // 	var randomPos = Math.random() * $cell.find('img').height();
+      // 	var randomH = Math.random() * 100;
+      // 	console.log(randomPos);
+      //  	var $img = $cell.clone();
+      //  	console.log($img);
+      //  	if(clonecount > imageArray.length){
+    		// 	clonecount = 0 
+    		// } 
+    		// else {
+	    	// 	$('.content').prepend('<div class="cell wrapper'+clonecount+'"><img src="'+imageArray[clonecount-1]+'"/></div>'); 
+	    	// 	$('.wrapper'+clonecount).css({
+	    	// 		'top': randomPos+'px',
+	    	// 		'height':randomH+'px',
+	    	// 		'z-index':clonecount +2
+	    	// 	}).find('img').css({
+	    	// 		'top': -randomPos+'px'
+	    	// 	});
+	    	// }
+
+    		// break;
+		}
+	});
 	
 	// setTimeout(function(){
 	// 	var randomIndex = Math.floor(Math.random() * dataArray.length);
@@ -306,6 +457,7 @@ function onImagesData(images){
 	console.log(images);
 	addImages();
 	changeImages();
+	glitchImages();
 	
 	// add Images in the right place	
 	function addImages(){
@@ -359,6 +511,39 @@ function onImagesData(images){
 			}
 
 		});
+	}
+
+	function glitchImages(){
+		
+		var clonecount =0;
+		var $el = $('.page-wrapper .right .image-content');
+   	
+   	$(document).on('keypress',function(e){
+			var code = e.keyCode;
+			console.log(code);
+			if(code == 110){
+		  	clonecount ++;
+		  	var randomPos = Math.random() * $el.find('img').height();
+		  	var randomH = Math.random() * 100;
+		  	console.log(randomPos);
+		   	var $img = $el.clone();
+		   	console.log($img);
+		   	if(clonecount > images.length){
+					clonecount = 0 
+				} 
+				else {
+		  		$('.right').prepend('<div class="image-content wrapper'+clonecount+'"><img src="images/'+images[clonecount]+'"/></div>'); 
+		  		$('.wrapper'+clonecount).css({
+		  			'top': randomPos+'px',
+		  			'height':randomH+'px',
+		  			'z-index':clonecount +2
+		  		}).find('img').css({
+		  			'position':'absolute',
+		  			'top': -randomPos+'px'
+		  		});
+		  	}
+		  }
+	  });
 	}
 
 }

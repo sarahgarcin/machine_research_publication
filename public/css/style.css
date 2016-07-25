@@ -6776,6 +6776,11 @@ body {
       height: 19cm;
       border-left: 1px solid #00E17B;
       display: inline-block; }
+      .page .page-wrapper .right .image-content {
+        position: absolute;
+        height: 10cm;
+        overflow: hidden;
+        width: 12.85cm; }
 
 body.capture .mainContent {
   max-width: none;

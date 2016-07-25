@@ -44,6 +44,13 @@ body {
       height: $heightPage - ($margintop * 2);
       border-left: 1px solid #00E17B;
       display:inline-block;
+      // position:relative;
+      .image-content{
+        position:absolute;
+        height: 10cm;
+        overflow:hidden;
+        width: ($widthPage - ($marginleft * 2))/2;
+      }
     }
   }
     // .cell{
