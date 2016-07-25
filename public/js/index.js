@@ -202,28 +202,102 @@ function init(){
 function onShortTextData(text){
 	console.log(text);
 	addTextShort();
+	changeTextShort();
 	
 	// add short text in the right place	
 	function addTextShort(){
 
 		var randomIndex = Math.floor(Math.random() * text.length);
 		var randomFile = text[randomIndex];
+		var $el = $('.page-wrapper .right .small-text-content');
+		$el.attr('data-index', randomIndex);
 
-		$('.page-wrapper .right .small-text-content').append('<p>'+randomFile+'</p>');
+		$el.append('<p>'+randomFile+'</p>');
+	}
+
+	function changeTextShort(){
+		$(document).on('keypress',function(e){
+			var code = e.keyCode;
+			console.log(code);
+			var $el = $('.page-wrapper .right .small-text-content');
+			// on "a" press go to prev image
+			if(e.keyCode == 97){
+				var dataIndex = $el.attr('data-index');
+				var prevIndex = parseInt((dataIndex)-1);
+
+				if(prevIndex >= 0){
+					$el.attr('data-index', prevIndex);
+					var prevFile = text[prevIndex];
+					$el.html('<p>'+prevFile+'</p>');
+				}
+			}
+
+			// on "e" press go to next image
+			if(e.keyCode == 101){
+
+				var dataIndex = $el.attr('data-index');
+				var nextIndex = (parseInt(dataIndex)+1);
+				
+				if(nextIndex < text.length){
+					console.log('text are there');
+					$el.attr('data-index', nextIndex);
+					var nextFile = text[nextIndex];
+					$el.html('<p>'+nextFile+'</p>');
+				}
+			}
+
+		});
 	}
 }
 
 function onTextData(text){
 	console.log(text);
 	addTextLong();
+	changeTextLong();
 	
 	// add long text in the right place	
 	function addTextLong(){
 
 		var randomIndex = Math.floor(Math.random() * text.length);
 		var randomFile = text[randomIndex];
+		var $el = $('.page-wrapper .left .text-content');
+		$el.attr('data-index', randomIndex);
 
-		$('.page-wrapper .left .text-content').append('<p>'+randomFile+'</p>');
+		$el.append('<p>'+randomFile+'</p>');
+	}
+
+	function changeTextLong(){
+		$(document).on('keypress',function(e){
+			var code = e.keyCode;
+			console.log(code);
+			var $el = $('.page-wrapper .left .text-content');
+			// on "a" press go to prev image
+			if(e.keyCode == 97){
+				var dataIndex = $el.attr('data-index');
+				var prevIndex = parseInt((dataIndex)-1);
+
+				if(prevIndex >= 0){
+					$el.attr('data-index', prevIndex);
+					var prevFile = text[prevIndex];
+					$el.html('<p>'+prevFile+'</p>');
+				}
+			}
+
+			// on "e" press go to next image
+			if(e.keyCode == 101){
+
+				var dataIndex = $el.attr('data-index');
+				var nextIndex = (parseInt(dataIndex)+1);
+				
+				if(nextIndex < text.length){
+					console.log('text are there');
+					$el.attr('data-index', nextIndex);
+					var nextFile = text[nextIndex];
+					$el.html('<p>'+nextFile+'</p>');
+				}
+			}
+
+		});
 	}
 }
 
