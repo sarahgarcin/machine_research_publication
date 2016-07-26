@@ -6776,11 +6776,15 @@ body {
       height: 19cm;
       border-left: 1px solid #00E17B;
       display: inline-block; }
-      .page .page-wrapper .right .image-content {
+      .page .page-wrapper .right .image-wrapper {
         position: absolute;
+        width: 12.85cm;
         height: 10cm;
-        overflow: hidden;
-        width: 12.85cm; }
+        overflow: hidden; }
+        .page .page-wrapper .right .image-wrapper .image-content {
+          position: absolute;
+          overflow: hidden;
+          width: 12.85cm; }
 
 body.capture .mainContent {
   max-width: none;

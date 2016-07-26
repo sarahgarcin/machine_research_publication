@@ -31,7 +31,7 @@ jQuery(document).ready(function($) {
 
 function init(){
 
-	var $cell = $("div.right div.image-content");
+	var $cell = $("div.right div.image-wrapper");
 	var count = 1;
 	var posX = (29.7/2) + 1.6;
 	var posY= 1;
@@ -532,7 +532,7 @@ function onImagesData(images){
 					clonecount = 0 
 				} 
 				else {
-		  		$('.right').prepend('<div class="image-content wrapper'+clonecount+'"><img src="images/'+images[clonecount]+'"/></div>'); 
+		  		$('.right .image-wrapper').prepend('<div class="image-content wrapper'+clonecount+'"><img src="images/'+images[clonecount]+'"/></div>'); 
 		  		$('.wrapper'+clonecount).css({
 		  			'top': randomPos+'px',
 		  			'height':randomH+'px',
