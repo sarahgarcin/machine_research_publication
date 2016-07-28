@@ -4,6 +4,8 @@
  * 2. Prevent iOS and IE text size adjust after device orientation change,
  *    without disabling user zoom.
  */
+@import url(../fonts/volkorn/stylesheet.css);
+@import url(../fonts/savate/stylesheet.css);
 html {
   font-family: sans-serif;
   /* 1 */
@@ -6748,19 +6750,58 @@ html {
 body, html {
   height: 100%; }
 
-li {
-  list-style: none; }
-
 body {
   margin: 0;
   color: #000;
-  font-size: 1em; }
+  font-size: 12px;
+  font-family: 'vollkorn', serif; }
+
+h1, h2, h3, h4, h5 {
+  font-family: 'savate', sans-serif;
+  margin-bottom: 0.1cm; }
+
+h1 {
+  font-size: 20pt; }
+
+h2 {
+  font-size: 15pt; }
+
+h3, h4, h5 {
+  font-size: 12pt; }
+
+li {
+  list-style: none; }
+
+p {
+  font-family: 'vollkorn', serif;
+  font-size: 10pt;
+  line-height: 125%;
+  padding-left: 0.5cm; }
+  p:first-child {
+    margin: 0; }
+
+img {
+  max-width: 100%; }
 
 .page {
   width: 29.7cm;
   height: 21cm;
   border: 1px solid #000;
-  margin: 0px auto; }
+  margin: 0px auto;
+  position: relative; }
+  .page .ronds {
+    margin-left: 0.75cm;
+    top: 6.5cm;
+    position: absolute; }
+    .page .ronds.ronds-right {
+      right: 0;
+      margin-right: 0.75cm; }
+    .page .ronds div {
+      width: 0.5cm;
+      height: 0.5cm;
+      border: 1px solid #000;
+      border-radius: 50%;
+      margin-bottom: 8cm; }
   .page .page-wrapper {
     margin: 1cm 2cm;
     width: 25.7cm;
@@ -6770,7 +6811,8 @@ body {
       width: 12.85cm;
       height: 19cm;
       border-right: 1px solid #0022E1;
-      display: inline-block; }
+      display: inline-block;
+      padding-right: 0.5cm; }
     .page .page-wrapper .right {
       width: 12.79cm;
       height: 19cm;
@@ -6779,12 +6821,14 @@ body {
       .page .page-wrapper .right .image-wrapper {
         position: absolute;
         width: 12.85cm;
-        height: 10cm;
+        height: 12cm;
         overflow: hidden; }
         .page .page-wrapper .right .image-wrapper .image-content {
           position: absolute;
           overflow: hidden;
           width: 12.85cm; }
+          .page .page-wrapper .right .image-wrapper .image-content img {
+            width: 100%; }
 
 body.capture .mainContent {
   max-width: none;

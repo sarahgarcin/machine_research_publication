@@ -2,6 +2,7 @@
 var socket = io.connect();
 var dataTextLong;
 var dataImages= [];
+var converter = new showdown.Converter();
 
 /* sockets */
 function onSocketConnect() {
@@ -26,6 +27,7 @@ jQuery(document).ready(function($) {
 
 	$(document).foundation();
 	init();
+	gridDisplayer();
 });
 
 
@@ -69,8 +71,8 @@ function init(){
 					});
 				}
 				break;
-		  //press "x" to move image on the right
-			case 120:
+		  //press "l" to move image on the right
+			case 108:
 				if(posX < 25){
 					console.log(posX);
 					posX += 0.5;
@@ -80,8 +82,8 @@ function init(){
 					})
 	      }
 				break;
-			//press "w" to move image on the left
-			case 119:
+			//press "j" to move image on the left
+			case 106:
 				if(posX >= 0){
 					posX -= 0.5;
 	        $cell.css({
@@ -90,8 +92,8 @@ function init(){
 					})
 			}
 				break;
-			//press "y" to move image down
-			case 121:
+			//press "k" to move image down
+			case 107:
 				if(posY < 15){
 					posY += 0.5;
 	        $cell.css({
@@ -100,8 +102,8 @@ function init(){
 					})
 				}
 				break;
-			//press "h" to move image up
-			case 104:
+			//press "i" to move image up
+			case 105:
 				if(posY >= 0){
 					posY -= 0.5;
 	        $cell.css({
@@ -156,6 +158,7 @@ function init(){
 				})
 		    console.log(space)
 				break;
+
 			//press "n" to mix images in a "glitch" 
       // case 110:
       // 	clonecount ++;
@@ -179,6 +182,7 @@ function init(){
 	    	// }
 
     		// break;
+    		e.preventDefault(); // prevent the default action (scroll / move caret)
 		}
 	});
 	
@@ -363,7 +367,7 @@ function onShortTextData(text){
 		var $el = $('.page-wrapper .right .small-text-content');
 		$el.attr('data-index', randomIndex);
 
-		$el.append('<p>'+randomFile+'</p>');
+		$el.append('<p>'+converter.makeHtml(randomFile)+'</p>');
 	}
 
 	function changeTextShort(){
@@ -379,7 +383,7 @@ function onShortTextData(text){
 				if(prevIndex >= 0){
 					$el.attr('data-index', prevIndex);
 					var prevFile = text[prevIndex];
-					$el.html('<p>'+prevFile+'</p>');
+					$el.html('<p>'+converter.makeHtml(prevFile)+'</p>');
 				}
 			}
 
@@ -393,7 +397,7 @@ function onShortTextData(text){
 					console.log('text are there');
 					$el.attr('data-index', nextIndex);
 					var nextFile = text[nextIndex];
-					$el.html('<p>'+nextFile+'</p>');
+					$el.html('<p>'+converter.makeHtml(nextFile)+'</p>');
 				}
 			}
 
@@ -414,7 +418,7 @@ function onTextData(text){
 		var $el = $('.page-wrapper .left .text-content');
 		$el.attr('data-index', randomIndex);
 
-		$el.append('<p>'+randomFile+'</p>');
+		$el.append('<p>'+converter.makeHtml(randomFile)+'</p>');
 	}
 
 	function changeTextLong(){
@@ -430,7 +434,7 @@ function onTextData(text){
 				if(prevIndex >= 0){
 					$el.attr('data-index', prevIndex);
 					var prevFile = text[prevIndex];
-					$el.html('<p>'+prevFile+'</p>');
+					$el.html('<p>'+converter.makeHtml(prevFile)+'</p>');
 				}
 			}
 
@@ -444,7 +448,7 @@ function onTextData(text){
 					console.log('text are there');
 					$el.attr('data-index', nextIndex);
 					var nextFile = text[nextIndex];
-					$el.html('<p>'+nextFile+'</p>');
+					$el.html('<p>'+converter.makeHtml(nextFile)+'</p>');
 				}
 			}
 
@@ -525,14 +529,17 @@ function onImagesData(images){
 		  	clonecount ++;
 		  	var randomPos = Math.random() * $el.find('img').height();
 		  	var randomH = Math.random() * 100;
-		  	console.log(randomPos);
+		  	var randomIndex = Math.floor(Math.random() * images.length);
+				var randomFile = images[randomIndex];
+		  	// console.log(randomPos);
 		   	var $img = $el.clone();
-		   	console.log($img);
-		   	if(clonecount > images.length){
-					clonecount = 0 
+		   	// console.log($img);
+		   	if(clonecount > 10){
+		   		$('.glitch').remove();
+					clonecount = 0;
 				} 
 				else {
-		  		$('.right .image-wrapper').prepend('<div class="image-content wrapper'+clonecount+'"><img src="images/'+images[clonecount]+'"/></div>'); 
+		  		$('.right .image-wrapper').prepend('<div class="image-content wrapper'+clonecount+' glitch"><img src="images/'+randomFile+'"/></div>'); 
 		  		$('.wrapper'+clonecount).css({
 		  			'top': randomPos+'px',
 		  			'height':randomH+'px',
@@ -546,6 +553,27 @@ function onImagesData(images){
 	  });
 	}
 
+}
+
+function gridDisplayer(){
+	var grid = true;
+	$(document).on('keypress',function(e){
+		console.log(grid);
+		if(e.keyCode == '119'){
+			if(grid == true){
+				$('.page-wrapper').css('border', 'none');
+				$('.page-wrapper .left').css('border', 'none');
+				$('.page-wrapper .right').css('border', 'none');
+				grid = false;
+			}
+			else{
+				$('.page-wrapper').css('border', '1px solid #E100B6');
+				$('.page-wrapper .left').css('border-right', '1px solid #00E17B');
+				$('.page-wrapper .right').css('border-left', '1px solid #00E17B');
+				grid = true;
+			}
+		}
+	});
 }
 
 

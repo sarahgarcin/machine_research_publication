@@ -1,3 +1,7 @@
+// F O N T 
+@import "../fonts/volkorn/stylesheet.css";
+@import "../fonts/savate/stylesheet.css";
+
 // PAGE
 $widthPage: 29.7cm;
 $heightPage: 21cm;
@@ -5,9 +9,12 @@ $margintop: 1cm;
 $marginleft: 2cm;
 
 // FONT SIZE
+$h1Size: 20pt;
+$h2Size: 15pt;
+$h3Size: 12pt;
 $buttonFont: 1rem;
 $titlePopUpFont: 1.5em;
-$h2Size: 1.8em;
+// $h2Size: 1.8em;
 
 // T A I L L E S
 $margin: 16px;
@@ -38,6 +45,8 @@ $c-capture: $orange;
 $c-publi: #EF4651;
 
 $c-separator: #DFDFDF;
+
+
 
 
 

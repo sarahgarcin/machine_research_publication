@@ -8,6 +8,9 @@ html
 
     div.content-wrapper
       div#page-content.page
+        div.ronds-left.ronds
+          div.rond-haut
+          div.rond-bas
         div.page-wrapper
           div.left
             div.text-content
@@ -15,6 +18,9 @@ html
             div.image-wrapper
               div.image-content
             div.small-text-content
+        div.ronds-right.ronds
+          div.rond-haut
+          div.rond-bas
       //- div#page-content.page.row
       //-     div.cell
       //-     div.cell
@@ -25,6 +31,7 @@ html
     script(src='/socket.io/socket.io.js')
     script(src='/bower_components/jquery/dist/jquery.min.js')
     script(src='/bower_components/foundation/js/foundation.min.js')
+    script(src='/bower_components/showdown/dist/showdown.min.js')
     script(src='/js/index.js')
 
 

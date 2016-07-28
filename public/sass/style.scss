@@ -14,12 +14,35 @@ body,html {
 	height:100%;
 }
 
-li{list-style: none;}
-
 body {
   margin: 0;
   color: #000;
-  font-size: 1em;
+  font-size: 12px;
+  font-family: 'vollkorn', serif;
+}
+
+h1, h2, h3, h4, h5{
+  font-family: 'savate', sans-serif;
+  margin-bottom: 0.1cm;
+}
+
+h1{font-size: $h1Size;}
+h2{font-size: $h2Size;}
+h3, h4, h5{font-size: $h3Size;}
+
+li{list-style: none;}
+p{
+  font-family: 'vollkorn', serif;
+  font-size: 10pt;
+  line-height: 125%;
+  padding-left: 0.5cm;
+  &:first-child{
+    margin: 0;
+  }
+}
+
+img{
+  max-width: 100%;
 }
 
 // PAGE GENERATED
@@ -28,6 +51,23 @@ body {
   height: $heightPage;
   border: 1px solid #000;
   margin: 0px auto;
+  position: relative;
+  .ronds {
+    margin-left: ($marginleft /2) - (0.5/2);
+    top:($heightPage / 2) - 4;
+    position:absolute;
+    &.ronds-right{
+      right: 0;
+      margin-right: ($marginleft /2) - (0.5/2);
+    }
+    div{
+      width: 0.5cm;
+      height: 0.5cm; 
+      border: 1px solid #000;
+      border-radius: 50%;
+      margin-bottom: 8cm;
+    }
+  }
   .page-wrapper{
     margin: $margintop $marginleft;
     width: $widthPage - ($marginleft * 2);
@@ -38,6 +78,7 @@ body {
       height: $heightPage - ($margintop * 2);
       border-right: 1px solid #0022E1;
       display:inline-block;
+      padding-right: 0.5cm;
     }
     .right{
       width: ($widthPage - ($marginleft * 2))/2 - 0.06;
@@ -48,7 +89,7 @@ body {
       .image-wrapper{
         position:absolute;
         width: ($widthPage - ($marginleft * 2))/2;
-        height: 10cm;
+        height: 12cm;
         overflow:hidden;
         .image-content{
           position:absolute;
@@ -56,6 +97,11 @@ body {
           // height: 10cm;
           overflow:hidden;
           width: ($widthPage - ($marginleft * 2))/2;
+          img{
+            width: 100%;
+            // margin-top: 50%;
+            // transform: translateY(-50%);
+          }
         }
       }
     }
