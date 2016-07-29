@@ -8,7 +8,7 @@ var converter = new showdown.Converter();
 function onSocketConnect() {
 	sessionId = socket.io.engine.id;
 	console.log('Connected ' + sessionId);
-	socket.emit('listData');
+	// socket.emit('listData');
 };
 
 function onSocketError(reason) {
@@ -35,12 +35,14 @@ function init(){
 
 	var $cell = $("div.right div.image-wrapper");
 	var count = 1;
-	var posX = (29.7/2) + 1.6;
-	var posY= 1;
+	var posX = 0;
+	var posY= 0;
 	var space= 0;
 	var countRegex = 0;
 	var html = $('p').html();
 	var $text = $(".text-content");
+
+	// $('.left').prepend('<h1>Hello world</h1>');
 
 	$(document).on('keypress', function(e){
 		// console.log(e.keyCode);
@@ -50,7 +52,7 @@ function init(){
 			//zoom press "z"
 			case 122:
 				if(count > 2){
-					count = 1
+					count = count
 				}
 				else{
 					count += 0.1;
@@ -62,7 +64,7 @@ function init(){
 			//zoomout press "-"
 			case 45:
 				if(count < 0.4){
-					count = 1;
+					count = count;
 				}
 				else{
 					count -= 0.1;
@@ -73,7 +75,7 @@ function init(){
 				break;
 		  //press "l" to move image on the right
 			case 108:
-				if(posX < 25){
+				if(posX < 10){
 					console.log(posX);
 					posX += 0.5;
 	        $cell.css({
@@ -84,7 +86,7 @@ function init(){
 				break;
 			//press "j" to move image on the left
 			case 106:
-				if(posX >= 0){
+				if(posX >= -2){
 					posX -= 0.5;
 	        $cell.css({
 							'left': posX+'cm',
@@ -94,6 +96,7 @@ function init(){
 				break;
 			//press "k" to move image down
 			case 107:
+				console.log(posX);
 				if(posY < 15){
 					posY += 0.5;
 	        $cell.css({
@@ -104,7 +107,7 @@ function init(){
 				break;
 			//press "i" to move image up
 			case 105:
-				if(posY >= 0){
+				if(posY >= -5){
 					posY -= 0.5;
 	        $cell.css({
 							'left': posX+'cm',
@@ -159,31 +162,14 @@ function init(){
 		    console.log(space)
 				break;
 
-			//press "n" to mix images in a "glitch" 
-      // case 110:
-      // 	clonecount ++;
-      // 	var randomPos = Math.random() * $cell.find('img').height();
-      // 	var randomH = Math.random() * 100;
-      // 	console.log(randomPos);
-      //  	var $img = $cell.clone();
-      //  	console.log($img);
-      //  	if(clonecount > imageArray.length){
-    		// 	clonecount = 0 
-    		// } 
-    		// else {
-	    	// 	$('.content').prepend('<div class="cell wrapper'+clonecount+'"><img src="'+imageArray[clonecount-1]+'"/></div>'); 
-	    	// 	$('.wrapper'+clonecount).css({
-	    	// 		'top': randomPos+'px',
-	    	// 		'height':randomH+'px',
-	    	// 		'z-index':clonecount +2
-	    	// 	}).find('img').css({
-	    	// 		'top': -randomPos+'px'
-	    	// 	});
-	    	// }
-
-    		// break;
-    		e.preventDefault(); // prevent the default action (scroll / move caret)
+			//Press P and generate PDF
+			case 112:
+				var page = $('body').html();
+				// window.print();
+				socket.emit('generate', page);
+				break;
 		}
+		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
 	
 	// setTimeout(function(){
@@ -456,30 +442,31 @@ function onTextData(text){
 	}
 }
 
-function onImagesData(images){
+function onImagesData(file, index){
 	// dataImages.push(images);
-	console.log(images);
+	// console.log(images);
 	addImages();
-	changeImages();
-	glitchImages();
+	// changeImages();
+	// glitchImages();
 	
 	// add Images in the right place	
 	function addImages(){
+		console.log(file, index);
 
-		var randomIndex = Math.floor(Math.random() * images.length);
-		var randomFile = images[randomIndex];
-		var ext = randomFile.split('.')[1];
-		var $el = $('.page-wrapper .right .image-content');
-		$el.attr('data-index', randomIndex);
+		// var randomIndex = Math.floor(Math.random() * images.length);
+		// var randomFile = images[randomIndex];
+		// var ext = randomFile.split('.')[1];
+		// var $el = $('.page-wrapper .right .image-content');
+		// $el.attr('data-index', randomIndex);
 
-		if(ext == 'jpg'){
-			console.log('Yes jpg image');
-			$el.append('<img src="images/'+randomFile+'">');
-		}
-		else{
-			console.log('Not a jpg image');
-			addImages();
-		}
+		// if(ext == 'jpg'){
+		// 	console.log('Yes jpg image');
+		// 	$el.append('<img src="images/'+randomFile+'">');
+		// }
+		// else{
+		// 	console.log('Not a jpg image');
+		// 	addImages();
+		// }
 
 	}
 
@@ -528,7 +515,7 @@ function onImagesData(images){
 			if(code == 110){
 		  	clonecount ++;
 		  	var randomPos = Math.random() * $el.find('img').height();
-		  	var randomH = Math.random() * 100;
+		  	var randomH = Math.random() * 100 + 10;
 		  	var randomIndex = Math.floor(Math.random() * images.length);
 				var randomFile = images[randomIndex];
 		  	// console.log(randomPos);
@@ -561,12 +548,14 @@ function gridDisplayer(){
 		console.log(grid);
 		if(e.keyCode == '119'){
 			if(grid == true){
+				$('.page').css('border', 'none');
 				$('.page-wrapper').css('border', 'none');
 				$('.page-wrapper .left').css('border', 'none');
 				$('.page-wrapper .right').css('border', 'none');
 				grid = false;
 			}
 			else{
+				$('.page').css('border', '1px solid #000');
 				$('.page-wrapper').css('border', '1px solid #E100B6');
 				$('.page-wrapper .left').css('border-right', '1px solid #00E17B');
 				$('.page-wrapper .right').css('border-left', '1px solid #00E17B');

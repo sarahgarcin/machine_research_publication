@@ -2,10 +2,14 @@ var fs = require('fs-extra'),
 	glob = require("glob"),
 	moment = require('moment'),
 	path = require("path"),
-	wkhtmltopdf = require('wkhtmltopdf'),
-	pdf = require('phantom-html2pdf'),
-	phantom = require('phantom');
-	// html2pdf = require('html-pdf');
+	exec = require('child_process').exec,
+	easyimg = require('easyimage');
+	// wkhtmltopdf = require('wkhtmltopdf'),
+	// pdf = require('phantom-html2pdf'),
+	// phantom = require('phantom');
+	// // html2pdf = require('html-pdf');
+	var phantom = require('phantom');
+	var _ph, _page, _outObj;
 
 module.exports = function(app, io){
 
@@ -14,8 +18,10 @@ module.exports = function(app, io){
 	io.on("connection", function(socket){
 
 		//INDEX
-		socket.on( 'listData', function (data){ onListData( socket); });
-		socket.on('savePDF', createPDF);
+		onListData( socket);
+		// socket.on( 'listData', function (data){ onListData( socket); });
+		// socket.on('savePDF', createPDF);
+		socket.on('generate', generatePdf);
 
 		// DODOC part
 		socket.on("newMedia", onNewMedia);
@@ -32,7 +38,18 @@ module.exports = function(app, io){
 		fs.readdir( 'content/images', function (err, images) {
 			// console.log(images);
 		 	if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-		 	else{socket.emit('sendImages', images);}
+		 	else{
+		 		var randomIndex = Math.floor(Math.random() * images.length);
+				var randomFile = images[randomIndex];
+				var ext = randomFile.split('.')[1];
+				if(ext == 'jpg'){
+					// console.log(randomFile);
+		 			io.socket.emit('sendImages', {file: randomFile, index: randomIndex});
+				}
+				else{
+					onListData(socket);
+				}
+		 	}
 	 	});
 
 	 	// List text longs
@@ -44,7 +61,7 @@ module.exports = function(app, io){
 		    textArray.push(textInFile)
 		});
 
-		console.log(textArray);
+		// console.log(textArray);
 		socket.emit('sendText', textArray);
 
 		// List short texts
@@ -56,37 +73,110 @@ module.exports = function(app, io){
 		    shortTextArray.push(shortText)
 		});
 
-		console.log(shortTextArray);
+		// console.log(shortTextArray);
 		socket.emit('sendShortText', shortTextArray);
 	}
 
-	function onListTest(socket){
-		fs.readdir( 'content/', function (err, dir) {
-      if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-	 		dir.forEach(function(folder) {
-	 			if(folder !='.DS_Store'){
-		 			fs.readdir('content/'+folder, function (err, files){
-		 				if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-		 				files.forEach(function(file){
-		 					if(file.split('.')[1] == 'txt'){
-		 						fs.readFile('content/'+folder+'/'+file, 'utf8', function(err, data) {
-								  if (err) return console.log( 'Couldn\'t read content file : ' + err);
-								  // console.log('OK: ' + file);
-								  // console.log(data)
-								  socket.emit('sendText', data);
-								});
-		 					}
-		 					if(file.split('.')[1] == 'jpg'){
-								socket.emit('sendImages', file);
-		 					}
-		 				});
-		 			});
-		 		}
-	 		});
-	 	});
-	}
+	// function onListTest(socket){
+	// 	fs.readdir( 'content/', function (err, dir) {
+ //      if (err) return console.log( 'Couldn\'t read content dir : ' + err);
+	//  		dir.forEach(function(folder) {
+	//  			if(folder !='.DS_Store'){
+	// 	 			fs.readdir('content/'+folder, function (err, files){
+	// 	 				if (err) return console.log( 'Couldn\'t read content dir : ' + err);
+	// 	 				files.forEach(function(file){
+	// 	 					if(file.split('.')[1] == 'txt'){
+	// 	 						fs.readFile('content/'+folder+'/'+file, 'utf8', function(err, data) {
+	// 							  if (err) return console.log( 'Couldn\'t read content file : ' + err);
+	// 							  // console.log('OK: ' + file);
+	// 							  // console.log(data)
+	// 							  socket.emit('sendText', data);
+	// 							});
+	// 	 					}
+	// 	 					if(file.split('.')[1] == 'jpg'){
+	// 							socket.emit('sendImages', file);
+	// 	 					}
+	// 	 				});
+	// 	 			});
+	// 	 		}
+	//  		});
+	//  	});
+	// }
 
 	//------------- PDF -------------------
+	function generatePdf(html){	
+
+		var date = getCurrentDate();
+		var css = fs.readFileSync('public/css/style.css', 'utf8');
+
+
+		console.log(date);
+
+		exec('screencapture -R 140,0,1010,715 -x pdf/'+date+'.png',function(error, stdout, stderr){ //Pour OSX
+			console.log(error);
+			console.log('success screencapture');
+			// easyimg.resize({src:'pdf/'+date+'.png', dst: 'pdf/'+date+'-resize.png', width:3840, height:2160}).then(function (file) {
+			// 	console.log('file resized');
+   //    });
+		});
+
+		// phantom.create([
+	 //  '--ignore-ssl-errors=yes',
+	 //  '--load-images=yes',
+	 //  '--local-to-remote-url-access=yes'
+		// ]).then(function(ph) {
+		//   ph.createPage().then(function(page) {
+		//   	// page.open('http://localhost:8080/')
+		//   	// .then(function(){
+		//   		// console.log(html);
+		//   		// return page.property('content')
+		//   		var doc = '<html><head><script>'+css+'</script></head><body>'+html+'</body></html>'
+		//   		return page.property('content', doc)
+		//     	// page.property('content', '<html><head><link rel="stylesheet" href="public/css/style.css"</head><body>'+html+'</body></html>')
+		//     	.then(function() {
+		//     		// page.property('zoomFactor', 0.5);
+		//     		// page.property('viewportSize', {width: 1280, height: 800});
+	 //    			// page.property('paperSize', {format: 'A4', orientation: 'landscape'});
+		// 	      setTimeout(function(){
+		// 	      	// page.property('viewportSize', {width: 10, height: 718});
+		// 	      	page.property('paperSize', {format: 'A4', orientation: 'landscape'}).then(function() {
+		// 	      		// page.property('viewportSize', {width: 1280, height: 800});
+		// 	      	// page.property('paperSize', {format: 'A4', orientation: 'landscape'});
+		// 			      page.render('pdf/'+date+'.pdf').then(function() {
+		// 			      	console.log('success');
+		// 			      	page.close();
+		// 				    	ph.exit();
+		// 			      });
+		// 			    });
+		// 	     	}, 2000)
+		// 	     });
+		//     // });
+		//   });
+		// });
+
+		// phantom.create().then(ph => {
+	 //    _ph = ph;
+	 //    return _ph.createPage();
+		// }).then(page => {
+		//     _page = page;
+		//     // return _page.open('http://localhost:8080/');
+		// })
+		// .then(status => {
+		//   console.log(status);
+		//   // return _page.content = html;
+		//   var doc = '<html><head><script>'+css+'</script></head><body>'+html+'</body></html>'
+		//   return page.property('content', doc)
+		// })
+		// .then(content => {
+		//     console.log(content);
+		//     setTimeout(function(){
+		// 	   	_page.property('paperSize', {format: 'A4', orientation: 'landscape', margin: '0.5cm'});
+		// 	    _page.render('pdf/'+date+'.pdf');
+		// 	    _page.close();
+		// 	    _ph.exit();
+		//     }, 2000);
+		// });
+	}
 		// function createPDF(){
 		// 	var url = 'http://localhost:8080/',
 	 // 				pdf = 'pdf/'+getCurrentDate()+'.pdf';
@@ -132,28 +222,28 @@ module.exports = function(app, io){
 		// 	});
 		// }
 	
-	function createPDF(){
-		var _ph, _page, _outObj;
-		var url = 'http://localhost:8080/',
- 				pdf = 'pdf/'+getCurrentDate()+'.pdf';
- 				console.log('create PDF');
-		phantom.create().then(ph => {
-	    _ph = ph;
-	    return _ph.createPage();
-		}).then(page => {
-	    _page = page;
-	    return _page.open(url);
-		}).then(status => {
-	    // console.log(status);
-	    return _page.property('content');
-		}).then(content => {
-	    // console.log(content);
-	    _page.property('paperSize', {format: 'A4', orientation: 'landscape', margin: '0.5cm'});
-	    _page.render(pdf);
-	    _page.close();
-	    _ph.exit();
-		});
-	}
+	// function createPDF(){
+	// 	var _ph, _page, _outObj;
+	// 	var url = 'http://localhost:8080/',
+ // 				pdf = 'pdf/'+getCurrentDate()+'.pdf';
+ // 				console.log('create PDF');
+	// 	phantom.create().then(ph => {
+	//     _ph = ph;
+	//     return _ph.createPage();
+	// 	}).then(page => {
+	//     _page = page;
+	//     return _page.open(url);
+	// 	}).then(status => {
+	//     // console.log(status);
+	//     return _page.property('content');
+	// 	}).then(content => {
+	//     // console.log(content);
+	//     _page.property('paperSize', {format: 'A4', orientation: 'landscape', margin: '0.5cm'});
+	//     _page.render(pdf);
+	//     _page.close();
+	//     _ph.exit();
+	// 	});
+	// }
 
 	// ------------- D O D O C -------------------
 	function onNewMedia( mediaData) {

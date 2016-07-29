@@ -6817,18 +6817,26 @@ img {
       width: 12.79cm;
       height: 19cm;
       border-left: 1px solid #00E17B;
-      display: inline-block; }
+      display: inline-block;
+      position: relative; }
       .page .page-wrapper .right .image-wrapper {
         position: absolute;
         width: 12.85cm;
         height: 12cm;
-        overflow: hidden; }
+        overflow: hidden;
+        z-index: -1; }
         .page .page-wrapper .right .image-wrapper .image-content {
           position: absolute;
           overflow: hidden;
           width: 12.85cm; }
           .page .page-wrapper .right .image-wrapper .image-content img {
             width: 100%; }
+      .page .page-wrapper .right .small-text-content {
+        position: absolute;
+        top: 13cm; }
+        .page .page-wrapper .right .small-text-content p {
+          font-weight: bold;
+          font-size: 12pt; }
 
 body.capture .mainContent {
   max-width: none;

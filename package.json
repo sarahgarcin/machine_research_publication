@@ -10,6 +10,7 @@
   "author": "Sarah Garcin",
   "license": "GPL-3.0",
   "dependencies": {
+    "easyimage": "^2.1.0",
     "express": "^4.13.4",
     "fs-extra": "^0.26.5",
     "glob": "^7.0.3",
