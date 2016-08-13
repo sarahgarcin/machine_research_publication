@@ -4,23 +4,22 @@ var fs = require('fs-extra'),
 	path = require("path"),
 	exec = require('child_process').exec,
 	easyimg = require('easyimage');
-	// wkhtmltopdf = require('wkhtmltopdf'),
-	// pdf = require('phantom-html2pdf'),
-	// phantom = require('phantom');
-	// // html2pdf = require('html-pdf');
 	var phantom = require('phantom');
 	var _ph, _page, _outObj;
 
 module.exports = function(app, io){
 
 	console.log("main module initialized");
-	onListData( );
 	
 	io.on("connection", function(socket){
 
 		//INDEX
-		// onListData( socket);
-		// socket.on( 'listData', function (data){ onListData( socket); });
+		socket.on('zoom', onZoom);
+		socket.on('move', onMove);
+		socket.on('wordSpacing', onWordSpacing);
+		socket.on('changeText', onChangeText);
+		socket.on('changeImages', onChangeImages);
+
 		// socket.on('savePDF', createPDF);
 		socket.on('generate', generatePdf);
 
@@ -32,89 +31,42 @@ module.exports = function(app, io){
 
 
 // ------------- F U N C T I O N S -------------------
-
-	// ------------- I N D E X  -------------------
-	function onListData(){
-		// List images
-		fs.readdir( 'content/images', function (err, images) {
-			// console.log(images);
-		 	if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-		 	else{
-		 		var randomIndex = Math.floor(Math.random() * images.length);
-				var randomFile = images[randomIndex];
-				var ext = randomFile.split('.')[1];
-				// var el = document.getElementsByClassName("image-content");
-				// el.setAttribute('data-index', randomIndex);
-
-		// if(ext == 'jpg'){
-		// 	console.log('Yes jpg image');
-		// 	$el.append('<img src="images/'+randomFile+'">');
-		// }
-		// else{
-		// 	console.log('Not a jpg image');
-		// 	addImages();
-		// }
-				if(ext == 'jpg'){
-					// console.log(randomFile);
-					// el.appendChild('<img src="images/'+randomFile+'">');
-		 			// io.socket.emit('sendImages', {file: randomFile, index: randomIndex});
-				}
-				else{
-					onListData();
-				}
-		 	}
-	 	});
-
-	 	// List text longs
-	 	var textArray = [];
-	 	var arrayOfFiles = fs.readdirSync('content/long');
-
-	 	arrayOfFiles.forEach( function (file) {
-		    var textInFile = fs.readFileSync('content/long/'+file, 'utf8');
-		    textArray.push(textInFile)
-		});
-
-		// console.log(textArray);
-		// socket.emit('sendText', textArray);
-
-		// List short texts
-	 	var shortTextArray = [];
-	 	var arrayOfShort = fs.readdirSync('content/short');
-
-	 	arrayOfShort.forEach( function (file) {
-		    var shortText = fs.readFileSync('content/short/'+file, 'utf8');
-		    shortTextArray.push(shortText)
-		});
-
-		// console.log(shortTextArray);
-		// socket.emit('sendShortText', shortTextArray);
+	
+	// ------------- SYNCHRONISE FUNCTIONS -------------
+	function onZoom(zoom){
+		io.sockets.emit('zoomEvents', zoom);
 	}
 
-	// function onListTest(socket){
-	// 	fs.readdir( 'content/', function (err, dir) {
- //      if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-	//  		dir.forEach(function(folder) {
-	//  			if(folder !='.DS_Store'){
-	// 	 			fs.readdir('content/'+folder, function (err, files){
-	// 	 				if (err) return console.log( 'Couldn\'t read content dir : ' + err);
-	// 	 				files.forEach(function(file){
-	// 	 					if(file.split('.')[1] == 'txt'){
-	// 	 						fs.readFile('content/'+folder+'/'+file, 'utf8', function(err, data) {
-	// 							  if (err) return console.log( 'Couldn\'t read content file : ' + err);
-	// 							  // console.log('OK: ' + file);
-	// 							  // console.log(data)
-	// 							  socket.emit('sendText', data);
-	// 							});
-	// 	 					}
-	// 	 					if(file.split('.')[1] == 'jpg'){
-	// 							socket.emit('sendImages', file);
-	// 	 					}
-	// 	 				});
-	// 	 			});
-	// 	 		}
-	//  		});
-	//  	});
-	// }
+	function onMove(posX, posY){
+		io.sockets.emit('moveEvents', posX, posY);
+	}
+
+	function onWordSpacing(space){
+		io.sockets.emit('wordSpacingEvents', space);
+	}
+
+	function onChangeText(prevIndex, dir, element){
+		var textArray = [];
+    var arrayOfFiles = fs.readdirSync(dir);
+
+    arrayOfFiles.forEach( function (file) {
+      var textInFile = fs.readFileSync(dir+'/'+file, 'utf8');
+      textArray.push(textInFile);
+    });
+    io.sockets.emit('changeTextEvents', textArray, prevIndex, element);
+	} 
+
+	function onChangeImages(prevIndex, dir, element){
+		var fileType = '.jpg',
+        files = [];
+    var arrayOfFiles = fs.readdirSync(dir);
+    arrayOfFiles.forEach( function (file) {
+      if(path.extname(file) === fileType) {
+        files.push(file); //store the file name into the array files
+      }
+    });
+    io.sockets.emit('changeImagesEvents', files, prevIndex, element);
+	}
 
 	//------------- PDF -------------------
 	function generatePdf(html){	

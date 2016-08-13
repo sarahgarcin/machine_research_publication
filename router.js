@@ -51,13 +51,13 @@ module.exports = function(app,io,m){
         files.push(file); //store the file name into the array files
       }
     });
-    var randomIndex = Math.floor(Math.random() * files.length);
+    var randomIndex = files.length - 1;
     var randomFile = files[randomIndex];
     return {index: randomIndex, file: randomFile};
   }
 
   function getText(textDir){
-    // List text longs
+    // List text
     var textArray = [];
     var arrayOfFiles = fs.readdirSync(textDir);
 
@@ -65,7 +65,7 @@ module.exports = function(app,io,m){
       var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
       textArray.push(textInFile);
     });
-    var randomIndex = Math.floor(Math.random() * textArray.length);
+    var randomIndex = textArray.length - 1;
     var randomFile = marked(textArray[randomIndex]);
     return {index: randomIndex, file: randomFile};
   }

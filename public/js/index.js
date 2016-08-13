@@ -4,11 +4,14 @@ var dataTextLong;
 var dataImages= [];
 var converter = new showdown.Converter();
 
+// html elements
+var $cell = $("div.right div.image-wrapper");
+var $text = $(".text-content");
+
 /* sockets */
 function onSocketConnect() {
 	sessionId = socket.io.engine.id;
 	console.log('Connected ' + sessionId);
-	// socket.emit('listData');
 };
 
 function onSocketError(reason) {
@@ -22,102 +25,151 @@ socket.on('sendText', onTextData);
 socket.on('sendShortText', onShortTextData);
 socket.on('sendImages', onImagesData);
 
+socket.on('zoomEvents', function(zoom){
+	$cell.css('transform', 'scale('+zoom+')'); 
+});
+
+socket.on('moveEvents', function(posX, posY){
+  $cell.css({
+		'left': posX+'cm',
+		'top':posY+'cm',
+	})
+});
+
+socket.on('wordSpacingEvents', function(space){
+	$text.css('word-spacing', ''+space +'px'); 
+});
+
+socket.on('changeTextEvents', function(textArray, index, element){
+	var $textEl = $(element);
+	var newFile = textArray[index];
+	console.log(index);
+	if(index > 0 && index < textArray.length){
+		$textEl.attr('data-index', index);
+		$textEl.html('<p>'+converter.makeHtml(newFile)+'</p>');
+	}
+});
+
+socket.on('changeImagesEvents', function(files, index, element){
+	var $el = $(element);
+	var newFile = files[index];
+	console.log(index);
+	if(index > 0 && index < files.length){
+		$el.attr('data-index', index);
+		$el.html('<img src="images/'+newFile+'">');
+	}
+});
+
 
 jQuery(document).ready(function($) {
 
 	$(document).foundation();
 	init();
 	gridDisplayer();
+
 });
 
 
 function init(){
+	
+	// Z O O M  var
+	var zoom = 1,
+			minZoom = 0.4,
+			maxZoom = 2,
+			zoomStep = 0.1;
 
-	var $cell = $("div.right div.image-wrapper");
-	var count = 1;
-	var posX = 0;
-	var posY= 0;
-	var space= 0;
+	// M O V E  var
+	var posX = 0,
+			posY= 0,
+			maxX = 10,
+			minX = -2,
+			xStep = 0.5,
+			maxY = 15,
+			minY = -5,
+			yStep = 0.5;
+
+	// W O R D   S P A C I N G var
+	var space= 0,
+			spacePlus = 5,
+			spaceMoins = 3;
+
 	var countRegex = 0;
+	
 	var html = $('p').html();
-	var $text = $(".text-content");
 
-	// $('.left').prepend('<h1>Hello world</h1>');
 
 	$(document).on('keypress', function(e){
 		// console.log(e.keyCode);
 		var code = e.keyCode;
 
 		switch(code){
-			//zoom press "z"
+		
+		// ------   C H A N G E   C O N T E N T ---------
+			
+			//press "a" to go to prev content
+			case 97:
+				prevContent('.right .small-text-content', 'content/short', 'changeText');
+				prevContent('.left .text-content', 'content/long', 'changeText');
+				prevContent('.right .image-content', 'content/images', 'changeImages');
+				break;
+
+			// press "e" to go to next content
+			case 101:
+				nextContent('.right .small-text-content', 'content/short', 'changeText');
+				nextContent('.left .text-content', 'content/long', 'changeText');
+				nextContent('.right .image-content', 'content/images', 'changeImages');
+				break;
+
+		// ------   Z O O M -----------
+			
+			//zoomIn press "z"
 			case 122:
-				if(count > 2){
-					count = count
-				}
-				else{
-					count += 0.1;
-					$cell.css({
-						'transform':'scale('+count+')',
-					}); 
-				}
+				if(zoom > maxZoom){ zoom = zoom }
+				else{ zoom += zoomStep; }
+				socket.emit("zoom", zoom);
 				break;
-			//zoomout press "-"
+			
+			//zoomOut press "-"
 			case 45:
-				if(count < 0.4){
-					count = count;
-				}
-				else{
-					count -= 0.1;
-					$cell.css({
-						'transform':'scale('+count+')',
-					});
-				}
+				if(zoom < minZoom){ zoom = zoom; }
+				else{ zoom -= zoomStep; }
+				socket.emit("zoom", zoom);
 				break;
+
+		// ------   M O V E    I M A G E S -----------
 		  //press "l" to move image on the right
 			case 108:
-				if(posX < 10){
-					console.log(posX);
-					posX += 0.5;
-	        $cell.css({
-						'left': posX+'cm',
-						'top':posY+'cm',
-					})
+				if(posX < maxX){
+					posX += xStep;
+					socket.emit("move", posX, posY);
 	      }
 				break;
 			//press "j" to move image on the left
 			case 106:
-				if(posX >= -2){
-					posX -= 0.5;
-	        $cell.css({
-							'left': posX+'cm',
-							'top':posY+'cm',
-					})
-			}
+				if(posX >= minX){
+					posX -= xStep;
+					socket.emit("move", posX, posY);
+				}
 				break;
 			//press "k" to move image down
 			case 107:
-				console.log(posX);
-				if(posY < 15){
-					posY += 0.5;
-	        $cell.css({
-							'left': posX+'cm',
-							'top':posY+'cm',
-					})
+				if(posY < maxY){
+					posY += yStep;
+					socket.emit("move", posX, posY);
 				}
 				break;
 			//press "i" to move image up
 			case 105:
-				if(posY >= -5){
-					posY -= 0.5;
-	        $cell.css({
-							'left': posX+'cm',
-							'top':posY+'cm',
-					})
+				if(posY >= minY){
+					posY -= yStep;
+					socket.emit("move", posX, posY);
 			}
 			break;
 
+		// ------   C H A N G E    F O N T  ------ 
+
 			//change font-family
-			// case 99:
+			case 99:
 				countRegex ++;
 				console.log(countRegex);
 				if(countRegex >= 1){
@@ -147,362 +199,54 @@ function init(){
 					countRegex = 0;
 				}
 				break;
+
+		// ------   W O R D    S P A C I N G  ------ 
+		 
 		  //press "s" to add space between each words
 			case 115:
-				space += 5;
-				$text.css({ 
-					'word-spacing': ''+space +'px',
-				})
+				space += spacePlus;
+				socket.emit('wordSpacing', space);
+				break;
+			
 			//press "q" to decrease space between each words
 			case 113:
-				space -= 3;
-				$text.css({ 
-					'word-spacing': ''+space +'px',
-				})
-		    console.log(space)
+				space -= spaceMoins;
+		    socket.emit('wordSpacing', space);
 				break;
 
+		// ------   G E N E R A T E     P D F  ------ 
+			
 			//Press P and generate PDF
 			case 112:
 				var page = $('body').html();
-				// window.print();
 				socket.emit('generate', page);
 				break;
 		}
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
 	
-	// setTimeout(function(){
-	// 	var randomIndex = Math.floor(Math.random() * dataArray.length);
-	// 	var randomFile = dataArray[randomIndex];
-		
-	// }, 3000);
-
-
-	// var scaleCount = 1;
-	// var imagePosY = 0;
-	// var imagePosX = 0;
-	// setTimeout(function(){
-	// 	// console.log(dataArray);
-
-	// 	for(var i =0; i<9; i++){
-	// 		var randomIndex = Math.floor(Math.random() * dataArray.length);
-	// 		var randomFile = dataArray[randomIndex];
-	// 		var $randomCell = $('.cell').eq(i);
-	// 		// console.log(randomFile);
-	// 		var ext = randomFile.split('.')[1];
-	// 		$randomCell.attr('data-index', randomIndex);
-	// 		if(ext == 'jpg'){
-	// 			$randomCell.attr('data-ext', 'jpg');
-	// 			$randomCell.html('<img src="images/'+randomFile+'">');
-	// 		}
-	// 		else{
-	// 			$randomCell.attr('data-ext', 'txt');
-	// 			$randomCell.html('<p>'+randomFile+'</p>');
-	// 		}
-	// 	}
-	// },3000);
-
-	// Action on keypress
-		// $(document).on('keypress',function(e){
-		// 	var code = e.keyCode;
-		// 	console.log(code);
-		// 	var $firstCell = $('.cell').eq(0);
-		// 	// press space (32) -> transform the page in pdf
-		// 	if(e.keyCode == 32){
-		// 		socket.emit('savePDF');
-		// 	}
-		// 	//a 97 et e 101
-		// 	// change image in the first cell
-		// 	if(e.keyCode == 97){
-		// 		var dataIndex = $('.cell').eq(0).attr('data-index');
-		// 		$('.cell').eq(0).attr('data-index', (parseInt(dataIndex-1)));
-		// 		var prevFile = dataArray[parseInt((dataIndex-1))];
-		// 		var extension = $('.cell').eq(0).attr('data-ext');
-		// 		console.log(extension);
-		// 		if(extension == 'jpg'){
-		// 			$('.cell').eq(0).html('<img src="images/'+prevFile+'">');
-		// 		}
-		// 		else{
-		// 			$('.cell').eq(0).html('<p>'+prevFile+'</p>');
-		// 		}
-		// 	}
-		// 	if(e.keyCode == 101){
-		// 		var dataIndex = $('.cell').eq(0).attr('data-index');
-		// 		$('.cell').eq(0).attr('data-index', (parseInt(dataIndex)+1));
-		// 		// console.log((parseInt(dataIndex)+1));
-		// 		var nextFile = dataArray[(parseInt(dataIndex)+1)];
-		// 		var extension = $('.cell').eq(0).attr('data-ext');
-		// 		if(extension == 'jpg'){
-		// 			$('.cell').eq(0).html('<img src="images/'+nextFile+'">');
-		// 		}
-		// 		else{
-		// 			$('.cell').eq(0).html('<p>'+nextFile+'</p>');
-		// 		}
-		// 	}
-		// 	// press Z and if zoom in the cell
-		// 	if(e.keyCode == 122){
-		// 		console.log(scaleCount);
-		// 		if(scaleCount > 4){
-		// 			console.log('too big');
-		// 			scaleCount = 1;
-		// 		}
-		// 		else{
-		// 			console.log('increase');
-		// 			scaleCount += 0.2;
-		// 			$firstCell.children().css({
-		// 				'transform': 'scale('+scaleCount+')'
-		// 			});
-		// 		}
-		// 	}
-		// 	// press - and if zoom out the cell
-		// 	if(e.keyCode == 45){
-		// 		console.log(scaleCount);
-		// 		if(scaleCount < 0.4){
-		// 			console.log('too small');
-		// 			scaleCount = 1.2;
-		// 		}
-		// 		else{
-		// 			console.log('discrease');
-		// 			scaleCount -= 0.2;
-		// 			$firstCell.children().css({
-		// 				'transform': 'scale('+scaleCount+')'
-		// 			});
-		// 		}
-		// 	}
-		// 	// move the image in the cell
-		// 	// press o to move the image up
-		// 	if(e.keyCode == 111){
-		// 		console.log(imagePosY, $firstCell.children().height());
-		// 		if(imagePosY < -$firstCell.children().height()){
-		// 			console.log('too high');
-		// 			imagePosY = 0;
-		// 		}
-		// 		else{
-		// 			console.log('go high');
-		// 			imagePosY -= 10;
-		// 			$firstCell.children().css({
-		// 				'transform': 'translateY('+imagePosY+'px)',
-		// 				// 'transform': 'scale('+scaleCount+')'
-		// 			});
-		// 		}
-		// 	}
-		// 	// press l to move the image down
-		// 	if(e.keyCode == 108){
-		// 		console.log(imagePosY, $firstCell.children().height());
-		// 		if(imagePosY > $firstCell.children().height()){
-		// 			console.log('too low');
-		// 			imagePosY = 0;
-		// 		}
-		// 		else{
-		// 			console.log('go low');
-		// 			imagePosY += 10;
-		// 			$firstCell.children().css({
-		// 				'transform': 'translateY('+imagePosY+'px)',
-		// 				// 'transform': 'scale('+scaleCount+')'
-		// 			});
-		// 		}
-		// 	}
-		// 	// press k to move the image left
-		// 	if(e.keyCode == 107){
-		// 		console.log(imagePosX, $firstCell.children().width());
-		// 		if(imagePosX < -$firstCell.children().width()){
-		// 			console.log('too low');
-		// 			imagePosX = 0;
-		// 		}
-		// 		else{
-		// 			console.log('go low');
-		// 			imagePosX -= 10;
-		// 			$firstCell.children().css({
-		// 				'transform': 'translateX('+imagePosX+'px)',
-		// 				// 'transform': 'scale('+scaleCount+')'
-		// 			});
-		// 		}
-		// 	}
-		// 	// press m to move the image right
-		// 	if(e.keyCode == 109){
-		// 		console.log(imagePosX, $firstCell.children().width());
-		// 		if(imagePosX > $firstCell.children().width()){
-		// 			console.log('too high');
-		// 			imagePosX = 0;
-		// 		}
-		// 		else{
-		// 			console.log('go high');
-		// 			imagePosX += 10;
-		// 			$firstCell.children().css({
-		// 				'transform': 'translateX('+imagePosX+'px)',
-		// 				// 'transform': 'scale('+scaleCount+')'
-		// 			});
-		// 		}
-		// 	}
-
-		// });	
-
 }
 
-function onShortTextData(text){
-	console.log(text);
-	addTextShort();
-	changeTextShort();
-	
-	// add short text in the right place	
-	function addTextShort(){
-
-		var randomIndex = Math.floor(Math.random() * text.length);
-		var randomFile = text[randomIndex];
-		var $el = $('.page-wrapper .right .small-text-content');
-		$el.attr('data-index', randomIndex);
-
-		$el.append('<p>'+converter.makeHtml(randomFile)+'</p>');
-	}
-
-	function changeTextShort(){
-		$(document).on('keypress',function(e){
-			var code = e.keyCode;
-			console.log(code);
-			var $el = $('.page-wrapper .right .small-text-content');
-			// on "a" press go to prev image
-			if(e.keyCode == 97){
-				var dataIndex = $el.attr('data-index');
-				var prevIndex = parseInt((dataIndex)-1);
-
-				if(prevIndex >= 0){
-					$el.attr('data-index', prevIndex);
-					var prevFile = text[prevIndex];
-					$el.html('<p>'+converter.makeHtml(prevFile)+'</p>');
-				}
-			}
-
-			// on "e" press go to next image
-			if(e.keyCode == 101){
-
-				var dataIndex = $el.attr('data-index');
-				var nextIndex = (parseInt(dataIndex)+1);
-				
-				if(nextIndex < text.length){
-					console.log('text are there');
-					$el.attr('data-index', nextIndex);
-					var nextFile = text[nextIndex];
-					$el.html('<p>'+converter.makeHtml(nextFile)+'</p>');
-				}
-			}
-
-		});
-	}
+function prevContent(element, dir, eventToSend){
+	var $el = $(element);
+	var dataIndex = $el.attr('data-index');
+	var prevIndex = parseInt((dataIndex)-1);
+	socket.emit(eventToSend, prevIndex, dir, element);
 }
 
-function onTextData(text){
-	console.log(text);
-	addTextLong();
-	changeTextLong();
-	
-	// add long text in the right place	
-	function addTextLong(){
-
-		var randomIndex = Math.floor(Math.random() * text.length);
-		var randomFile = text[randomIndex];
-		var $el = $('.page-wrapper .left .text-content');
-		$el.attr('data-index', randomIndex);
-
-		$el.append('<p>'+converter.makeHtml(randomFile)+'</p>');
-	}
-
-	function changeTextLong(){
-		$(document).on('keypress',function(e){
-			var code = e.keyCode;
-			console.log(code);
-			var $el = $('.page-wrapper .left .text-content');
-			// on "a" press go to prev image
-			if(e.keyCode == 97){
-				var dataIndex = $el.attr('data-index');
-				var prevIndex = parseInt((dataIndex)-1);
-
-				if(prevIndex >= 0){
-					$el.attr('data-index', prevIndex);
-					var prevFile = text[prevIndex];
-					$el.html('<p>'+converter.makeHtml(prevFile)+'</p>');
-				}
-			}
-
-			// on "e" press go to next image
-			if(e.keyCode == 101){
-
-				var dataIndex = $el.attr('data-index');
-				var nextIndex = (parseInt(dataIndex)+1);
-				
-				if(nextIndex < text.length){
-					console.log('text are there');
-					$el.attr('data-index', nextIndex);
-					var nextFile = text[nextIndex];
-					$el.html('<p>'+converter.makeHtml(nextFile)+'</p>');
-				}
-			}
-
-		});
-	}
+function nextContent(element, dir, eventToSend){
+	var $el = $(element);
+	var dataIndex = $el.attr('data-index');
+	var nextIndex = (parseInt(dataIndex)+1);
+	socket.emit(eventToSend, nextIndex, dir, element);
 }
 
 function onImagesData(file, index){
 	// dataImages.push(images);
 	// console.log(images);
-	addImages();
+	// addImages();
 	// changeImages();
 	// glitchImages();
-	
-	// add Images in the right place	
-	function addImages(){
-		console.log(file, index);
-
-		// var randomIndex = Math.floor(Math.random() * images.length);
-		// var randomFile = images[randomIndex];
-		// var ext = randomFile.split('.')[1];
-		// var $el = $('.page-wrapper .right .image-content');
-		// $el.attr('data-index', randomIndex);
-
-		// if(ext == 'jpg'){
-		// 	console.log('Yes jpg image');
-		// 	$el.append('<img src="images/'+randomFile+'">');
-		// }
-		// else{
-		// 	console.log('Not a jpg image');
-		// 	addImages();
-		// }
-
-	}
-
-	function changeImages(){
-		$(document).on('keypress',function(e){
-			var code = e.keyCode;
-			console.log(code);
-			var $el = $('.page-wrapper .right .image-content');
-			// on "a" press go to prev image
-			if(e.keyCode == 97){
-				var dataIndex = $el.attr('data-index');
-				var prevIndex = parseInt((dataIndex)-1);
-
-				if(prevIndex > 0){
-					$el.attr('data-index', prevIndex);
-					var prevFile = images[prevIndex];
-					$el.html('<img src="images/'+prevFile+'">');
-				}
-			}
-
-			// on "e" press go to next image
-			if(e.keyCode == 101){
-
-				var dataIndex = $el.attr('data-index');
-				var nextIndex = (parseInt(dataIndex)+1);
-				
-				if(nextIndex < (images.length - 1)){
-					console.log('images are there');
-					$el.attr('data-index', nextIndex);
-					var nextFile = images[nextIndex];
-					$el.html('<img src="images/'+nextFile+'">');
-				}
-			}
-
-		});
-	}
 
 	function glitchImages(){
 		
