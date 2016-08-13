@@ -95,143 +95,39 @@ module.exports = function(app, io){
 	function generatePdf(html){	
 
 		var date = getCurrentDate();
-		var css = fs.readFileSync('public/css/style.css', 'utf8');
+		// console.log(date);
 
-
-		console.log(date);
-
-		exec('screencapture -R 140,0,1010,715 -x pdf/'+date+'.png',function(error, stdout, stderr){ //Pour OSX
-			console.log(error);
-			console.log('success screencapture');
-			// easyimg.resize({src:'pdf/'+date+'.png', dst: 'pdf/'+date+'-resize.png', width:3840, height:2160}).then(function (file) {
-			// 	console.log('file resized');
-   //    });
+		phantom.create([
+	  '--ignore-ssl-errors=yes',
+	  '--load-images=yes',
+	  '--local-to-remote-url-access=yes'
+		]).then(function(ph) {
+		  ph.createPage().then(function(page) {
+		  	page.open('http://localhost:8080/')
+		  	.then(function(){
+		  		return page.property('content')
+		    	.then(function() {
+			      setTimeout(function(){
+				      page.render('pdf/'+date+'.pdf').then(function() {
+				      	console.log('success');
+				      	page.close();
+					    	ph.exit();
+				      });
+			     	}, 2000)
+			    });
+		    });
+		  });
 		});
 
-		// phantom.create([
-	 //  '--ignore-ssl-errors=yes',
-	 //  '--load-images=yes',
-	 //  '--local-to-remote-url-access=yes'
-		// ]).then(function(ph) {
-		//   ph.createPage().then(function(page) {
-		//   	// page.open('http://localhost:8080/')
-		//   	// .then(function(){
-		//   		// console.log(html);
-		//   		// return page.property('content')
-		//   		var doc = '<html><head><script>'+css+'</script></head><body>'+html+'</body></html>'
-		//   		return page.property('content', doc)
-		//     	// page.property('content', '<html><head><link rel="stylesheet" href="public/css/style.css"</head><body>'+html+'</body></html>')
-		//     	.then(function() {
-		//     		// page.property('zoomFactor', 0.5);
-		//     		// page.property('viewportSize', {width: 1280, height: 800});
-	 //    			// page.property('paperSize', {format: 'A4', orientation: 'landscape'});
-		// 	      setTimeout(function(){
-		// 	      	// page.property('viewportSize', {width: 10, height: 718});
-		// 	      	page.property('paperSize', {format: 'A4', orientation: 'landscape'}).then(function() {
-		// 	      		// page.property('viewportSize', {width: 1280, height: 800});
-		// 	      	// page.property('paperSize', {format: 'A4', orientation: 'landscape'});
-		// 			      page.render('pdf/'+date+'.pdf').then(function() {
-		// 			      	console.log('success');
-		// 			      	page.close();
-		// 				    	ph.exit();
-		// 			      });
-		// 			    });
-		// 	     	}, 2000)
-		// 	     });
-		//     // });
-		//   });
-		// });
-
-		// phantom.create().then(ph => {
-	 //    _ph = ph;
-	 //    return _ph.createPage();
-		// }).then(page => {
-		//     _page = page;
-		//     // return _page.open('http://localhost:8080/');
-		// })
-		// .then(status => {
-		//   console.log(status);
-		//   // return _page.content = html;
-		//   var doc = '<html><head><script>'+css+'</script></head><body>'+html+'</body></html>'
-		//   return page.property('content', doc)
-		// })
-		// .then(content => {
-		//     console.log(content);
-		//     setTimeout(function(){
-		// 	   	_page.property('paperSize', {format: 'A4', orientation: 'landscape', margin: '0.5cm'});
-		// 	    _page.render('pdf/'+date+'.pdf');
-		// 	    _page.close();
-		// 	    _ph.exit();
-		//     }, 2000);
+	// CODE POUR LA CAPTURE D'ECRAN
+		// exec('screencapture -R 140,0,1010,715 -x pdf/'+date+'.png',function(error, stdout, stderr){ //Pour OSX
+		// 	console.log(error);
+		// 	console.log('success screencapture');
+		// 	// easyimg.resize({src:'pdf/'+date+'.png', dst: 'pdf/'+date+'-resize.png', width:3840, height:2160}).then(function (file) {
+		// 	// 	console.log('file resized');
+  //  //    });
 		// });
 	}
-		// function createPDF(){
-		// 	var url = 'http://localhost:8080/',
-	 // 				pdf = 'pdf/'+getCurrentDate()+'.pdf';
-	 // 				console.log('create PDF');
-	 // 		phantom.create().then(function(ph) {
-		//     ph.createPage().then(function(page) {
-		//     	// console.log(page);
-		// 	      page.open(url).then(function(status) {
-		// 	       	// console.log(status, page);
-		// 		      setTimeout(function() {
-		// 	          if (status === 'success') {
-		// 	          	console.log(status);
-		// 							console.log('wait...');
-		// 		      		page.render(pdf);
-		// 		      		page.close();
-		// 							ph.exit();
-		// 	      //     	page.property('content').then(function(content){
-		// 							//   console.log("Content: ", content);
-		// 							//   page.close();
-		// 							//   ph.exit();
-		// 							//   fs.writeFile("test.html", content, function(err) {
-		// 							// 	  if(err) {
-		// 							// 	    return console.log(err);
-		// 							// 	    page.close();
-		// 							//   		ph.exit();
-		// 							// 	  }
-		// 							// 	  console.log("The file was saved!");
-		// 							// 	  page.close();
-		// 							//   	ph.exit();
-		// 							// 	}); 
-		// 							// 	// wkhtmltopdf(content, {output: 'out.pdf'});
-
-		// 							// });
-		// 	          } 
-		// 	          else {
-		// 	            console.log('some error');
-		// 	           	page.close();
-		// 	            ph.exit();
-		// 	          }
-		// 	        }, 3000);
-		//       	});
-		//     });
-		// 	});
-		// }
-	
-	// function createPDF(){
-	// 	var _ph, _page, _outObj;
-	// 	var url = 'http://localhost:8080/',
- // 				pdf = 'pdf/'+getCurrentDate()+'.pdf';
- // 				console.log('create PDF');
-	// 	phantom.create().then(ph => {
-	//     _ph = ph;
-	//     return _ph.createPage();
-	// 	}).then(page => {
-	//     _page = page;
-	//     return _page.open(url);
-	// 	}).then(status => {
-	//     // console.log(status);
-	//     return _page.property('content');
-	// 	}).then(content => {
-	//     // console.log(content);
-	//     _page.property('paperSize', {format: 'A4', orientation: 'landscape', margin: '0.5cm'});
-	//     _page.render(pdf);
-	//     _page.close();
-	//     _ph.exit();
-	// 	});
-	// }
 
 	// ------------- D O D O C -------------------
 	function onNewMedia( mediaData) {
