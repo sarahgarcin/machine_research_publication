@@ -14,11 +14,12 @@ var fs = require('fs-extra'),
 module.exports = function(app, io){
 
 	console.log("main module initialized");
-
+	onListData( );
+	
 	io.on("connection", function(socket){
 
 		//INDEX
-		onListData( socket);
+		// onListData( socket);
 		// socket.on( 'listData', function (data){ onListData( socket); });
 		// socket.on('savePDF', createPDF);
 		socket.on('generate', generatePdf);
@@ -33,7 +34,7 @@ module.exports = function(app, io){
 // ------------- F U N C T I O N S -------------------
 
 	// ------------- I N D E X  -------------------
-	function onListData(socket){
+	function onListData(){
 		// List images
 		fs.readdir( 'content/images', function (err, images) {
 			// console.log(images);
@@ -42,12 +43,24 @@ module.exports = function(app, io){
 		 		var randomIndex = Math.floor(Math.random() * images.length);
 				var randomFile = images[randomIndex];
 				var ext = randomFile.split('.')[1];
+				// var el = document.getElementsByClassName("image-content");
+				// el.setAttribute('data-index', randomIndex);
+
+		// if(ext == 'jpg'){
+		// 	console.log('Yes jpg image');
+		// 	$el.append('<img src="images/'+randomFile+'">');
+		// }
+		// else{
+		// 	console.log('Not a jpg image');
+		// 	addImages();
+		// }
 				if(ext == 'jpg'){
 					// console.log(randomFile);
-		 			io.socket.emit('sendImages', {file: randomFile, index: randomIndex});
+					// el.appendChild('<img src="images/'+randomFile+'">');
+		 			// io.socket.emit('sendImages', {file: randomFile, index: randomIndex});
 				}
 				else{
-					onListData(socket);
+					onListData();
 				}
 		 	}
 	 	});
@@ -62,7 +75,7 @@ module.exports = function(app, io){
 		});
 
 		// console.log(textArray);
-		socket.emit('sendText', textArray);
+		// socket.emit('sendText', textArray);
 
 		// List short texts
 	 	var shortTextArray = [];
@@ -74,7 +87,7 @@ module.exports = function(app, io){
 		});
 
 		// console.log(shortTextArray);
-		socket.emit('sendShortText', shortTextArray);
+		// socket.emit('sendShortText', shortTextArray);
 	}
 
 	// function onListTest(socket){

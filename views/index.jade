@@ -13,11 +13,14 @@ html
         //-   div.rond-bas
         div.page-wrapper
           div.left
-            div.text-content
+            div(class='text-content' data-index='#{longIndex}') 
+              != longFile
           div.right
             div.image-wrapper
-              div.image-content
-            div.small-text-content
+              div(class='image-content' data-index='#{imageIndex}')
+                img(src= 'images/#{imageFile}')
+            div(class='small-text-content' data-index='#{shortIndex}') 
+              != shortFile
         //- div.ronds-right.ronds
         //-   div.rond-haut
         //-   div.rond-bas

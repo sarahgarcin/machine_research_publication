@@ -1,6 +1,9 @@
 var _ = require("underscore");
-var url = require('url')
-var fs = require('fs-extra');
+var url = require('url'),
+    path = require('path'),
+    fs = require('fs-extra'),
+    marked = require('marked'),
+    html2jade = require('html2jade');
 
 
 module.exports = function(app,io,m){
@@ -17,11 +20,54 @@ module.exports = function(app,io,m){
 
   // GET
   function getIndex(req, res) {
-    res.render("index", {title : "Frankenstein Bot"});
+    var longTextData = getText('content/long');
+    var shortTextData = getText('content/short');
+    var ImageData = getImages('content/images');
+    
+    var dataToSend = {
+      title: "Frankenstein Bot",
+      longIndex: longTextData.index,
+      longFile: longTextData.file,
+      shortIndex: shortTextData.index,
+      shortFile: shortTextData.file,
+      imageIndex: ImageData.index,
+      imageFile: ImageData.file
+    }
+    // console.log(dataToSend.longFile);
+    res.render("index", dataToSend);
+
   };
 
   function getDodoc(req, res) {
     res.render("dodoc", {title : "Frankenstein Bot | Dodoc"});
   };
+
+  function getImages(imageDir, callback) {
+    var fileType = '.jpg',
+        files = [];
+    var arrayOfFiles = fs.readdirSync(imageDir);
+    arrayOfFiles.forEach( function (file) {
+      if(path.extname(file) === fileType) {
+        files.push(file); //store the file name into the array files
+      }
+    });
+    var randomIndex = Math.floor(Math.random() * files.length);
+    var randomFile = files[randomIndex];
+    return {index: randomIndex, file: randomFile};
+  }
+
+  function getText(textDir){
+    // List text longs
+    var textArray = [];
+    var arrayOfFiles = fs.readdirSync(textDir);
+
+    arrayOfFiles.forEach( function (file) {
+      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
+      textArray.push(textInFile);
+    });
+    var randomIndex = Math.floor(Math.random() * textArray.length);
+    var randomFile = marked(textArray[randomIndex]);
+    return {index: randomIndex, file: randomFile};
+  }
 
 };
