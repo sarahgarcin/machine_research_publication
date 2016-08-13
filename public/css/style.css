@@ -6789,19 +6789,6 @@ img {
   border: 1px solid #000;
   margin: 0px auto;
   position: relative; }
-  .page .ronds {
-    margin-left: 0.75cm;
-    top: 6.5cm;
-    position: absolute; }
-    .page .ronds.ronds-right {
-      right: 0;
-      margin-right: 0.75cm; }
-    .page .ronds div {
-      width: 0.5cm;
-      height: 0.5cm;
-      border: 1px solid #000;
-      border-radius: 50%;
-      margin-bottom: 8cm; }
   .page .page-wrapper {
     margin: 1cm 2cm;
     width: 25.7cm;
@@ -6837,6 +6824,12 @@ img {
         .page .page-wrapper .right .small-text-content p {
           font-weight: bold;
           font-size: 12pt; }
+  .page .change-font {
+    font-family: 'savate', sans-serif;
+    font-size: 2em;
+    line-height: 1; }
+  .page .normal-font {
+    font-family: 'vollkorn', serif; }
 
 body.capture .mainContent {
   max-width: none;

@@ -122,9 +122,10 @@ function init(){
 	// G L I T C H  var
 	var clonecount =0;
 
+	// C H A N G E  F O N T   var
 	var countRegex = 0;
-	
-	var html = $('p').html();
+	var arrayWords = ['froid', 'cire', 'frappe'];
+	var wordsCount = [];
 
 
 	$(document).on('keypress', function(e){
@@ -211,35 +212,24 @@ function init(){
 
 		// ------   C H A N G E    F O N T  ------ 
 
-			//change font-family
+			// "c" press -> change font-family 
 			case 99:
 				countRegex ++;
-				console.log(countRegex);
-				if(countRegex >= 1){
-      		$('p').wrapInTag({
-					  tag: 'span',
-					  class: 'change',
-					  words: ['horreur']
-					});
-				}
-				if (countRegex >= 2){
+				if(countRegex <= arrayWords.length){
+					for(var a =0; a<countRegex; a++){
+						wordsCount.push(arrayWords[a]);
+						console.log(arrayWords[a]);
+					}
 					$('p').wrapInTag({
 					  tag: 'span',
-					  class: 'change',
-					  words: ['horreur', 'nuit']
+					  class: 'change-font',
+					  words: wordsCount
 					});
 				}
-
-				if (countRegex >= 3){
-					$('p').wrapInTag({
-					  tag: 'span',
-					  class: 'change',
-					  words: ['horreur', 'nuit', 'lit']
-					});
-				}
-				if (countRegex >= 4){
-					$text.find('.change').attr("class","dataface");
+				else{
+					$('p').find('.change-font').attr("class","normal-font");
 					countRegex = 0;
+					wordsCount = [];
 				}
 				break;
 
@@ -306,6 +296,19 @@ function gridDisplayer(){
 		}
 	});
 }
+
+$.fn.wrapInTag = function(opts) {
+
+  var tag = opts.tag, 
+  words = opts.words || [],
+  regex = RegExp(words.join('|'), 'gi'), // case insensitive
+  classname = opts.class || 'none'
+  replacement = '<'+ tag +' class="'+classname+'">$&</'+ tag +'>';
+
+  return this.html(function() {
+    return $(this).text().replace(regex, replacement);
+  });
+};
 
 
 
