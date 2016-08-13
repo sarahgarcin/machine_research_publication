@@ -21,9 +21,7 @@ function onSocketError(reason) {
 /* sockets */
 socket.on('connect', onSocketConnect);
 socket.on('error', onSocketError);
-socket.on('sendText', onTextData);
-socket.on('sendShortText', onShortTextData);
-socket.on('sendImages', onImagesData);
+
 
 socket.on('zoomEvents', function(zoom){
 	$cell.css('transform', 'scale('+zoom+')'); 
@@ -38,6 +36,25 @@ socket.on('moveEvents', function(posX, posY){
 
 socket.on('wordSpacingEvents', function(space){
 	$text.css('word-spacing', ''+space +'px'); 
+});
+
+socket.on('glitchEvents', function(clonecount, images, randomPos, randomH, randomIndex){
+
+	var randomFile = images[randomIndex];
+
+ 	$('.right .image-wrapper').prepend('<div class="image-content wrapper'+clonecount+' glitch"><img src="images/'+randomFile+'"/></div>'); 
+	$('.wrapper'+clonecount).css({
+		'top': randomPos+'px',
+		'height':randomH+'px',
+		'z-index':clonecount +2
+	}).find('img').css({
+		'position':'absolute',
+		'top': -randomPos+'px'
+	});
+});
+
+socket.on('glitchRemEvents',function(){
+	$('.glitch').remove();
 });
 
 socket.on('changeTextEvents', function(textArray, index, element){
@@ -60,9 +77,18 @@ socket.on('changeImagesEvents', function(files, index, element){
 	}
 });
 
+socket.on('nbImages', function(countImg, clonecount){
+	var $imageEl = $('.page-wrapper .right .image-content');
+  var randomPos = Math.random() * $imageEl.find('img').height();
+	var randomH = Math.random() * 100 + 10;
+	var randomIndex = Math.floor(Math.random() * countImg);
+	var $img = $imageEl.clone();
+	
+	socket.emit('glitch', clonecount, randomPos, randomH, randomIndex);
+});
+
 
 jQuery(document).ready(function($) {
-
 	$(document).foundation();
 	init();
 	gridDisplayer();
@@ -92,6 +118,9 @@ function init(){
 	var space= 0,
 			spacePlus = 5,
 			spaceMoins = 3;
+
+	// G L I T C H  var
+	var clonecount =0;
 
 	var countRegex = 0;
 	
@@ -166,6 +195,20 @@ function init(){
 			}
 			break;
 
+		// ------   G L I T C H    I M A G E S -----------
+			// on "n" press glitch images
+			case 110:
+				clonecount ++;
+
+		   	if(clonecount > 10){
+		   		socket.emit('glitchRemove');
+					clonecount = 0;
+				} 
+				else {
+					socket.emit("countImages", clonecount);
+		  	}
+				break; 
+
 		// ------   C H A N G E    F O N T  ------ 
 
 			//change font-family
@@ -239,51 +282,6 @@ function nextContent(element, dir, eventToSend){
 	var dataIndex = $el.attr('data-index');
 	var nextIndex = (parseInt(dataIndex)+1);
 	socket.emit(eventToSend, nextIndex, dir, element);
-}
-
-function onImagesData(file, index){
-	// dataImages.push(images);
-	// console.log(images);
-	// addImages();
-	// changeImages();
-	// glitchImages();
-
-	function glitchImages(){
-		
-		var clonecount =0;
-		var $el = $('.page-wrapper .right .image-content');
-   	
-   	$(document).on('keypress',function(e){
-			var code = e.keyCode;
-			console.log(code);
-			if(code == 110){
-		  	clonecount ++;
-		  	var randomPos = Math.random() * $el.find('img').height();
-		  	var randomH = Math.random() * 100 + 10;
-		  	var randomIndex = Math.floor(Math.random() * images.length);
-				var randomFile = images[randomIndex];
-		  	// console.log(randomPos);
-		   	var $img = $el.clone();
-		   	// console.log($img);
-		   	if(clonecount > 10){
-		   		$('.glitch').remove();
-					clonecount = 0;
-				} 
-				else {
-		  		$('.right .image-wrapper').prepend('<div class="image-content wrapper'+clonecount+' glitch"><img src="images/'+randomFile+'"/></div>'); 
-		  		$('.wrapper'+clonecount).css({
-		  			'top': randomPos+'px',
-		  			'height':randomH+'px',
-		  			'z-index':clonecount +2
-		  		}).find('img').css({
-		  			'position':'absolute',
-		  			'top': -randomPos+'px'
-		  		});
-		  	}
-		  }
-	  });
-	}
-
 }
 
 function gridDisplayer(){

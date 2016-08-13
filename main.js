@@ -19,6 +19,9 @@ module.exports = function(app, io){
 		socket.on('wordSpacing', onWordSpacing);
 		socket.on('changeText', onChangeText);
 		socket.on('changeImages', onChangeImages);
+		socket.on('countImages', onCountImages);
+		socket.on('glitch', onGlitch);
+		socket.on('glitchRemove', onGlitchRemove);
 
 		// socket.on('savePDF', createPDF);
 		socket.on('generate', generatePdf);
@@ -45,6 +48,21 @@ module.exports = function(app, io){
 		io.sockets.emit('wordSpacingEvents', space);
 	}
 
+	function onCountImages(clonecount){
+		var files = readImagesDir('content/images');
+		var countImg = files.length;
+		io.sockets.emit('nbImages', countImg, clonecount);
+	}
+
+	function onGlitch(clonecount, pos, height, index){
+		var files = readImagesDir('content/images');
+		io.sockets.emit('glitchEvents', clonecount,files, pos, height, index);
+	}
+
+	function onGlitchRemove(){
+		io.sockets.emit('glitchRemEvents');
+	}
+
 	function onChangeText(prevIndex, dir, element){
 		var textArray = [];
     var arrayOfFiles = fs.readdirSync(dir);
@@ -57,6 +75,11 @@ module.exports = function(app, io){
 	} 
 
 	function onChangeImages(prevIndex, dir, element){
+		var files = readImagesDir(dir);
+    io.sockets.emit('changeImagesEvents', files, prevIndex, element);
+	}
+
+	function readImagesDir(dir){
 		var fileType = '.jpg',
         files = [];
     var arrayOfFiles = fs.readdirSync(dir);
@@ -65,7 +88,7 @@ module.exports = function(app, io){
         files.push(file); //store the file name into the array files
       }
     });
-    io.sockets.emit('changeImagesEvents', files, prevIndex, element);
+    return files;
 	}
 
 	//------------- PDF -------------------
