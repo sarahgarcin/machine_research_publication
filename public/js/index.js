@@ -87,6 +87,18 @@ socket.on('nbImages', function(countImg, clonecount){
 	socket.emit('glitch', clonecount, randomPos, randomH, randomIndex);
 });
 
+socket.on('changeFontEvents', function(wordsCount){
+	$('p').wrapInTag({
+	  tag: 'span',
+	  class: 'change-font',
+	  words: wordsCount
+	});
+});
+
+socket.on('removeFontEvents', function(){
+	$('p').find('.change-font').attr("class","normal-font");
+});
+
 
 jQuery(document).ready(function($) {
 	$(document).foundation();
@@ -220,14 +232,10 @@ function init(){
 						wordsCount.push(arrayWords[a]);
 						console.log(arrayWords[a]);
 					}
-					$('p').wrapInTag({
-					  tag: 'span',
-					  class: 'change-font',
-					  words: wordsCount
-					});
+					socket.emit('changeFont', wordsCount);
 				}
 				else{
-					$('p').find('.change-font').attr("class","normal-font");
+					socket.emit('removeFont');
 					countRegex = 0;
 					wordsCount = [];
 				}

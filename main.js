@@ -22,6 +22,8 @@ module.exports = function(app, io){
 		socket.on('countImages', onCountImages);
 		socket.on('glitch', onGlitch);
 		socket.on('glitchRemove', onGlitchRemove);
+		socket.on('changeFont', onChangeFont);
+		socket.on('removeFont', onRemoveFont);
 
 		// socket.on('savePDF', createPDF);
 		socket.on('generate', generatePdf);
@@ -77,6 +79,14 @@ module.exports = function(app, io){
 	function onChangeImages(prevIndex, dir, element){
 		var files = readImagesDir(dir);
     io.sockets.emit('changeImagesEvents', files, prevIndex, element);
+	}
+
+	function onChangeFont(words){
+		io.sockets.emit('changeFontEvents', words);
+	}
+
+	function onRemoveFont(words){
+		io.sockets.emit('removeFontEvents');
 	}
 
 	function readImagesDir(dir){
