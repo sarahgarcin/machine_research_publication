@@ -140,6 +140,8 @@ function init(){
 	var arrayWords = ['froid', 'cire', 'frappe'];
 	var wordsCount = [];
 
+	//Reset keypress
+	reset();
 
 	$(document).on('keypress', function(e){
 		// console.log(e.keyCode);
@@ -332,6 +334,25 @@ function onDisplayPage(data){
 		$('.glitch').remove();
 	}
 
+}
+
+function reset(){
+	// press z and - in the same time
+	var map = {90: false, 189: false};
+	$(document).keydown(function(e) {
+    if (e.keyCode in map) {
+      map[e.keyCode] = true;
+      if (map[90] && map[189]) {
+        // FIRE EVENT
+        console.log('RESET');
+        socket.emit('reset');
+      }
+    }
+	}).keyup(function(e) {
+    if (e.keyCode in map) {
+      map[e.keyCode] = false;
+    }
+	});
 }
 
 function gridDisplayer(){

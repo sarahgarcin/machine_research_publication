@@ -25,6 +25,8 @@ module.exports = function(app, io){
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
 
+		socket.on('reset', onReset);
+
 		displayPage(socket);
 
 		// socket.on('savePDF', createPDF);
@@ -79,6 +81,36 @@ module.exports = function(app, io){
 			var obj = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
 			io.sockets.emit('displayPageEvents', obj);
 		}
+	}
+
+	// reset 
+	function onReset(){
+		var jsonFile = "data.json";
+
+		var images = readImagesDir('content/images');
+		var lastImg = images[images.length-1];
+
+		var longtxt = readTxtDir('content/long');
+		var lastlong = longtxt[longtxt.length-1];
+
+		var shorttxt = readTxtDir('content/short');
+		var lastshort = shorttxt[shorttxt.length-1];
+
+		var jsonObject = {
+			zoom : 1,
+			posX : 0,
+			posY: 0,
+			space: 0,
+			image: lastImg,
+			imagesglitch: [],
+			txtlong: lastlong,
+			txtshort: lastshort,
+			fontwords: []
+		}
+		var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
+		fs.unlinkSync(jsonFile);
+		fs.writeFileSync(jsonFile, dataToWrite);
+		io.sockets.emit('displayPageEvents', jsonObject);
 	}
 	
 	// ------------- SYNCHRONISE FUNCTIONS -------------
