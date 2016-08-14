@@ -25,6 +25,8 @@ module.exports = function(app, io){
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
 
+		displayPage(socket);
+
 		// socket.on('savePDF', createPDF);
 		socket.on('generate', generatePdf);
 
@@ -36,17 +38,82 @@ module.exports = function(app, io){
 
 
 // ------------- F U N C T I O N S -------------------
+
+	// save data in json file
+	function displayPage(socket){
+		var jsonFile = "data.json";
+
+		var images = readImagesDir('content/images');
+		var lastImg = images[images.length-1];
+
+		var longtxt = readTxtDir('content/long');
+		var lastlong = longtxt[longtxt.length-1];
+
+		var shorttxt = readTxtDir('content/short');
+		var lastshort = shorttxt[shorttxt.length-1];
+
+		var jsonObject = {
+			zoom : 1,
+			posX : 0,
+			posY: 0,
+			space: 0,
+			image: lastImg,
+			imagesglitch: [],
+			txtlong: lastlong,
+			txtshort: lastshort,
+			fontwords: []
+		}
+
+		if (! fs.existsSync(jsonFile)){
+			console.log("File does not exist!");
+			var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
+			try {
+			  fs.writeFileSync(jsonFile, dataToWrite);
+			  console.log("JSON saved to " + jsonFile);
+			} 
+			catch (err) {
+			  return console.log(err);
+			}
+		}
+		else{
+			var obj = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
+			io.sockets.emit('displayPageEvents', obj);
+		}
+	}
 	
 	// ------------- SYNCHRONISE FUNCTIONS -------------
 	function onZoom(zoom){
+		// save zoom in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.zoom = zoom;
+
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+		
+		// send to everyone
 		io.sockets.emit('zoomEvents', zoom);
+
 	}
 
 	function onMove(posX, posY){
+		// save pos in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.posX = posX;
+		obj.posY = posY;
+
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
+		// send to everyone
 		io.sockets.emit('moveEvents', posX, posY);
 	}
 
 	function onWordSpacing(space){
+
+		// save space in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.space = space;
+
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
 		io.sockets.emit('wordSpacingEvents', space);
 	}
 
@@ -58,10 +125,20 @@ module.exports = function(app, io){
 
 	function onGlitch(clonecount, pos, height, index){
 		var files = readImagesDir('content/images');
+		// save glitch in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.imagesglitch.push({image: files[index], pos: pos, height:height, count: clonecount });
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
 		io.sockets.emit('glitchEvents', clonecount,files, pos, height, index);
 	}
 
 	function onGlitchRemove(){
+		// save glitch in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.imagesglitch = [];
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
 		io.sockets.emit('glitchRemEvents');
 	}
 
@@ -73,19 +150,46 @@ module.exports = function(app, io){
       var textInFile = fs.readFileSync(dir+'/'+file, 'utf8');
       textArray.push(textInFile);
     });
+
+    // save new text in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		if(dir == "content/long"){
+			obj.txtlong = textArray[prevIndex];
+		}
+		if(dir == "content/short"){
+			obj.txtshort = textArray[prevIndex];
+		}
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
     io.sockets.emit('changeTextEvents', textArray, prevIndex, element);
 	} 
 
 	function onChangeImages(prevIndex, dir, element){
 		var files = readImagesDir(dir);
+
+		// save new text in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.image = files[prevIndex];
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
     io.sockets.emit('changeImagesEvents', files, prevIndex, element);
 	}
 
 	function onChangeFont(words){
+		// save change font in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.fontwords = words;
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
 		io.sockets.emit('changeFontEvents', words);
 	}
 
 	function onRemoveFont(words){
+		// save remove font in json
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.fontwords = [];
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
 		io.sockets.emit('removeFontEvents');
 	}
 
@@ -100,6 +204,18 @@ module.exports = function(app, io){
     });
     return files;
 	}
+
+	function readTxtDir(textDir){
+    // List text
+    var textArray = [];
+    var arrayOfFiles = fs.readdirSync(textDir);
+
+    arrayOfFiles.forEach( function (file) {
+      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
+      textArray.push(textInFile);
+    });
+    return textArray;
+  }
 
 	//------------- PDF -------------------
 	function generatePdf(html){	
@@ -139,7 +255,7 @@ module.exports = function(app, io){
 		// });
 	}
 
-	// ------------- D O D O C -------------------
+// ------------- D O D O C -------------------
 	function onNewMedia( mediaData) {
 		// console.log(mediaData)
 		var newFileName = getCurrentDate();

@@ -22,6 +22,7 @@ function onSocketError(reason) {
 socket.on('connect', onSocketConnect);
 socket.on('error', onSocketError);
 
+socket.on('displayPageEvents', onDisplayPage);
 
 socket.on('zoomEvents', function(zoom){
 	$cell.css('transform', 'scale('+zoom+')'); 
@@ -63,7 +64,7 @@ socket.on('changeTextEvents', function(textArray, index, element){
 	console.log(index);
 	if(index > 0 && index < textArray.length){
 		$textEl.attr('data-index', index);
-		$textEl.html('<p>'+converter.makeHtml(newFile)+'</p>');
+		$textEl.html(converter.makeHtml(newFile));
 	}
 });
 
@@ -280,6 +281,57 @@ function nextContent(element, dir, eventToSend){
 	var dataIndex = $el.attr('data-index');
 	var nextIndex = (parseInt(dataIndex)+1);
 	socket.emit(eventToSend, nextIndex, dir, element);
+}
+
+function onDisplayPage(data){
+	console.log(data);
+	// Content
+	$('.left .text-content').html(converter.makeHtml(data.txtlong));
+	$('.right .small-text-content').html(converter.makeHtml(data.txtshort));
+	$('.right .image-content img').attr('src', 'images/'+data.image);
+
+	// Zoom 
+	$cell.css('transform', 'scale('+data.zoom+')');
+
+	// ImagePos
+	$cell.css({
+		'left': data.posX+'cm',
+		'top':data.posY+'cm',
+	});
+
+	// Word spacing
+	$text.css('word-spacing', ''+data.space +'px'); 
+
+	// change font
+	if(data.fontwords.length != 0){
+		$('p').wrapInTag({
+		  tag: 'span',
+		  class: 'change-font',
+		  words: data.fontwords
+		});
+	}
+
+	// glitch images
+	if(data.imagesglitch.length !=0){
+		// console.log(data.imagesglitch);
+		for(var a=0; a<data.imagesglitch.length; a++){
+			console.log(data.imagesglitch[a]);
+			var glitch = data.imagesglitch[a];
+			$('.right .image-wrapper').prepend('<div class="image-content wrapper'+glitch.count+' glitch"><img src="images/'+glitch.image+'"/></div>'); 
+			$('.wrapper'+glitch.count).css({
+				'top': glitch.pos+'px',
+				'height':glitch.height+'px',
+				'z-index':glitch.count +2
+			}).find('img').css({
+				'position':'absolute',
+				'top': -glitch.pos+'px'
+			});
+		}
+	}
+	else{
+		$('.glitch').remove();
+	}
+
 }
 
 function gridDisplayer(){
