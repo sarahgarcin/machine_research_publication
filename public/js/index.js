@@ -62,8 +62,13 @@ socket.on('changeTextEvents', function(textArray, index, element){
 	var $textEl = $(element);
 	var newFile = textArray[index];
 	console.log(index);
-	if(index > 0 && index < textArray.length){
+	if(index >= 0 && index < textArray.length){
 		$textEl.attr('data-index', index);
+		$textEl.html(converter.makeHtml(newFile));
+	}
+	else{
+		$textEl.attr('data-index', textArray.length-1);
+		var newFile = textArray[textArray.length-1];
 		$textEl.html(converter.makeHtml(newFile));
 	}
 });
@@ -72,8 +77,13 @@ socket.on('changeImagesEvents', function(files, index, element){
 	var $el = $(element);
 	var newFile = files[index];
 	console.log(index);
-	if(index > 0 && index < files.length){
+	if(index >= 0 && index < files.length){
 		$el.attr('data-index', index);
+		$el.html('<img src="images/'+newFile+'">');
+	}
+	else{
+		$el.attr('data-index', files.length-1);
+		var newFile = files[files.length-1];
 		$el.html('<img src="images/'+newFile+'">');
 	}
 });
@@ -140,11 +150,14 @@ function init(){
 	var arrayWords = ['froid', 'cire', 'frappe'];
 	var wordsCount = [];
 
+	// C H A N G E    C O N T E N T 
+	var partCount = 0;
+
 	//Reset keypress
 	reset();
 
 	$(document).on('keypress', function(e){
-		// console.log(e.keyCode);
+		console.log(e.keyCode);
 		var code = e.keyCode;
 
 		switch(code){
@@ -152,30 +165,53 @@ function init(){
 		// ------   C H A N G E   C O N T E N T ---------
 			
 			//press "a" to go to prev content
-			case 97:
-				prevContent('.right .small-text-content', 'content/short', 'changeText');
-				prevContent('.left .text-content', 'content/long', 'changeText');
-				prevContent('.right .image-content', 'content/images', 'changeImages');
+			// case 111:
+			// 	prevContent('.right .small-text-content', 'content/short', 'changeText');
+			// 	prevContent('.left .text-content', 'content/long', 'changeText');
+			// 	prevContent('.right .image-content', 'content/images', 'changeImages');
+			// 	break;
+
+			// // press "e" to go to next content
+			// case 112:
+			// 	nextContent('.right .small-text-content', 'content/short', 'changeText');
+			// 	nextContent('.left .text-content', 'content/long', 'changeText');
+			// 	nextContent('.right .image-content', 'content/images', 'changeImages');
+			// 	break;
+
+			// v2 press "?" to change content (go prev)
+			case 111:
+				if(partCount == 0){
+					prevContent('.left .text-content', 'content/long', 'changeText');
+				}
+				if(partCount == 1){
+					prevContent('.right .image-content', 'content/images', 'changeImages');
+				}
+				if(partCount == 2){
+					prevContent('.right .small-text-content', 'content/short', 'changeText');
+				}
 				break;
 
-			// press "e" to go to next content
-			case 101:
-				nextContent('.right .small-text-content', 'content/short', 'changeText');
-				nextContent('.left .text-content', 'content/long', 'changeText');
-				nextContent('.right .image-content', 'content/images', 'changeImages');
+			// v2 press "?" to go to next part to change
+			case 112:
+				if(partCount<3){
+					partCount ++;
+				}
+				else{ partCount=0; }
 				break;
+
+
 
 		// ------   Z O O M -----------
 			
 			//zoomIn press "z"
-			case 122:
+			case 117:
 				if(zoom > maxZoom){ zoom = zoom }
 				else{ zoom += zoomStep; }
 				socket.emit("zoom", zoom);
 				break;
 			
 			//zoomOut press "-"
-			case 45:
+			case 32:
 				if(zoom < minZoom){ zoom = zoom; }
 				else{ zoom -= zoomStep; }
 				socket.emit("zoom", zoom);
@@ -183,28 +219,28 @@ function init(){
 
 		// ------   M O V E    I M A G E S -----------
 		  //press "l" to move image on the right
-			case 108:
+			case 113:
 				if(posX < maxX){
 					posX += xStep;
 					socket.emit("move", posX, posY);
 	      }
 				break;
 			//press "j" to move image on the left
-			case 106:
+			case 97:
 				if(posX >= minX){
 					posX -= xStep;
 					socket.emit("move", posX, posY);
 				}
 				break;
 			//press "k" to move image down
-			case 107:
+			case 119:
 				if(posY < maxY){
 					posY += yStep;
 					socket.emit("move", posX, posY);
 				}
 				break;
 			//press "i" to move image up
-			case 105:
+			case 115:
 				if(posY >= minY){
 					posY -= yStep;
 					socket.emit("move", posX, posY);
@@ -213,7 +249,7 @@ function init(){
 
 		// ------   G L I T C H    I M A G E S -----------
 			// on "n" press glitch images
-			case 110:
+			case 105:
 				clonecount ++;
 
 		   	if(clonecount > 10){
@@ -228,7 +264,7 @@ function init(){
 		// ------   C H A N G E    F O N T  ------ 
 
 			// "c" press -> change font-family 
-			case 99:
+			case 101:
 				countRegex ++;
 				if(countRegex <= arrayWords.length){
 					for(var a =0; a<countRegex; a++){
@@ -247,13 +283,13 @@ function init(){
 		// ------   W O R D    S P A C I N G  ------ 
 		 
 		  //press "s" to add space between each words
-			case 115:
+			case 121:
 				space += spacePlus;
 				socket.emit('wordSpacing', space);
 				break;
 			
 			//press "q" to decrease space between each words
-			case 113:
+			case 114:
 				space -= spaceMoins;
 		    socket.emit('wordSpacing', space);
 				break;
@@ -261,7 +297,7 @@ function init(){
 		// ------   G E N E R A T E     P D F  ------ 
 			
 			//Press P and generate PDF
-			case 112:
+			case 116:
 				var page = $('body').html();
 				socket.emit('generate', page);
 				break;
@@ -338,11 +374,11 @@ function onDisplayPage(data){
 
 function reset(){
 	// press z and - in the same time
-	var map = {90: false, 189: false};
+	var map = {111: false, 112: false};
 	$(document).keydown(function(e) {
     if (e.keyCode in map) {
       map[e.keyCode] = true;
-      if (map[90] && map[189]) {
+      if (map[111] && map[112]) {
         // FIRE EVENT
         console.log('RESET');
         socket.emit('reset');
@@ -359,7 +395,7 @@ function gridDisplayer(){
 	var grid = true;
 	$(document).on('keypress',function(e){
 		console.log(grid);
-		if(e.keyCode == '119'){
+		if(e.keyCode == '60'){
 			if(grid == true){
 				$('.page').css('border', 'none');
 				$('.page-wrapper').css('border', 'none');
