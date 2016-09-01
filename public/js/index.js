@@ -76,7 +76,7 @@ socket.on('changeTextEvents', function(textArray, index, element){
 socket.on('changeImagesEvents', function(files, index, element){
 	var $el = $(element);
 	var newFile = files[index];
-	console.log(index);
+	console.log(newFile);
 	if(index >= 0 && index < files.length){
 		$el.attr('data-index', index);
 		$el.html('<img src="images/'+newFile+'">');
@@ -152,6 +152,9 @@ function init(){
 
 	// C H A N G E    C O N T E N T 
 	var partCount = 0;
+
+	// C H A N G E    F O N T    C O L O R
+	var black = true;
 
 	//Reset keypress
 	reset();
@@ -304,6 +307,28 @@ function init(){
 		}
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
+
+	// double keypress
+	// press 'r' and 'y' or two black buttons in the same time
+	var down = {};
+	$(document).keydown(function(e) {
+		down[e.keyCode] = true;
+	}).keyup(function(e) {
+		if (down[82] && down[89]) {
+      console.log('Double key Press');
+      if(black == true){
+		    $('.text-content').css('color', '#FFF');
+		    $('.small-text-content').css('color', '#FFF');
+		    black = false;
+		  }
+		  else{
+		  	$('.text-content').css('color', '#000');
+		    $('.small-text-content').css('color', '#000');
+		    black = true;
+		  }
+    }
+    down[e.keyCode] = false;
+	});
 	
 }
 
@@ -372,29 +397,27 @@ function onDisplayPage(data){
 
 }
 
+
+
 function reset(){
-	// press z and - in the same time
-	var map = {111: false, 112: false};
+	// press o and p in the same time
+	var down = {};
 	$(document).keydown(function(e) {
-    if (e.keyCode in map) {
-      map[e.keyCode] = true;
-      if (map[111] && map[112]) {
-        // FIRE EVENT
-        console.log('RESET');
-        socket.emit('reset');
-      }
-    }
+		down[e.keyCode] = true;
 	}).keyup(function(e) {
-    if (e.keyCode in map) {
-      map[e.keyCode] = false;
+		if (down[111] && down[112]) {
+      console.log('Double key Press');
+      socket.emit('reset');
     }
+    down[e.keyCode] = false;
 	});
 }
+
 
 function gridDisplayer(){
 	var grid = true;
 	$(document).on('keypress',function(e){
-		console.log(grid);
+		// console.log(grid);
 		if(e.keyCode == '60'){
 			if(grid == true){
 				$('.page').css('border', 'none');
