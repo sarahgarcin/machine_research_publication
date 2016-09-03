@@ -6841,12 +6841,15 @@ body.capture .container-inner {
   margin: auto;
   height: 100%; }
 
-body.capture .content-wrapper:before, body.capture .content-wrapper:after {
-  content: " ";
-  display: table; }
-
-body.capture .content-wrapper:after {
-  clear: both; }
+body.capture .content-wrapper {
+  width: 100%;
+  height: 100%;
+  margin-top: 5%; }
+  body.capture .content-wrapper:before, body.capture .content-wrapper:after {
+    content: " ";
+    display: table; }
+  body.capture .content-wrapper:after {
+    clear: both; }
 
 .captureLeft {
   margin: auto;
@@ -6854,10 +6857,10 @@ body.capture .content-wrapper:after {
   background-color: #FFF;
   z-index: 2;
   margin-bottom: 25px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
   height: auto;
   max-width: 46%;
-  width: 80vh;
+  width: 50%;
   left: 50%;
   transform: translate3d(-50%, 0, 0);
   transition: transform .4s ease-out; }
@@ -6875,21 +6878,22 @@ body.capture .content-wrapper:after {
     background-color: #FF4246; }
   .captureLeft .video-view {
     position: relative;
-    padding-bottom: 80px;
+    padding-bottom: 96px;
     height: 100%;
     width: 100%; }
     body.is--fullscreen .captureLeft .video-view {
       padding-bottom: 0; }
   .captureLeft video {
     height: auto;
-    max-height: 100%; }
+    max-height: 100%;
+    width: 100%; }
   .captureLeft .btn-capture-wrapper {
     z-index: 1000;
     text-align: center;
     position: absolute;
     padding-top: 8px;
     padding-bottom: 8px;
-    height: 80px;
+    height: 96px;
     bottom: 0;
     width: 100%;
     overflow: hidden; }
@@ -6897,9 +6901,7 @@ body.capture .content-wrapper:after {
       outline: none !important;
       border: none !important;
       background: none !important;
-      margin: auto;
-      width: 64px;
-      height: 64px; }
+      margin: auto; }
     .captureLeft .btn-capture-wrapper .btn.icon {
       transform-origin: center center;
       transition: transform .4s ease-out; }
@@ -7017,11 +7019,10 @@ body.capture .content-wrapper:after {
   display: block;
   overflow: hidden;
   opacity: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 10px;
   height: auto;
-  max-width: 41%;
-  width: 80vh;
+  max-width: 46%;
+  width: 50%;
   left: 50%;
   transform: translate3d(-50%, 0, 0);
   transition: transform .4s ease-out, opacity .6s ease-out; }

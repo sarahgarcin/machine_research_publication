@@ -13,6 +13,9 @@ module.exports = function(app, io){
 	
 	io.on("connection", function(socket){
 
+		socket.on('test', function(info){
+			console.log(info);
+		});
 		//INDEX
 		socket.on('zoom', onZoom);
 		socket.on('move', onMove);

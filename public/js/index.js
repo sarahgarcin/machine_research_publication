@@ -123,18 +123,18 @@ function init(){
 	
 	// Z O O M  var
 	var zoom = 1,
-			minZoom = 0.4,
-			maxZoom = 2,
+			minZoom = 0.3,
+			maxZoom = 3,
 			zoomStep = 0.1;
 
 	// M O V E  var
 	var posX = 0,
 			posY= 0,
-			maxX = 10,
-			minX = -2,
+			maxX = 15,
+			minX = -20,
 			xStep = 0.5,
-			maxY = 15,
-			minY = -5,
+			maxY = 18,
+			minY = -12,
 			yStep = 0.5;
 
 	// W O R D   S P A C I N G var

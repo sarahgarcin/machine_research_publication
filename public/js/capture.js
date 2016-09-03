@@ -100,22 +100,43 @@ var currentStream = (function(context) {
     console.log('navigator.getUserMedia error: ', error);
   }
 
+  function gotDevices(sourceInfos) {
+    // socket.emit('test', sourceInfos[3].label);
+    if(sourceInfos[3].label == 'camera 0, facing back'){
+      return sourceInfos[3].deviceId;
+    }
+    else{
+      return sourceInfos[0].deviceId;
+    }
+  }
+
   function getCameraFeed() {
     return new Promise(function(resolve, reject) {
       console.log( "Getting camera feed");
-
-      navigator.getUserMedia(
-        {
-          video: true,
-          audio: false
-        },
-        function (stream) {
-          resolve( stream);
-        },
-        function(err) {
-          alert('\n\n error: ' + JSON.stringify(err));
-        }
-      );
+      navigator.mediaDevices.enumerateDevices()
+      .then(function(deviceInfos) {
+        return gotDevices(deviceInfos);
+      }).then(function(videoSource){
+        console.log(videoSource);
+        navigator.getUserMedia(
+          {
+            video: {
+              optional: [ videoSource ? {sourceId: videoSource} : undefined],
+              mandatory: {
+                minWidth: 1280,
+                minHeight: 720
+              }
+            },
+            audio: false
+          },
+          function (stream) {
+            resolve( stream);
+          },
+          function(err) {
+            alert('\n\n error: ' + JSON.stringify(err));
+          }
+        );
+      });
     });
   }
 
@@ -126,10 +147,19 @@ var currentStream = (function(context) {
 
     init : function() {
 
+      // return new Promise(function(resolve, reject) {
+      //   navigator.mediaDevices.enumerateDevices(), function(err) {
+      //       reject("Failed to init stream : " + err);
+      //     };
+      // });
       return new Promise(function(resolve, reject) {
-        navigator.mediaDevices.enumerateDevices(), function(err) {
+        navigator.mediaDevices.enumerateDevices()
+          .then(function(deviceInfos) {
+            gotDevices(deviceInfos);
+            resolve();
+          }, function(err) {
             reject("Failed to init stream : " + err);
-          };
+          });
       });
     },
 
