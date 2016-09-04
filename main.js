@@ -278,16 +278,21 @@ module.exports = function(app, io){
 		  ph.createPage().then(function(page) {
 		  	page.open('https://localhost:8080/')
 		  	.then(function(){
-		  		return page.property('content')
-		    	.then(function() {
-			      setTimeout(function(){
-				      page.render('content/pdf/'+date+'.pdf').then(function() {
-				      	console.log('success');
-				      	page.close();
-					    	ph.exit();
-				      });
-			     	}, 2000)
-			    });
+		  		page.property('viewportSize', {width: 1280, height: 800});
+		  		// page.property('paperSize', {format: 'A4', orientation: 'landscape'})
+		  		page.property('paperSize', {width: 1125, height: 795})
+		  		.then(function() {
+			  		return page.property('content')
+			    	.then(function() {
+				      setTimeout(function(){
+					      page.render('content/pdf/'+date+'.pdf').then(function() {
+					      	console.log('success');
+					      	page.close();
+						    	ph.exit();
+					      });
+				     	}, 2000)
+				    });
+				  });
 		    });
 		  });
 		});
