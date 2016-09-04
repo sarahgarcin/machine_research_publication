@@ -110,6 +110,17 @@ socket.on('removeFontEvents', function(){
 	$('p').find('.change-font').attr("class","normal-font");
 });
 
+socket.on('changeFontColorEvents', function(black){
+	if(black == true){
+		$('.text-content').css('color', '#000');
+    $('.small-text-content').css('color', '#000');
+  }
+  else{
+  	$('.text-content').css('color', '#FFF');
+    $('.small-text-content').css('color', '#FFF');
+  }
+});
+
 
 jQuery(document).ready(function($) {
 	$(document).foundation();
@@ -166,22 +177,8 @@ function init(){
 		switch(code){
 		
 		// ------   C H A N G E   C O N T E N T ---------
-			
-			//press "a" to go to prev content
-			// case 111:
-			// 	prevContent('.right .small-text-content', 'content/short', 'changeText');
-			// 	prevContent('.left .text-content', 'content/long', 'changeText');
-			// 	prevContent('.right .image-content', 'content/images', 'changeImages');
-			// 	break;
 
-			// // press "e" to go to next content
-			// case 112:
-			// 	nextContent('.right .small-text-content', 'content/short', 'changeText');
-			// 	nextContent('.left .text-content', 'content/long', 'changeText');
-			// 	nextContent('.right .image-content', 'content/images', 'changeImages');
-			// 	break;
-
-			// v2 press "?" to change content (go prev)
+			// v2 press "o" to change content (go prev)
 			case 111:
 				if(partCount == 0){
 					prevContent('.left .text-content', 'content/long', 'changeText');
@@ -194,7 +191,7 @@ function init(){
 				}
 				break;
 
-			// v2 press "?" to go to next part to change
+			// v2 press "p" to go to next part to change
 			case 112:
 				if(partCount<3){
 					partCount ++;
@@ -308,6 +305,7 @@ function init(){
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
 
+	// ------   C H A N G E    F O N T     C O L O R  ------
 	// double keypress
 	// press 'r' and 'y' or two black buttons in the same time
 	var down = {};
@@ -317,14 +315,12 @@ function init(){
 		if (down[82] && down[89]) {
       console.log('Double key Press');
       if(black == true){
-		    $('.text-content').css('color', '#FFF');
-		    $('.small-text-content').css('color', '#FFF');
 		    black = false;
+		    socket.emit('changeFontColor', black);
 		  }
 		  else{
-		  	$('.text-content').css('color', '#000');
-		    $('.small-text-content').css('color', '#000');
 		    black = true;
+		    socket.emit('changeFontColor', black);
 		  }
     }
     down[e.keyCode] = false;
@@ -373,6 +369,16 @@ function onDisplayPage(data){
 		  words: data.fontwords
 		});
 	}
+
+	// change font color
+	if(data.black == true){
+		$('.text-content').css('color', '#000');
+    $('.small-text-content').css('color', '#000');
+  }
+  else{
+  	$('.text-content').css('color', '#FFF');
+    $('.small-text-content').css('color', '#FFF');
+  }
 
 	// glitch images
 	if(data.imagesglitch.length !=0){

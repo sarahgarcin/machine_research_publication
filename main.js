@@ -27,6 +27,7 @@ module.exports = function(app, io){
 		socket.on('glitchRemove', onGlitchRemove);
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
+		socket.on('changeFontColor', onChangeFontColor);
 
 		socket.on('reset', onReset);
 
@@ -66,7 +67,8 @@ module.exports = function(app, io){
 			imagesglitch: [],
 			txtlong: lastlong,
 			txtshort: lastshort,
-			fontwords: []
+			fontwords: [],
+			black: true
 		}
 
 		if (! fs.existsSync(jsonFile)){
@@ -226,6 +228,16 @@ module.exports = function(app, io){
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 
 		io.sockets.emit('removeFontEvents');
+	}
+
+	function onChangeFontColor(black){
+		// save change font in json
+		console.log(black);
+		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+		obj.black = black;
+		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
+		io.sockets.emit('changeFontColorEvents', black);
 	}
 
 	function readImagesDir(dir){
