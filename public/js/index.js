@@ -75,17 +75,20 @@ socket.on('changeTextEvents', function(textArray, index, element){
 
 socket.on('changeImagesEvents', function(files, index, element){
 	var $el = $(element);
-	var newFile = files[index];
-	console.log(newFile);
-	if(index >= 0 && index < files.length){
-		$el.attr('data-index', index);
-		$el.html('<img src="images/'+newFile+'">');
-	}
-	else{
-		$el.attr('data-index', files.length-1);
-		var newFile = files[files.length-1];
-		$el.html('<img src="images/'+newFile+'">');
-	}
+	$el.each(function(){
+		if(!$(this).hasClass('glitch')){
+			if(index >= 0 && index < files.length){
+				var newFile = files[index];
+				$(this).attr('data-index', index);
+				$(this).html('<img src="images/'+newFile+'">');
+			}
+			else{
+				$(this).attr('data-index', files.length-1);
+				var newFile = files[files.length-1];
+				$(this).html('<img src="images/'+newFile+'">');
+			}
+		}
+	});
 });
 
 socket.on('nbImages', function(countImg, clonecount){
@@ -112,12 +115,13 @@ socket.on('removeFontEvents', function(){
 
 socket.on('changeFontColorEvents', function(black){
 	if(black == true){
-		$('.text-content').css('color', '#000');
-    $('.small-text-content').css('color', '#000');
+		$('.text-content').addClass('black-color').removeClass('white-color');
+    $('.small-text-content').addClass('black-color').removeClass('white-color');
+
   }
   else{
-  	$('.text-content').css('color', '#FFF');
-    $('.small-text-content').css('color', '#FFF');
+  	$('.text-content').addClass('white-color').removeClass('black-color');
+    $('.small-text-content').addClass('white-color').removeClass('black-color');
   }
 });
 
@@ -331,9 +335,22 @@ function init(){
 
 function prevContent(element, dir, eventToSend){
 	var $el = $(element);
-	var dataIndex = $el.attr('data-index');
-	var prevIndex = parseInt((dataIndex)-1);
-	socket.emit(eventToSend, prevIndex, dir, element);
+
+	if($el.length > 1){
+		$el.each(function(){
+			if(!$(this).hasClass('glitch')){
+				var dataIndex = $(this).attr('data-index');
+				var prevIndex = parseInt((dataIndex)-1);
+				socket.emit(eventToSend, prevIndex, dir, element);
+			}
+		});
+	}
+	else{
+		var dataIndex = $el.attr('data-index');
+		var prevIndex = parseInt((dataIndex)-1);
+		socket.emit(eventToSend, prevIndex, dir, element);
+	}
+	// socket.emit(eventToSend, prevIndex, dir, element);
 }
 
 // function nextContent(element, dir, eventToSend){
@@ -371,14 +388,16 @@ function onDisplayPage(data){
 		});
 	}
 
+	console.log('black '+data.black);
 	// change font color
 	if(data.black == true){
-		$('.text-content').css('color', '#000');
-    $('.small-text-content').css('color', '#000');
+		$('.text-content').addClass('black-color').removeClass('white-color');
+    $('.small-text-content').addClass('black-color').removeClass('white-color');
+
   }
   else{
-  	$('.text-content').css('color', '#FFF');
-    $('.small-text-content').css('color', '#FFF');
+  	$('.text-content').addClass('white-color').removeClass('black-color');
+    $('.small-text-content').addClass('white-color').removeClass('black-color');
   }
 
 	// glitch images
@@ -403,8 +422,6 @@ function onDisplayPage(data){
 	}
 
 }
-
-
 
 function reset(){
 	// press o and p in the same time
