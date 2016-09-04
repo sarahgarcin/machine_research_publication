@@ -6776,7 +6776,8 @@ p {
   font-family: 'vollkorn', serif;
   font-size: 10pt;
   line-height: 125%;
-  padding-left: 0.5cm; }
+  padding-left: 0.5cm;
+  word-wrap: break-word; }
   p:first-child {
     margin: 0; }
 
@@ -6797,7 +6798,8 @@ img {
       width: 12.85cm;
       height: 19cm;
       display: inline-block;
-      padding-right: 0.5cm; }
+      padding-right: 0.5cm;
+      overflow: hidden; }
     .page .page-wrapper .right {
       width: 12.79cm;
       height: 19cm;

@@ -189,14 +189,15 @@ function init(){
 				if(partCount == 2){
 					prevContent('.right .small-text-content', 'content/short', 'changeText');
 				}
+				console.log(partCount);
 				break;
 
 			// v2 press "p" to go to next part to change
 			case 112:
-				if(partCount<3){
+				if(partCount < 2){
 					partCount ++;
 				}
-				else{ partCount=0; }
+				else{ partCount = 0; }
 				break;
 
 
@@ -306,25 +307,25 @@ function init(){
 	});
 
 	// ------   C H A N G E    F O N T     C O L O R  ------
-	// double keypress
-	// press 'r' and 'y' or two black buttons in the same time
-	var down = {};
-	$(document).keydown(function(e) {
-		down[e.keyCode] = true;
-	}).keyup(function(e) {
-		if (down[82] && down[89]) {
-      console.log('Double key Press');
-      if(black == true){
-		    black = false;
-		    socket.emit('changeFontColor', black);
-		  }
-		  else{
-		    black = true;
-		    socket.emit('changeFontColor', black);
-		  }
-    }
-    down[e.keyCode] = false;
-	});
+		// double keypress
+		// press 'r' and 'y' or two black buttons in the same time
+		var down = {};
+		$(document).keydown(function(e) {
+			down[e.keyCode] = true;
+		}).keyup(function(e) {
+			if (down[82] && down[89]) {
+	      console.log('Double key Press');
+	      if(black == true){
+			    black = false;
+			    socket.emit('changeFontColor', black);
+			  }
+			  else{
+			    black = true;
+			    socket.emit('changeFontColor', black);
+			  }
+	    }
+	    down[e.keyCode] = false;
+		});
 	
 }
 
@@ -335,12 +336,12 @@ function prevContent(element, dir, eventToSend){
 	socket.emit(eventToSend, prevIndex, dir, element);
 }
 
-function nextContent(element, dir, eventToSend){
-	var $el = $(element);
-	var dataIndex = $el.attr('data-index');
-	var nextIndex = (parseInt(dataIndex)+1);
-	socket.emit(eventToSend, nextIndex, dir, element);
-}
+// function nextContent(element, dir, eventToSend){
+// 	var $el = $(element);
+// 	var dataIndex = $el.attr('data-index');
+// 	var nextIndex = (parseInt(dataIndex)+1);
+// 	socket.emit(eventToSend, nextIndex, dir, element);
+// }
 
 function onDisplayPage(data){
 	// console.log(data);
