@@ -6792,18 +6792,16 @@ img {
   .page .page-wrapper {
     margin: 1cm 2cm;
     width: 25.7cm;
-    height: 19cm;
-    border: 1px solid #E100B6; }
+    height: 19cm; }
     .page .page-wrapper .left {
       width: 12.85cm;
       height: 19cm;
-      border-right: 1px solid #0022E1;
       display: inline-block;
       padding-right: 0.5cm; }
     .page .page-wrapper .right {
       width: 12.79cm;
       height: 19cm;
-      border-left: 1px solid #00E17B;
+      border-left: 1px solid #000;
       display: inline-block;
       position: relative; }
       .page .page-wrapper .right .image-wrapper {

@@ -231,8 +231,7 @@ module.exports = function(app, io){
 	}
 
 	function onChangeFontColor(black){
-		// save change font in json
-		console.log(black);
+		// save change font color in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 		obj.black = black;
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
@@ -272,16 +271,17 @@ module.exports = function(app, io){
 
 		phantom.create([
 	  '--ignore-ssl-errors=yes',
+	  '--ssl-protocol=any', 
 	  '--load-images=yes',
 	  '--local-to-remote-url-access=yes'
 		]).then(function(ph) {
 		  ph.createPage().then(function(page) {
-		  	page.open('http://localhost:8080/')
+		  	page.open('https://localhost:8080/')
 		  	.then(function(){
 		  		return page.property('content')
 		    	.then(function() {
 			      setTimeout(function(){
-				      page.render('pdf/'+date+'.pdf').then(function() {
+				      page.render('content/pdf/'+date+'.pdf').then(function() {
 				      	console.log('success');
 				      	page.close();
 					    	ph.exit();

@@ -296,7 +296,7 @@ function init(){
 
 		// ------   G E N E R A T E     P D F  ------ 
 			
-			//Press P and generate PDF
+			//Press T and generate PDF
 			case 116:
 				var page = $('body').html();
 				socket.emit('generate', page);
@@ -343,7 +343,7 @@ function nextContent(element, dir, eventToSend){
 }
 
 function onDisplayPage(data){
-	console.log(data);
+	// console.log(data);
 	// Content
 	$('.left .text-content').html(converter.makeHtml(data.txtlong));
 	$('.right .small-text-content').html(converter.makeHtml(data.txtshort));
