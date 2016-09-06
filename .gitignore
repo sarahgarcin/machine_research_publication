@@ -1,6 +1,8 @@
 # Folder modules#
 node_modules
 bower_components
+content
+content-old
 
 # Compiled source #
 # ###################
