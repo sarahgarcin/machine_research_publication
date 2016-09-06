@@ -1,12 +1,50 @@
 {
-    "zoom": 3.0000000000000018,
-    "posX": -5,
-    "posY": 10.5,
-    "space": 10,
-    "image": "20160903_122106.jpg",
-    "imagesglitch": [],
-    "txtlong": "(16:32:24) frank-nick: sooopsop  \n\n\n(16:32:30) sooopsop: His hair was of a lustrous white, and flowing from his thyroid to his buttocks. These curls were hardly of common fashion, but instead made of dystonite and working as bioconnectors. His teeth of a pearly whiteness were of dystonite; but these luxuriances only formed a more horrid contrast with his watery eyes, where myriads of SGQ cords gave the creature grand capacities. \n(16:32:30) frank-nick: sooopsop  \n(16:32:34) sooopsop: His pharynx seemed almost of the same colour as the hyper-nylon of which they were composed. His shrivelled complexion was due to the great deal of plasticolene present on his eyelid, and straight black lips could only echo the trusses of the b-connectors of hisovary.  \n(16:32:34) frank-nick: sooopsop  \n(16:33:12) ana1: narrator  \n(16:33:12) sooopsop: His limbs were in proportion, his features were selected as beautiful. His yellow skin scarcely covered the work of his n-fibers and b-connectors; stratocables of carbon-styrene linked his leg with his pancreas. More b-connectors of plasticolene moved his vein in uncanny gestures. The greatest surface of his nostril was covered by carbon-styrene, stretching to his molar. The joints of his ear lobe were bundled in b-connectors, strange shapes of hyper-nylon  \n(16:33:18) sooopsop: His hair was of a lustrous white, and flowing from his blood to his eyelashes. These curls were hardly of common fashion, but instead made of dystonite and working as n-fibers. His teeth of a pearly whiteness were of dystonite; but these luxuriances only formed a more horrid contrast with his watery eyes, where myriads of bioconnectors gave the creature grand capacities.   \n(16:33:21) sooopsop: His patella seemed almost of the same colour as the hyper-nylon of which they were composed. His shrivelled complexion was due to the great deal of plasticolene present on his shin, and straight black lips could only echo the trusses of the b-connectors of hishair.\n(16:34:07) ana1: grep  \n",
-    "txtshort": "sa  gure, sa grandeur, sont apparentes; il est dur, il est froid, on le touche, et si vous le frappez, il rendra quelque son.\rEn n toutes les choses qui peuvent distinctement faire connaitre un corps, se ",
-    "fontwords": [],
-    "black": false
+    "zoom": 2.300000000000001,
+    "posX": 8,
+    "posY": 8,
+    "space": -1,
+    "imagesglitch": [
+        {
+            "image": "20160906_103856.jpg",
+            "pos": 221.950935574787,
+            "height": 67.81072416889714,
+            "count": 1
+        },
+        {
+            "image": "20160906_111109.jpg",
+            "pos": 92.77511355506678,
+            "height": 12.706054638719113,
+            "count": 2
+        },
+        {
+            "image": "20160906_103742.jpg",
+            "pos": 133.12386739568356,
+            "height": 45.67287271464401,
+            "count": 3
+        },
+        {
+            "image": "20160906_102305.jpg",
+            "pos": 182.52902861071348,
+            "height": 32.8812333788609,
+            "count": 4
+        },
+        {
+            "image": "20160906_112013.jpg",
+            "pos": 231.15387719944465,
+            "height": 25.64779937202969,
+            "count": 5
+        }
+    ],
+    "fontwords": [
+        "froid",
+        "froid",
+        "cire",
+        "froid",
+        "cire",
+        "frappe"
+    ],
+    "black": true,
+    "image": "20160906_113129.jpg",
+    "txtshort": "",
+    "txtlong": "(16:32:24) frank-nick: sooopsop  \n\n\n(16:32:30) sooopsop: His hair was of a lustrous white, and flowing from his thyroid to his buttocks. These curls were hardly of common fashion, but instead made of dystonite and working as bioconnectors. His teeth of a pearly whiteness were of dystonite; but these luxuriances only formed a more horrid contrast with his watery eyes, where myriads of SGQ cords gave the creature grand capacities. \n(16:32:30) frank-nick: sooopsop  \n(16:32:34) sooopsop: His pharynx seemed almost of the same colour as the hyper-nylon of which they were composed. His shrivelled complexion was due to the great deal of plasticolene present on his eyelid, and straight black lips could only echo the trusses of the b-connectors of hisovary.  \n(16:32:34) frank-nick: sooopsop  \n(16:33:12) ana1: narrator  \n(16:33:12) sooopsop: His limbs were in proportion, his features were selected as beautiful. His yellow skin scarcely covered the work of his n-fibers and b-connectors; stratocables of carbon-styrene linked his leg with his pancreas. More b-connectors of plasticolene moved his vein in uncanny gestures. The greatest surface of his nostril was covered by carbon-styrene, stretching to his molar. The joints of his ear lobe were bundled in b-connectors, strange shapes of hyper-nylon  \n(16:33:18) sooopsop: His hair was of a lustrous white, and flowing from his blood to his eyelashes. These curls were hardly of common fashion, but instead made of dystonite and working as n-fibers. His teeth of a pearly whiteness were of dystonite; but these luxuriances only formed a more horrid contrast with his watery eyes, where myriads of bioconnectors gave the creature grand capacities.   \n(16:33:21) sooopsop: His patella seemed almost of the same colour as the hyper-nylon of which they were composed. His shrivelled complexion was due to the great deal of plasticolene present on his shin, and straight black lips could only echo the trusses of the b-connectors of hishair.\n(16:34:07) ana1: grep  \n"
 }

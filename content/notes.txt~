@@ -1,0 +1,32 @@
+http://pad.constantvzw.org/p/Frankenstein_revisited
+
+installation de venv pour ce projet
+souci d'utilisation avec venv
+
+ce que j'ai installé (dans le folder botnet_frankenstein) : 
+from http://docs.python-guide.org/en/latest/dev/virtualenvs/
+
+$ virtualenv venv
+$ virtualenv -p /usr/bin/python2.7 venv
+$ source venv/bin/activate
+$ pip install irc
+
+à la fin de la session 
+$ deactivate
+
+qq explications : http://apprendre-python.com/page-virtualenv-python-environnement-virtuel
+http://sametmax.com/les-environnement-virtuels-python-virtualenv-et-virtualenvwrapper/
+http://sametmax.com/votre-python-aime-les-pip/
+
+write a file :
+> monk.txt
+append a file :
+>> monk.txt
+
+
+
+//
+liens intéressants possiblement :
+https://openclassrooms.com/courses/programmer-un-bot-irc-simplement-avec-ircbot
+https://fr.wikibooks.org/wiki/D%C3%A9butez_dans_IRC/Cr%C3%A9er_un_robot
+

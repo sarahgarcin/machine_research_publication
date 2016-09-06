@@ -125,6 +125,18 @@ socket.on('changeFontColorEvents', function(black){
   }
 });
 
+socket.on('removingBoders', function(){
+	// $('.page').css('border', 'none');
+	// $('.right').css('border', 'none');
+	// setTimeout(function(){
+	socket.emit('generate');
+	// }, 100);
+});
+
+socket.on('pdfIsGenerated', function(){
+	location.reload();
+});
+
 
 jQuery(document).ready(function($) {
 	$(document).foundation();
@@ -303,8 +315,11 @@ function init(){
 			
 			//Press T and generate PDF
 			case 116:
-				var page = $('body').html();
-				socket.emit('generate', page);
+				// var page = $('body').html();
+				// $('.page').css('border', 'none');
+				// $('.right').css('border', 'none');
+				socket.emit('removeBorders');
+				// socket.emit('generate');
 				break;
 		}
 		e.preventDefault(); // prevent the default action (scroll / move caret)
@@ -350,18 +365,14 @@ function prevContent(element, dir, eventToSend){
 		var prevIndex = parseInt((dataIndex)-1);
 		socket.emit(eventToSend, prevIndex, dir, element);
 	}
-	// socket.emit(eventToSend, prevIndex, dir, element);
+
 }
 
-// function nextContent(element, dir, eventToSend){
-// 	var $el = $(element);
-// 	var dataIndex = $el.attr('data-index');
-// 	var nextIndex = (parseInt(dataIndex)+1);
-// 	socket.emit(eventToSend, nextIndex, dir, element);
-// }
-
 function onDisplayPage(data){
-	// console.log(data);
+
+	// $('.page').css('border', '1px solid #000');
+	// $('.right').css('border-left', '1px solid #000');
+
 	// Content
 	$('.left .text-content').html(converter.makeHtml(data.txtlong));
 	$('.right .small-text-content').html(converter.makeHtml(data.txtshort));

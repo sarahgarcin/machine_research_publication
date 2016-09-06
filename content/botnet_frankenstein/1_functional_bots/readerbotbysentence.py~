@@ -1,0 +1,14 @@
+import time
+
+#File the bot will post from
+filename=open('frankenstein_gutenberg.txt','r')
+f=filename.readlines()
+filename.close()
+
+#Print every line of the texte
+for line in f:
+    print line.strip()
+
+time.sleep(2) #Sleep for x sec
+
+

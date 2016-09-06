@@ -34,6 +34,7 @@ module.exports = function(app, io){
 		displayPage(socket);
 
 		// socket.on('savePDF', createPDF);
+		socket.on('removeBorders', onRemoveBorders);
 		socket.on('generate', generatePdf);
 
 		// DODOC part
@@ -264,7 +265,11 @@ module.exports = function(app, io){
   }
 
 	//------------- PDF -------------------
-	function generatePdf(html){	
+	function onRemoveBorders(){
+		io.sockets.emit('removingBoders');
+	}
+
+	function generatePdf(){	
 
 		var date = getCurrentDate();
 		// console.log(date);
@@ -287,6 +292,7 @@ module.exports = function(app, io){
 				      setTimeout(function(){
 					      page.render('content/pdf/'+date+'.pdf').then(function() {
 					      	console.log('success');
+					      	io.sockets.emit('pdfIsGenerated');
 					      	page.close();
 						    	ph.exit();
 					      });
