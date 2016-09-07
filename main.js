@@ -6,6 +6,21 @@ var fs = require('fs-extra'),
 	easyimg = require('easyimage');
 	var phantom = require('phantom');
 	var _ph, _page, _outObj;
+	var frankenstein  = require('./content/settings.js');
+
+	var chapterFolder = frankenstein.folder;
+	var contentFolder = "content/";
+	var imagesFolder = "images";
+	var longFolder = "long";
+	var shortFolder = "short";
+	var pdfFolder = "pdf";
+
+	var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
+	var longFolderPath = contentFolder+chapterFolder+longFolder;
+	var shortFolderPath = contentFolder+chapterFolder+shortFolder;
+	var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
+
+
 
 module.exports = function(app, io){
 
@@ -50,13 +65,13 @@ module.exports = function(app, io){
 	function displayPage(socket){
 		var jsonFile = "data.json";
 
-		var images = readImagesDir('content/images');
+		var images = readImagesDir(imageFolderPath);
 		var lastImg = images[images.length-1];
 
-		var longtxt = readTxtDir('content/long');
+		var longtxt = readTxtDir(longFolderPath);
 		var lastlong = longtxt[longtxt.length-1];
 
-		var shorttxt = readTxtDir('content/short');
+		var shorttxt = readTxtDir(shortFolderPath);
 		var lastshort = shorttxt[shorttxt.length-1];
 
 		var jsonObject = {
@@ -93,13 +108,13 @@ module.exports = function(app, io){
 	function onReset(){
 		var jsonFile = "data.json";
 
-		var images = readImagesDir('content/images');
+		var images = readImagesDir(imageFolderPath);
 		var lastImg = images[images.length-1];
 
-		var longtxt = readTxtDir('content/long');
+		var longtxt = readTxtDir(longFolderPath);
 		var lastlong = longtxt[longtxt.length-1];
 
-		var shorttxt = readTxtDir('content/short');
+		var shorttxt = readTxtDir(shortFolderPath);
 		var lastshort = shorttxt[shorttxt.length-1];
 
 		var jsonObject = {
@@ -156,13 +171,13 @@ module.exports = function(app, io){
 	}
 
 	function onCountImages(clonecount){
-		var files = readImagesDir('content/images');
+		var files = readImagesDir(imageFolderPath);
 		var countImg = files.length;
 		io.sockets.emit('nbImages', countImg, clonecount);
 	}
 
 	function onGlitch(clonecount, pos, height, index){
-		var files = readImagesDir('content/images');
+		var files = readImagesDir(imageFolderPath);
 		// save glitch in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 		obj.imagesglitch.push({image: files[index], pos: pos, height:height, count: clonecount });
@@ -191,10 +206,10 @@ module.exports = function(app, io){
 
     // save new text in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		if(dir == "content/long"){
+		if(dir == longFolderPath){
 			obj.txtlong = textArray[prevIndex];
 		}
-		if(dir == "content/short"){
+		if(dir == shortFolderPath){
 			obj.txtshort = textArray[prevIndex];
 		}
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
@@ -290,7 +305,7 @@ module.exports = function(app, io){
 			  		return page.property('content')
 			    	.then(function() {
 				      setTimeout(function(){
-					      page.render('content/pdf/'+date+'.pdf').then(function() {
+					      page.render(pdfFolderPath+'/'+date+'.pdf').then(function() {
 					      	console.log('success');
 					      	io.sockets.emit('pdfIsGenerated');
 					      	page.close();
@@ -320,7 +335,7 @@ module.exports = function(app, io){
 		var pathToFile = '';
 		var fileExtension;
 
-		var mediaPath = 'content/images';
+		var mediaPath = imageFolderPath;
     pathToFile = mediaPath + '/' + newFileName;
 
     fileExtension = '.jpg';
@@ -337,7 +352,7 @@ module.exports = function(app, io){
 		console.log(mediaData);
 
 		var mediaName = mediaData.mediaName;
-		var pathToMediaFolder = 'content/images';
+		var pathToMediaFolder = imageFolderPath;
 		var filesInMediaFolder = fs.readdirSync( pathToMediaFolder);
 		var delDir = pathToMediaFolder+'/deleted';
 

@@ -4,6 +4,18 @@ var dataTextLong;
 var dataImages= [];
 var converter = new showdown.Converter();
 
+var chapterFolder = frankenstein.folder;
+var contentFolder = "content/";
+var imagesFolder = "images";
+var longFolder = "long";
+var shortFolder = "short";
+var pdfFolder = "pdf";
+
+var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
+var longFolderPath = contentFolder+chapterFolder+longFolder;
+var shortFolderPath = contentFolder+chapterFolder+shortFolder;
+var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
+
 // html elements
 var $cell = $("div.right div.image-wrapper");
 var $text = $(".text-content");
@@ -174,7 +186,7 @@ function init(){
 
 	// C H A N G E  F O N T   var
 	var countRegex = 0;
-	var arrayWords = ['froid', 'cire', 'frappe'];
+	var arrayWords = frankenstein.words;
 	var wordsCount = [];
 
 	// C H A N G E    C O N T E N T 
@@ -197,13 +209,13 @@ function init(){
 			// v2 press "o" to change content (go prev)
 			case 111:
 				if(partCount == 0){
-					prevContent('.left .text-content', 'content/long', 'changeText');
+					prevContent('.left .text-content', longFolderPath, 'changeText');
 				}
 				if(partCount == 1){
-					prevContent('.right .image-content', 'content/images', 'changeImages');
+					prevContent('.right .image-content', imageFolderPath, 'changeImages');
 				}
 				if(partCount == 2){
-					prevContent('.right .small-text-content', 'content/short', 'changeText');
+					prevContent('.right .small-text-content', shortFolderPath, 'changeText');
 				}
 				console.log(partCount);
 				break;

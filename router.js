@@ -5,6 +5,20 @@ var url = require('url'),
     marked = require('marked'),
     html2jade = require('html2jade');
 
+var frankenstein  = require('./content/settings.js');
+
+  var chapterFolder = frankenstein.folder;
+  var contentFolder = "content/";
+  var imagesFolder = "images";
+  var longFolder = "long";
+  var shortFolder = "short";
+  var pdfFolder = "pdf";
+
+  var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
+  var longFolderPath = contentFolder+chapterFolder+longFolder;
+  var shortFolderPath = contentFolder+chapterFolder+shortFolder;
+  var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
+
 
 module.exports = function(app,io,m){
 
@@ -20,9 +34,10 @@ module.exports = function(app,io,m){
 
   // GET
   function getIndex(req, res) {
-    var longTextData = getText('content/long');
-    var shortTextData = getText('content/short');
-    var ImageData = getImages('content/images');
+    console.log(imageFolderPath);
+    var longTextData = getText(longFolderPath);
+    var shortTextData = getText(shortFolderPath);
+    var ImageData = getImages(imageFolderPath);
     
     var dataToSend = {
       title: "Frankenstein Bot",
