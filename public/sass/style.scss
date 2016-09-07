@@ -58,6 +58,13 @@ img{
   }
 }
 
+.meta-data{
+  width: 75px;
+  position:absolute;
+  top: 10px;
+  left: 0px;
+}
+
 // PAGE GENERATED
 .page{
   width: $widthPage;
@@ -87,7 +94,8 @@ img{
       .image-wrapper{
         position:absolute;
         width: ($widthPage - ($marginleft * 2))/2;
-        height: 12cm;
+        height: $heightPage;
+        max-height: $heightPage;
         overflow:hidden;
         z-index: -1;
         .image-content{

@@ -155,13 +155,13 @@ socket.on('pdfIsGenerated', function(){
 
 jQuery(document).ready(function($) {
 	$(document).foundation();
-	init();
+	// init();
 	gridDisplayer();
 
 });
 
 
-function init(){
+function init(data){
 	
 	// Z O O M  var
 	var zoom = 1,
@@ -236,6 +236,7 @@ function init(){
 				}
 				if(partCount == 1){
 					$('.meta-data .block-select').html('images');
+					$('.meta-data .file-select').html(data.imageIndex + '/' + data.nbOfImg);
 				}
 				if(partCount == 2){
 					$('.meta-data .block-select').html('short text');
@@ -389,7 +390,7 @@ function prevContent(element, dir, eventToSend){
 	else{
 		var dataIndex = $el.attr('data-index');
 		var prevIndex = parseInt((dataIndex)-1);
-		console.log($el, dataIndex,prevIndex);
+		console.log($el.find('img'), dataIndex,prevIndex);
 		socket.emit(eventToSend, prevIndex, dir, element);
 	}
 
@@ -397,10 +398,7 @@ function prevContent(element, dir, eventToSend){
 
 function onDisplayPage(data){
 
-	//meta-data
-	// console.log(data);
-	// $('.meta-data .file-select').html(index+'/'+(files.length-1));
-
+	init(data);
 	// Content
 	$('.left .text-content').html(converter.makeHtml(data.txtlong));
 	$('.right .small-text-content').html(converter.makeHtml(data.txtshort));

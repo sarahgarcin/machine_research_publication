@@ -6790,6 +6790,12 @@ img {
 .white-color p, .white-color h1, .white-color h2, .white-color h3, .white-color h4, .white-color h5, .white-color a, .white-color li {
   color: #FFF; }
 
+.meta-data {
+  width: 75px;
+  position: absolute;
+  top: 10px;
+  left: 0px; }
+
 .page {
   width: 29.7cm;
   height: 21cm;
@@ -6814,7 +6820,8 @@ img {
       .page .page-wrapper .right .image-wrapper {
         position: absolute;
         width: 12.85cm;
-        height: 12cm;
+        height: 21cm;
+        max-height: 21cm;
         overflow: hidden;
         z-index: -1; }
         .page .page-wrapper .right .image-wrapper .image-content {

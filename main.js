@@ -67,6 +67,7 @@ module.exports = function(app, io){
 
 		var images = readImagesDir(imageFolderPath);
 		var lastImg = images[images.length-1];
+		var indexImg = images.length-1;
 
 		var longtxt = readTxtDir(longFolderPath);
 		var lastlong = longtxt[longtxt.length-1];
@@ -80,6 +81,8 @@ module.exports = function(app, io){
 			posY: 0,
 			space: 0,
 			image: lastImg,
+			imageIndex:indexImg,
+			nbOfImg : indexImg,
 			imagesglitch: [],
 			txtlong: lastlong,
 			txtshort: lastshort,
@@ -223,6 +226,7 @@ module.exports = function(app, io){
 		// save new text in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 		obj.image = files[prevIndex];
+		obj.imageIndex = prevIndex;
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 
     io.sockets.emit('changeImagesEvents', files, prevIndex, element);
@@ -260,7 +264,7 @@ module.exports = function(app, io){
         files = [];
     var arrayOfFiles = fs.readdirSync(dir);
     arrayOfFiles.forEach( function (file) {
-    	console.log(fileType.indexOf(path.extname(file))>-1, file);
+    	// console.log(fileType.indexOf(path.extname(file))>-1, file);
       if(fileType.indexOf(path.extname(file))>-1) {
         files.push(file); //store the file name into the array files
       }
