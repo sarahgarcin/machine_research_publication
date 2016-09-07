@@ -81,7 +81,7 @@ img{
     .right{
       width: ($widthPage - ($marginleft * 2))/2 - 0.06;
       height: $heightPage - ($margintop * 2);
-      border-left: 1px solid #000;
+      // border-left: 1px solid #000;
       display:inline-block;
       position:relative;
       .image-wrapper{

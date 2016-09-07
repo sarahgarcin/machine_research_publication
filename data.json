@@ -1,12 +1,13 @@
 {
-    "zoom": 1,
-    "posX": 0,
-    "posY": 0,
-    "space": 0,
-    "image": "setup_05092016.jpg",
+    "zoom": 0.7000000000000001,
+    "posX": 2,
+    "posY": -1,
+    "space": 8,
     "imagesglitch": [],
-    "txtlong": "Letter 1\n\nSt. Petersburgh, Dec. 11th, 17--\n\nTO Mrs. Saville, England\n\nYou will rejoice to hear that no disaster has accompanied the\ncommencement of an enterprise which you have regarded with such evil\nforebodings.  I arrived here yesterday, and my first task is to assure\nmy dear sister of my welfare and increasing confidence in the success\nof my undertaking.\n\nI am already far north of London, and as I walk in the streets of\nPetersburgh, I feel a cold northern breeze play upon my cheeks, which\nbraces my nerves and fills me with delight.  Do you understand this\nfeeling?  This breeze, which has travelled from the regions towards\nwhich I am advancing, gives me a foretaste of those icy climes.\nInspirited by this wind of promise, my daydreams become more fervent\nand vivid.  I try in vain to be persuaded that the pole is the seat of\nfrost and desolation; it ever presents itself to my imagination as the\nregion of beauty and delight.  There, Margaret, the sun is forever\nvisible, its broad disk just skirting the horizon and diffusing a\nperpetual splendour.  There--for with your leave, my sister, I will put\nsome trust in preceding navigators--there snow and frost are banished;\nand, sailing over a calm sea, we may be wafted to a land surpassing in\nwonders and in beauty every region hitherto discovered on the habitable\nglobe.  Its productions and features may be without example, as the\nphenomena of the heavenly bodies undoubtedly are in those undiscovered\nsolitudes.  What may not be expected in a country of eternal light?  I\nmay there discover the wondrous power which attracts the needle and may\nregulate a thousand celestial observations that require only this\nvoyage to render their seeming eccentricities consistent forever.  I\nshall satiate my ardent curiosity with the sight of a part of the world\nnever before visited, and may tread a land never before imprinted by\nthe foot of man. These are my enticements, and they are sufficient to\nconquer all fear of danger or death and to induce me to commence this\nlaborious voyage with the joy a child feels when he embarks in a little\nboat, with his holiday mates, on an expedition of discovery up his\nnative river. But supposing all these conjectures to be false, you\ncannot contest the inestimable benefit which I shall confer on all\nmankind, to the last generation, by discovering a passage near the pole\nto those countries, to reach which at present so many months are\nrequisite; or by ascertaining the secret of the magnet, which, if at\nall possible, can only be effected by an undertaking such as mine.\n",
-    "txtshort": "(12:48:42) hovelbot: Pieros-MBP spoke to googlemail.l.google.com\n(12:48:42) hovelbot: MBP-de-Sarah-3 spoke to imap.g-u-i.me\n(12:48:51) hovelbot: MBP-de-Sarah-3 spoke to www.wemove.eu\n(12:48:51) hovelbot: anagram spoke to pop.domainepublic.net\n(12:48:51) hovelbot: anarchronisme spoke to pad.constantvzw.org\n(12:49:09) hovelbot: MBP-de-Sarah-3 spoke to MBP-de-Sarah-3\n(12:49:18) hovelbot: MBP-de-Sarah-3 spoke to setup.icloud.com.akadns.net\n(12:49:26) hovelbot: MBP-de-Sarah-3 spoke to MBP-de-Sarah-3\n(12:49:35) hovelbot: Pieros-MBP spoke to www.google.ch\n",
-    "fontwords": [],
-    "black": true
+    "fontwords": [
+        "london"
+    ],
+    "black": true,
+    "txtshort": "(11:17:31) hovelbot: cathsign-X555LJ spoke to cdn1.smartadserver.com\n(11:17:31) hovelbot: cathsign-X555LJ spoke to acdn.adnxs.com\n(11:17:31) hovelbot: cathsign-X555LJ spoke to cat.nl.eu.criteo.com\n(11:17:39) hovelbot: cathsign-X555LJ spoke to www.lavie.fr\n(11:17:39) hovelbot: cathsign-X555LJ spoke to p260.bench.cedexis-test.com\n(11:17:39) hovelbot: cathsign-X555LJ spoke to chefsimon.lemonde.fr\n(11:17:39) hovelbot: cathsign-X555LJ spoke to 3.download.windowsupdate.com\n(11:17:39) hovelbot: cathsign-X555LJ spoke to global2.cmdolb.com\n(11:17:48) hovelbot: cathsign-X555LJ spoke to conjugaison.lemonde.fr\n",
+    "image": "20160907_103201.jpg"
 }

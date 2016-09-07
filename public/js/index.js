@@ -4,6 +4,7 @@ var dataTextLong;
 var dataImages= [];
 var converter = new showdown.Converter();
 
+// var chapterFolder = frankenstein.folder;
 var chapterFolder = frankenstein.folder;
 var contentFolder = "content/";
 var imagesFolder = "images";
@@ -137,13 +138,13 @@ socket.on('changeFontColorEvents', function(black){
   }
 });
 
-socket.on('removingBoders', function(){
-	// $('.page').css('border', 'none');
-	// $('.right').css('border', 'none');
-	// setTimeout(function(){
-	socket.emit('generate');
-	// }, 100);
-});
+// socket.on('removingBoders', function(){
+// 	// $('.page').css('border', 'none');
+// 	// $('.right').css('border', 'none');
+// 	// setTimeout(function(){
+// 	socket.emit('generate');
+// 	// }, 100);
+// });
 
 socket.on('pdfIsGenerated', function(){
 	location.reload();
@@ -330,8 +331,8 @@ function init(){
 				// var page = $('body').html();
 				// $('.page').css('border', 'none');
 				// $('.right').css('border', 'none');
-				socket.emit('removeBorders');
-				// socket.emit('generate');
+				// socket.emit('removeBorders');
+				socket.emit('generate');
 				break;
 		}
 		e.preventDefault(); // prevent the default action (scroll / move caret)
