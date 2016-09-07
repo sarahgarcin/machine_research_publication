@@ -58,11 +58,11 @@ module.exports = function(app,io,m){
   };
 
   function getImages(imageDir, callback) {
-    var fileType = '.jpg',
+    var fileType = ['.jpg', '.jpeg', '.png'],
         files = [];
     var arrayOfFiles = fs.readdirSync(imageDir);
     arrayOfFiles.forEach( function (file) {
-      if(path.extname(file) === fileType) {
+      if(fileType.indexOf(path.extname(file))>-1) {
         files.push(file); //store the file name into the array files
       }
     });

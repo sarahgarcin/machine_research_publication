@@ -256,11 +256,12 @@ module.exports = function(app, io){
 	}
 
 	function readImagesDir(dir){
-		var fileType = '.jpg',
+		var fileType = ['.jpg', '.jpeg', '.png'],
         files = [];
     var arrayOfFiles = fs.readdirSync(dir);
     arrayOfFiles.forEach( function (file) {
-      if(path.extname(file) === fileType) {
+    	console.log(fileType.indexOf(path.extname(file))>-1, file);
+      if(fileType.indexOf(path.extname(file))>-1) {
         files.push(file); //store the file name into the array files
       }
     });

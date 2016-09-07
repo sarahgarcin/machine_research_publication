@@ -88,7 +88,9 @@ socket.on('changeTextEvents', function(textArray, index, element){
 
 socket.on('changeImagesEvents', function(files, index, element){
 	var $el = $(element);
-	$el.each(function(){
+	console.log(index);
+	$('.meta-data .file-select').html(index+'/'+(files.length-1));
+		$el.each(function(){
 		if(!$(this).hasClass('glitch')){
 			if(index >= 0 && index < files.length){
 				var newFile = files[index];
@@ -227,6 +229,17 @@ function init(){
 					partCount ++;
 				}
 				else{ partCount = 0; }
+
+				// add info to know where you are
+				if(partCount == 0){
+					$('.meta-data .block-select').html('long text');
+				}
+				if(partCount == 1){
+					$('.meta-data .block-select').html('images');
+				}
+				if(partCount == 2){
+					$('.meta-data .block-select').html('short text');
+				}
 				break;
 
 
@@ -376,6 +389,7 @@ function prevContent(element, dir, eventToSend){
 	else{
 		var dataIndex = $el.attr('data-index');
 		var prevIndex = parseInt((dataIndex)-1);
+		console.log($el, dataIndex,prevIndex);
 		socket.emit(eventToSend, prevIndex, dir, element);
 	}
 
@@ -383,8 +397,9 @@ function prevContent(element, dir, eventToSend){
 
 function onDisplayPage(data){
 
-	// $('.page').css('border', '1px solid #000');
-	// $('.right').css('border-left', '1px solid #000');
+	//meta-data
+	// console.log(data);
+	// $('.meta-data .file-select').html(index+'/'+(files.length-1));
 
 	// Content
 	$('.left .text-content').html(converter.makeHtml(data.txtlong));
