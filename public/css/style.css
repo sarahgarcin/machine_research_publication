@@ -6756,7 +6756,7 @@ body {
   font-size: 12px;
   font-family: 'vollkorn', serif; }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, h6 {
   font-family: 'savate', sans-serif;
   margin-bottom: 0.1cm; }
 
@@ -6773,6 +6773,12 @@ h4 {
   text-align: right;
   margin-bottom: 0.3cm; }
 
+h6 {
+  position: absolute;
+  font-size: 80pt;
+  max-width: 10.85cm;
+  line-height: 110%; }
+
 li {
   list-style: none; }
 
@@ -6784,6 +6790,13 @@ p {
   word-wrap: break-word; }
   p:first-child {
     margin: 0; }
+
+pre {
+  margin-bottom: 0.5cm; }
+
+code {
+  background-color: #FFF;
+  border: none; }
 
 img {
   max-width: 100%; }

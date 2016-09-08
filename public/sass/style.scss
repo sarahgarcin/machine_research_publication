@@ -21,7 +21,7 @@ body {
   font-family: 'vollkorn', serif;
 }
 
-h1, h2, h3, h4, h5{
+h1, h2, h3, h4, h5, h6{
   font-family: 'savate', sans-serif;
   margin-bottom: 0.1cm;
 }
@@ -30,6 +30,13 @@ h1{font-size: $h1Size;}
 h2{font-size: $h2Size;}
 h3, h4, h5{font-size: $h3Size;}
 h4{text-align: right; margin-bottom: 0.3cm;}
+h6{
+  position:absolute;
+  // left: $marginleft;
+  font-size: $h6Size;
+  max-width: ($widthPage/2) - ($marginleft*2);
+  line-height:110%;
+}
 
 li{list-style: none;}
 p{
@@ -41,6 +48,13 @@ p{
   &:first-child{
     margin: 0;
   }
+}
+pre{
+  margin-bottom: 0.5cm;
+}
+code{
+  background-color: #FFF;
+  border:none;
 }
 
 img{

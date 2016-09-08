@@ -81,7 +81,7 @@ socket.on('changeTextEvents', function(textArray, index, element){
 	else{
 		$('.meta-data .file-select').html(index+'/'+(textArray.length-1));
 	}
-
+	console.log($textEl);
 	if(index >= 0 && index < textArray.length){
 		$textEl.attr('data-index', index);
 		$textEl.html(converter.makeHtml(newFile));
@@ -102,7 +102,7 @@ socket.on('changeImagesEvents', function(files, index, element){
 	else{
 		$('.meta-data .file-select').html(index+'/'+(files.length-1));
 	}
-		$el.each(function(){
+	$el.each(function(){
 		if(!$(this).hasClass('glitch')){
 			if(index >= 0 && index < files.length){
 				var newFile = files[index];
@@ -413,8 +413,8 @@ function onDisplayPage(data){
 	init(data);
 
 	// Meta-data
-	$('.meta-data .block-select').html('long text');
-	$('.meta-data .file-select').html(data.longIndex+"/"+data.nbOfLong);
+	// $('.meta-data .block-select').html('long text');
+	// $('.meta-data .file-select').html(data.longIndex+"/"+data.nbOfLong);
 
 	// Content
 	$('.left .text-content')
