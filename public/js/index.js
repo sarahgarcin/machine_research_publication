@@ -74,7 +74,14 @@ socket.on('glitchRemEvents',function(){
 socket.on('changeTextEvents', function(textArray, index, element){
 	var $textEl = $(element);
 	var newFile = textArray[index];
-	console.log(index);
+	// display the right index
+	if(index == -1){
+		$('.meta-data .file-select').html((textArray.length-1)+'/'+(textArray.length-1));
+	}
+	else{
+		$('.meta-data .file-select').html(index+'/'+(textArray.length-1));
+	}
+
 	if(index >= 0 && index < textArray.length){
 		$textEl.attr('data-index', index);
 		$textEl.html(converter.makeHtml(newFile));
@@ -88,8 +95,13 @@ socket.on('changeTextEvents', function(textArray, index, element){
 
 socket.on('changeImagesEvents', function(files, index, element){
 	var $el = $(element);
-	console.log(index);
-	$('.meta-data .file-select').html(index+'/'+(files.length-1));
+	// display the right index
+	if(index == -1){
+		$('.meta-data .file-select').html((files.length-1)+'/'+(files.length-1));
+	}
+	else{
+		$('.meta-data .file-select').html(index+'/'+(files.length-1));
+	}
 		$el.each(function(){
 		if(!$(this).hasClass('glitch')){
 			if(index >= 0 && index < files.length){
@@ -164,23 +176,23 @@ jQuery(document).ready(function($) {
 function init(data){
 	
 	// Z O O M  var
-	var zoom = 1,
+	var zoom = data.zoom,
 			minZoom = 0.3,
 			maxZoom = 3,
-			zoomStep = 0.1;
+			zoomStep = 0.07;
 
 	// M O V E  var
-	var posX = 0,
-			posY= 0,
+	var posX = data.posX,
+			posY= data.posY,
 			maxX = 15,
 			minX = -20,
-			xStep = 0.5,
+			xStep = 0.4,
 			maxY = 18,
 			minY = -12,
 			yStep = 0.5;
 
 	// W O R D   S P A C I N G var
-	var space= 0,
+	var space= data.space,
 			spacePlus = 5,
 			spaceMoins = 3;
 
@@ -196,13 +208,13 @@ function init(data){
 	var partCount = 0;
 
 	// C H A N G E    F O N T    C O L O R
-	var black = true;
+	var black = data.black;
 
 	//Reset keypress
 	reset();
 
 	$(document).on('keypress', function(e){
-		console.log(e.keyCode);
+		// console.log(e.keyCode);
 		var code = e.keyCode;
 
 		switch(code){
@@ -220,7 +232,7 @@ function init(data){
 				if(partCount == 2){
 					prevContent('.right .small-text-content', shortFolderPath, 'changeText');
 				}
-				console.log(partCount);
+				// console.log(partCount);
 				break;
 
 			// v2 press "p" to go to next part to change
@@ -233,6 +245,7 @@ function init(data){
 				// add info to know where you are
 				if(partCount == 0){
 					$('.meta-data .block-select').html('long text');
+					$('.meta-data .file-select').html(data.longIndex + '/' + data.nbOfLong);
 				}
 				if(partCount == 1){
 					$('.meta-data .block-select').html('images');
@@ -390,7 +403,6 @@ function prevContent(element, dir, eventToSend){
 	else{
 		var dataIndex = $el.attr('data-index');
 		var prevIndex = parseInt((dataIndex)-1);
-		console.log($el.find('img'), dataIndex,prevIndex);
 		socket.emit(eventToSend, prevIndex, dir, element);
 	}
 
@@ -399,10 +411,21 @@ function prevContent(element, dir, eventToSend){
 function onDisplayPage(data){
 
 	init(data);
+
+	// Meta-data
+	$('.meta-data .block-select').html('long text');
+	$('.meta-data .file-select').html(data.longIndex+"/"+data.nbOfLong);
+
 	// Content
-	$('.left .text-content').html(converter.makeHtml(data.txtlong));
-	$('.right .small-text-content').html(converter.makeHtml(data.txtshort));
-	$('.right .image-content img').attr('src', 'images/'+data.image);
+	$('.left .text-content')
+	.html(converter.makeHtml(data.txtlong))
+	.attr("data-index", data.longIndex);
+	$('.right .small-text-content')
+	.html(converter.makeHtml(data.txtshort))
+	.attr("data-index", data.shortIndex);
+	$('.right .image-content img')
+	.attr('src', 'images/'+data.image);
+	$('.right .image-content').attr("data-index", data.imageIndex);
 
 	// Zoom 
 	$cell.css('transform', 'scale('+data.zoom+')');
@@ -425,7 +448,7 @@ function onDisplayPage(data){
 		});
 	}
 
-	console.log('black '+data.black);
+	// console.log('black '+data.black);
 	// change font color
 	if(data.black == true){
 		$('.text-content').addClass('black-color').removeClass('white-color');
@@ -441,7 +464,7 @@ function onDisplayPage(data){
 	if(data.imagesglitch.length !=0){
 		// console.log(data.imagesglitch);
 		for(var a=0; a<data.imagesglitch.length; a++){
-			console.log(data.imagesglitch[a]);
+			// console.log(data.imagesglitch[a]);
 			var glitch = data.imagesglitch[a];
 			$('.right .image-wrapper').prepend('<div class="image-content wrapper'+glitch.count+' glitch"><img src="images/'+glitch.image+'"/></div>'); 
 			$('.wrapper'+glitch.count).css({
@@ -460,13 +483,14 @@ function onDisplayPage(data){
 
 }
 
+// not working
 function reset(){
 	// press o and p in the same time
 	var down = {};
 	$(document).keydown(function(e) {
 		down[e.keyCode] = true;
 	}).keyup(function(e) {
-		if (down[111] && down[112]) {
+		if (down[79] && down[80]) {
       console.log('Double key Press');
       socket.emit('reset');
     }
@@ -503,7 +527,7 @@ $.fn.wrapInTag = function(opts) {
   var tag = opts.tag, 
   words = opts.words || [],
   regex = RegExp(words.join('|'), 'gi'), // case insensitive
-  classname = opts.class || 'none'
+  classname = opts.class || 'none',
   replacement = '<'+ tag +' class="'+classname+'">$&</'+ tag +'>';
 
   return this.html(function() {

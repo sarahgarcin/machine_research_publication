@@ -29,6 +29,7 @@ h1, h2, h3, h4, h5{
 h1{font-size: $h1Size;}
 h2{font-size: $h2Size;}
 h3, h4, h5{font-size: $h3Size;}
+h4{text-align: right; margin-bottom: 0.3cm;}
 
 li{list-style: none;}
 p{
@@ -109,7 +110,7 @@ img{
       }
       .small-text-content{
         position:absolute;
-        top: 13cm;
+        bottom: 0cm;
         p{
           font-weight: bold;
           font-size: 12pt; 

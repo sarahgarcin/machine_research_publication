@@ -71,9 +71,11 @@ module.exports = function(app, io){
 
 		var longtxt = readTxtDir(longFolderPath);
 		var lastlong = longtxt[longtxt.length-1];
+		var indexLong = longtxt.length-1;
 
 		var shorttxt = readTxtDir(shortFolderPath);
 		var lastshort = shorttxt[shorttxt.length-1];
+		var indexShort = shorttxt.length-1;
 
 		var jsonObject = {
 			zoom : 1,
@@ -85,7 +87,11 @@ module.exports = function(app, io){
 			nbOfImg : indexImg,
 			imagesglitch: [],
 			txtlong: lastlong,
+			longIndex:indexLong,
+			nbOfLong : indexLong,
 			txtshort: lastshort,
+			shortIndex:indexShort,
+			nbOfShort : indexShort,
 			fontwords: [],
 			black: true
 		}
@@ -113,12 +119,15 @@ module.exports = function(app, io){
 
 		var images = readImagesDir(imageFolderPath);
 		var lastImg = images[images.length-1];
+		var indexImg = images.length-1;
 
 		var longtxt = readTxtDir(longFolderPath);
 		var lastlong = longtxt[longtxt.length-1];
+		var indexLong = longtxt.length-1;
 
 		var shorttxt = readTxtDir(shortFolderPath);
 		var lastshort = shorttxt[shorttxt.length-1];
+		var indexShort = shorttxt.length-1;
 
 		var jsonObject = {
 			zoom : 1,
@@ -126,11 +135,19 @@ module.exports = function(app, io){
 			posY: 0,
 			space: 0,
 			image: lastImg,
+			imageIndex:indexImg,
+			nbOfImg : indexImg,
 			imagesglitch: [],
 			txtlong: lastlong,
+			longIndex:indexLong,
+			nbOfLong : indexLong,
 			txtshort: lastshort,
-			fontwords: []
+			shortIndex:indexShort,
+			nbOfShort : indexShort,
+			fontwords: [],
+			black: true
 		}
+
 		var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
 		fs.unlinkSync(jsonFile);
 		fs.writeFileSync(jsonFile, dataToWrite);
@@ -211,9 +228,11 @@ module.exports = function(app, io){
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 		if(dir == longFolderPath){
 			obj.txtlong = textArray[prevIndex];
+			obj.longIndex = prevIndex;
 		}
 		if(dir == shortFolderPath){
 			obj.txtshort = textArray[prevIndex];
+			obj.shortIndex = prevIndex;
 		}
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 

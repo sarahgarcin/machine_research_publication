@@ -6769,6 +6769,10 @@ h2 {
 h3, h4, h5 {
   font-size: 12pt; }
 
+h4 {
+  text-align: right;
+  margin-bottom: 0.3cm; }
+
 li {
   list-style: none; }
 
@@ -6832,7 +6836,7 @@ img {
             width: 100%; }
       .page .page-wrapper .right .small-text-content {
         position: absolute;
-        top: 13cm; }
+        bottom: 0cm; }
         .page .page-wrapper .right .small-text-content p {
           font-weight: bold;
           font-size: 12pt; }
