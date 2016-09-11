@@ -79,8 +79,12 @@ module.exports = function(app, io){
 
 		var jsonObject = {
 			zoom : 1,
-			posX : 0,
-			posY: 0,
+			imgPosX : 0,
+			imgPosY: 0,
+			longPosX : 2,
+			longPosY: 1,
+			shortPosX : 0,
+			shortPosY: 11,
 			space: 0,
 			image: lastImg,
 			imageIndex:indexImg,
@@ -117,41 +121,48 @@ module.exports = function(app, io){
 	function onReset(){
 		var jsonFile = "data.json";
 
-		var images = readImagesDir(imageFolderPath);
-		var lastImg = images[images.length-1];
-		var indexImg = images.length-1;
+		// var images = readImagesDir(imageFolderPath);
+		// var lastImg = images[images.length-1];
+		// var indexImg = images.length-1;
 
-		var longtxt = readTxtDir(longFolderPath);
-		var lastlong = longtxt[longtxt.length-1];
-		var indexLong = longtxt.length-1;
+		// var longtxt = readTxtDir(longFolderPath);
+		// var lastlong = longtxt[longtxt.length-1];
+		// var indexLong = longtxt.length-1;
 
-		var shorttxt = readTxtDir(shortFolderPath);
-		var lastshort = shorttxt[shorttxt.length-1];
-		var indexShort = shorttxt.length-1;
+		// var shorttxt = readTxtDir(shortFolderPath);
+		// var lastshort = shorttxt[shorttxt.length-1];
+		// var indexShort = shorttxt.length-1;
 
-		var jsonObject = {
-			zoom : 1,
-			posX : 0,
-			posY: 0,
-			space: 0,
-			image: lastImg,
-			imageIndex:indexImg,
-			nbOfImg : indexImg,
-			imagesglitch: [],
-			txtlong: lastlong,
-			longIndex:indexLong,
-			nbOfLong : indexLong,
-			txtshort: lastshort,
-			shortIndex:indexShort,
-			nbOfShort : indexShort,
-			fontwords: [],
-			black: true
-		}
 
-		var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
+		// var jsonObject = {
+		// 	zoom : 1,
+		// 	imgPosX : 0,
+		// 	imgPosY: 0,
+		// 	longPosX : 2,
+		// 	longPosY: 1,
+		// 	shortPosX : 0,
+		// 	shortPosY: 11,
+		// 	space: 0,
+		// 	image: lastImg,
+		// 	imageIndex:indexImg,
+		// 	nbOfImg : indexImg,
+		// 	imagesglitch: [],
+		// 	txtlong: lastlong,
+		// 	longIndex:indexLong,
+		// 	nbOfLong : indexLong,
+		// 	txtshort: lastshort,
+		// 	shortIndex:indexShort,
+		// 	nbOfShort : indexShort,
+		// 	fontwords: [],
+		// 	black: true
+		// }
+
+		// var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
 		fs.unlinkSync(jsonFile);
-		fs.writeFileSync(jsonFile, dataToWrite);
-		io.sockets.emit('displayPageEvents', jsonObject);
+		// fs.writeFileSync(jsonFile, dataToWrite);
+		// io.sockets.emit('displayPageEvents', jsonObject);
+		io.sockets.emit('pdfIsGenerated');
+
 	}
 	
 	// ------------- SYNCHRONISE FUNCTIONS -------------
@@ -167,16 +178,27 @@ module.exports = function(app, io){
 
 	}
 
-	function onMove(posX, posY){
+	function onMove(posX, posY, count){
 		// save pos in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.posX = posX;
-		obj.posY = posY;
+		console.log(count, posX, posY);
+		if(count == 0){
+			obj.longPosX = posX;
+			obj.longPosY = posY;
+		}
+		if(count == 1){
+			obj.imgPosX = posX;
+			obj.imgPosY = posY;
+		}
+		if(count == 2){
+			obj.shortPosX = posX;
+			obj.shortPosY = posY;
+		}
 
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 
 		// send to everyone
-		io.sockets.emit('moveEvents', posX, posY);
+		io.sockets.emit('moveEvents', posX, posY, count);
 	}
 
 	function onWordSpacing(space){
@@ -324,7 +346,7 @@ module.exports = function(app, io){
 		  	.then(function(){
 		  		page.property('viewportSize', {width: 1280, height: 800});
 		  		// page.property('paperSize', {format: 'A4', orientation: 'landscape'})
-		  		page.property('paperSize', {width: 1125, height: 795})
+		  		page.property('paperSize', {width: 1120, height: 792})
 		  		.then(function() {
 			  		return page.property('content')
 			    	.then(function() {

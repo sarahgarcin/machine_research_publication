@@ -6791,8 +6791,13 @@ p {
   p:first-child {
     margin: 0; }
 
+a {
+  color: #000; }
+
 pre {
-  margin-bottom: 0.5cm; }
+  margin-bottom: 0.5cm;
+  box-sizing: content-box;
+  border: 0; }
 
 code {
   background-color: #FFF;
@@ -6808,27 +6813,37 @@ img {
   color: #FFF; }
 
 .meta-data {
-  width: 75px;
+  width: auto;
   position: absolute;
   top: 10px;
-  left: 0px; }
+  right: 10px;
+  text-transform: uppercase; }
+  .meta-data p {
+    font-size: 19px;
+    font-family: arial, sans-serif; }
 
 .page {
   width: 29.7cm;
   height: 21cm;
-  border: 1px solid #000;
-  margin: 0px auto;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-top: 1px solid #FFF;
+  border-left: 1px solid #FFF;
+  margin: 0px 0;
   position: relative; }
   .page .page-wrapper {
     margin: 1cm 2cm;
     width: 25.7cm;
     height: 19cm; }
     .page .page-wrapper .left {
-      width: 12.85cm;
+      width: 12.2381cm;
       height: 19cm;
       display: inline-block;
       padding-right: 0.5cm;
       overflow: hidden; }
+      .page .page-wrapper .left .text-content {
+        position: absolute;
+        width: 12.2381cm; }
     .page .page-wrapper .right {
       width: 12.79cm;
       height: 19cm;
@@ -6849,7 +6864,8 @@ img {
             width: 100%; }
       .page .page-wrapper .right .small-text-content {
         position: absolute;
-        bottom: 0cm; }
+        bottom: 0cm;
+        width: 12.85cm; }
         .page .page-wrapper .right .small-text-content p {
           font-weight: bold;
           font-size: 12pt; }

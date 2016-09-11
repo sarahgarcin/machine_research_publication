@@ -41,11 +41,26 @@ socket.on('zoomEvents', function(zoom){
 	$cell.css('transform', 'scale('+zoom+')'); 
 });
 
-socket.on('moveEvents', function(posX, posY){
-  $cell.css({
-		'left': posX+'cm',
-		'top':posY+'cm',
-	})
+socket.on('moveEvents', function(posX, posY, count){
+	console.log(count);
+	if(count == 0){
+		$('.left .text-content').css({
+			'left': posX+'cm',
+			'top':posY+'cm',
+		});
+	}
+	if(count == 1){
+		$cell.css({
+			'left': posX+'cm',
+			'top':posY+'cm',
+		});
+	}
+	if(count == 2){
+		$('.right .small-text-content').css({
+			'left': posX+'cm',
+			'top':posY+'cm',
+		});
+	}
 });
 
 socket.on('wordSpacingEvents', function(space){
@@ -121,7 +136,7 @@ socket.on('changeImagesEvents', function(files, index, element){
 socket.on('nbImages', function(countImg, clonecount){
 	var $imageEl = $('.page-wrapper .right .image-content');
   var randomPos = Math.random() * $imageEl.find('img').height();
-	var randomH = Math.random() * 100 + 10;
+	var randomH = Math.random() * 150 + 80;
 	var randomIndex = Math.floor(Math.random() * countImg);
 	var $img = $imageEl.clone();
 	
@@ -182,8 +197,12 @@ function init(data){
 			zoomStep = 0.07;
 
 	// M O V E  var
-	var posX = data.posX,
-			posY= data.posY,
+	var imgPosX  = data.imgPosX,
+			imgPosY = data.imgPosY,
+			longPosX  = data.longPosX,
+			longPosY = data.longPosY,
+			shortPosX  = data.shortPosX,
+			shortPosY = data.shortPosY,
 			maxX = 15,
 			minX = -20,
 			xStep = 0.4,
@@ -241,7 +260,7 @@ function init(data){
 					partCount ++;
 				}
 				else{ partCount = 0; }
-
+				console.log(partCount);
 				// add info to know where you are
 				if(partCount == 0){
 					$('.meta-data .block-select').html('long text');
@@ -277,31 +296,79 @@ function init(data){
 		// ------   M O V E    I M A G E S -----------
 		  //press "l" to move image on the right
 			case 113:
-				if(posX < maxX){
-					posX += xStep;
-					socket.emit("move", posX, posY);
-	      }
+				// if(posX < maxX){
+					if(partCount == 0){
+						longPosX += xStep;
+						socket.emit("move", longPosX, longPosY, partCount);
+					}
+					if(partCount == 1){
+						imgPosX += xStep;
+						socket.emit("move", imgPosX, imgPosY, partCount);
+					}
+					if(partCount == 2){
+						shortPosX += xStep;
+						socket.emit("move", shortPosX, shortPosY, partCount);
+					}
+					// posX += xStep;
+					// socket.emit("move", posX, posY, partCount);
+	      // }
 				break;
 			//press "j" to move image on the left
 			case 97:
-				if(posX >= minX){
-					posX -= xStep;
-					socket.emit("move", posX, posY);
-				}
+				// if(posX >= minX){
+					if(partCount == 0){
+						longPosX -= xStep;
+						socket.emit("move", longPosX, longPosY, partCount);
+					}
+					if(partCount == 1){
+						imgPosX -= xStep;
+						socket.emit("move", imgPosX, imgPosY, partCount);
+					}
+					if(partCount == 2){
+						shortPosX -= xStep;
+						socket.emit("move", shortPosX, shortPosY, partCount);
+					}
+					// posX -= xStep;
+					// socket.emit("move", posX, posY, partCount);
+				// }
 				break;
 			//press "k" to move image down
 			case 119:
-				if(posY < maxY){
-					posY += yStep;
-					socket.emit("move", posX, posY);
-				}
+				// if(posY < maxY){
+					if(partCount == 0){
+						longPosY += yStep;
+						socket.emit("move", longPosX, longPosY, partCount);
+					}
+					if(partCount == 1){
+						imgPosY += yStep;
+						socket.emit("move", imgPosX, imgPosY, partCount);
+					}
+					if(partCount == 2){
+						shortPosY += yStep;
+						socket.emit("move", shortPosX, shortPosY, partCount);
+					}
+					// posY += yStep;
+					// socket.emit("move", posX, posY, partCount);
+				// }
 				break;
 			//press "i" to move image up
 			case 115:
-				if(posY >= minY){
-					posY -= yStep;
-					socket.emit("move", posX, posY);
-			}
+				// if(posY >= minY){
+					if(partCount == 0){
+						longPosY -= yStep;
+						socket.emit("move", longPosX, longPosY, partCount);
+					}
+					if(partCount == 1){
+						imgPosY -= yStep;
+						socket.emit("move", imgPosX, imgPosY, partCount);
+					}
+					if(partCount == 2){
+						shortPosY -= yStep;
+						socket.emit("move", shortPosX, shortPosY, partCount);
+					}
+					// posY -= yStep;
+					// socket.emit("move", posX, posY, partCount);
+				// }
 			break;
 
 		// ------   G L I T C H    I M A G E S -----------
@@ -432,8 +499,18 @@ function onDisplayPage(data){
 
 	// ImagePos
 	$cell.css({
-		'left': data.posX+'cm',
-		'top':data.posY+'cm',
+		'left': data.imgPosX+'cm',
+		'top':data.imgPosY+'cm',
+	});
+
+	$('.right .small-text-content').css({
+			'left': data.shortPosX+'cm',
+			'top':data.shortPosY+'cm',
+	});
+
+	$('.left .text-content').css({
+		'left': data.longPosX+'cm',
+		'top':data.longPosY+'cm',
 	});
 
 	// Word spacing
