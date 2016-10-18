@@ -42,7 +42,7 @@ module.exports = function(app, io){
 		// socket.on('glitchRemove', onGlitchRemove);
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
-		socket.on('changeFontColor', onChangeFontColor);
+		// socket.on('changeFontColor', onChangeFontColor);
 
 		socket.on('reset', onReset);
 
@@ -121,7 +121,7 @@ module.exports = function(app, io){
 	}
 	
 	// ------------- SYNCHRONISE FUNCTIONS -------------
-	function onZoom(zoom){
+	function onZoom(zoom, element){
 		// save zoom in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 		obj.zoom = zoom;
@@ -129,7 +129,7 @@ module.exports = function(app, io){
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 		
 		// send to everyone
-		io.sockets.emit('zoomEvents', zoom);
+		io.sockets.emit('zoomEvents', zoom, element);
 
 	}
 
@@ -200,6 +200,10 @@ module.exports = function(app, io){
       var textInFile = fs.readFileSync(dir+'/'+file, 'utf8');
       textArray.push(textInFile);
     });
+
+    if(prevIndex < 0){
+    	prevIndex = arrayOfFiles.length - 1;
+    }
 
     // save new text in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));

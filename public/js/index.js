@@ -9,9 +9,11 @@ var longFolder = "long";
 var shortFolder = "short";
 var pdfFolder = "pdf";
 
-var longFolderPath = contentFolder+chapterFolder+longFolder;
-var shortFolderPath = contentFolder+chapterFolder+shortFolder;
-var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
+var pageFolder = contentFolder+chapterFolder;
+
+var longFolderPath = pageFolder + longFolder;
+var shortFolderPath = pageFolder + shortFolder;
+var pdfFolderPath = pageFolder + pdfFolder;
 
 // html elements
 var $text = $(".text-content");
@@ -32,8 +34,9 @@ socket.on('error', onSocketError);
 
 socket.on('displayPageEvents', onDisplayPage);
 
-socket.on('zoomEvents', function(zoom){ 
-	$text.zoom(zoom);
+socket.on('zoomEvents', function(zoom, element){ 
+	console.log(element);
+	$(element).zoom(zoom);
 });
 
 socket.on('moveEvents', function(posX, posY, count){
@@ -65,23 +68,12 @@ socket.on('wordSpacingEvents', function(space){
 socket.on('changeTextEvents', function(textArray, index, element){
 	var $textEl = $(element);
 	var newFile = textArray[index];
+
 	// display the right index
-	if(index == -1){
-		$('.meta-data .file-select').html((textArray.length-1)+'/'+(textArray.length-1));
-	}
-	else{
-		$('.meta-data .file-select').html(index+'/'+(textArray.length-1));
-	}
-	console.log($textEl);
-	if(index >= 0 && index < textArray.length){
-		$textEl.attr('data-index', index);
-		$textEl.html(converter.makeHtml(newFile));
-	}
-	else{
-		$textEl.attr('data-index', textArray.length-1);
-		var newFile = textArray[textArray.length-1];
-		$textEl.html(converter.makeHtml(newFile));
-	}
+	$('.meta-data .file-select').html((index+1)+'/'+ textArray.length );
+	
+	$textEl.attr('data-index', index);
+	$textEl.html(converter.makeHtml(newFile));
 });
 
 socket.on('changeFontEvents', function(wordsCount){
@@ -94,18 +86,6 @@ socket.on('changeFontEvents', function(wordsCount){
 
 socket.on('removeFontEvents', function(){
 	$('p').find('.change-font').attr("class","normal-font");
-});
-
-socket.on('changeFontColorEvents', function(black){
-	if(black == true){
-		$('.text-content').addClass('black-color').removeClass('white-color');
-    $('.small-text-content').addClass('black-color').removeClass('white-color');
-
-  }
-  else{
-  	$('.text-content').addClass('white-color').removeClass('black-color');
-    $('.small-text-content').addClass('white-color').removeClass('black-color');
-  }
 });
 
 socket.on('pdfIsGenerated', function(){
@@ -122,6 +102,15 @@ jQuery(document).ready(function($) {
 
 
 function init(data){
+
+	// C H A N G E    C O N T E N T 
+	var partCount = 0;
+	var elObj = [];
+	// push element into array
+	$('.--js-content-el').each(function(i){
+		elObj[i] = $(this);
+		return elObj;
+	});
 	
 	// Z O O M  var
 	var zoom = data.zoom,
@@ -156,14 +145,9 @@ function init(data){
 	var arrayWords = settings.words;
 	var wordsCount = [];
 
-	// C H A N G E    C O N T E N T 
-	var partCount = 0;
-
-	// C H A N G E    F O N T    C O L O R
-	var black = data.black;
-
 	//Reset keypress
 	reset();
+
 
 	$(document).on('keypress', function(e){
 		// console.log(e.keyCode);
@@ -175,36 +159,33 @@ function init(data){
 
 			// v2 press "o" to change content (go prev)
 			case 111:
-				if(partCount == 0){
-					prevContent('.left .text-content', longFolderPath, 'changeText');
+				for(i in elObj){
+					if(partCount == i){
+						var folderName = elObj[i].attr('data-folder');
+						var folder = pageFolder + folderName;
+						prevContent(elObj[i], folder, 'changeText');
+					}
 				}
-				if(partCount == 1){
-					// prevContent('.right .image-content', imageFolderPath, 'changeImages');
-				}
-				if(partCount == 2){
-					prevContent('.right .small-text-content', shortFolderPath, 'changeText');
-				}
-				// console.log(partCount);
 				break;
 
 			// v2 press "p" to go to next part to change
 			case 112:
-				if(partCount < 2){
+				if(partCount < elObj.length-1){
 					partCount ++;
 				}
 				else{ partCount = 0; }
-				console.log(partCount);
-				// add info to know where you are
-				if(partCount == 0){
-					$('.meta-data .block-select').html('long text');
-					$('.meta-data .file-select').html(data.longIndex + '/' + data.nbOfLong);
-				}
-				if(partCount == 1){
-					// $('.meta-data .block-select').html('images');
-					// $('.meta-data .file-select').html(data.imageIndex + '/' + data.nbOfImg);
-				}
-				if(partCount == 2){
-					$('.meta-data .block-select').html('short text');
+
+				for(i in elObj){
+					if(partCount == i){
+						var type = elObj[i].attr('data-folder');
+						$('.meta-data .block-select').html(type + ' text');
+						if(type == 'long'){
+							$('.meta-data .file-select').html((data.longIndex+1) + '/' + (data.nbOfLong+1));
+						}
+						if(type == 'short'){
+							$('.meta-data .file-select').html((data.shortIndex+1) + '/' + (data.nbOfShort+1));
+						}
+					}
 				}
 				break;
 
@@ -214,17 +195,27 @@ function init(data){
 			
 			//zoomIn press "u"
 			case 117:
-				zoom = zoomIn(zoom, maxZoom, zoomStep);
-				socket.emit("zoom", zoom);
+				for(i in elObj){
+					if(partCount == i){
+						var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
+						zoom = zoomIn(zoom, maxZoom, zoomStep);
+						socket.emit("zoom", zoom, elementClass);
+					}
+				}
 				break;
 			
 			//zoomOut press "space"
 			case 32:
-				zoom = zoomOut(zoom, minZoom, zoomStep);
-				socket.emit("zoom", zoom);
+				for(i in elObj){
+					if(partCount == i){
+						var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
+						zoom = zoomOut(zoom, minZoom, zoomStep);
+						socket.emit("zoom", zoom, elementClass);
+					}
+				}
 				break;
 
-		// ------   M O V E    I M A G E S -----------
+		// ------   M O V E    E L E M E N T S -----------
 		  //press "l" to move image on the right
 			case 113:
 				// if(posX < maxX){
@@ -305,15 +296,7 @@ function init(data){
 		// ------   G L I T C H    I M A G E S -----------
 			// on "n" press glitch images
 			case 105:
-				// clonecount ++;
 
-		  //  	if(clonecount > 10){
-		  //  		socket.emit('glitchRemove');
-				// 	clonecount = 0;
-				// } 
-				// else {
-				// 	socket.emit("countImages", clonecount);
-		  // 	}
 				break; 
 
 		// ------   C H A N G E    F O N T  ------ 
@@ -362,57 +345,17 @@ function init(data){
 		}
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
-
-	// ------   C H A N G E    F O N T     C O L O R  ------
-		// double keypress
-		// press 'r' and 'y' or two black buttons in the same time
-		var down = {};
-		$(document).keydown(function(e) {
-			down[e.keyCode] = true;
-		}).keyup(function(e) {
-			if (down[82] && down[89]) {
-	      console.log('Double key Press');
-	      if(black == true){
-			    black = false;
-			    socket.emit('changeFontColor', black);
-			  }
-			  else{
-			    black = true;
-			    socket.emit('changeFontColor', black);
-			  }
-	    }
-	    down[e.keyCode] = false;
-		});
 	
 }
 
-function prevContent(element, dir, eventToSend){
-	var $el = $(element);
-
-	if($el.length > 1){
-		$el.each(function(){
-			if(!$(this).hasClass('glitch')){
-				var dataIndex = $(this).attr('data-index');
-				var prevIndex = parseInt((dataIndex)-1);
-				socket.emit(eventToSend, prevIndex, dir, element);
-			}
-		});
-	}
-	else{
-		var dataIndex = $el.attr('data-index');
-		var prevIndex = parseInt((dataIndex)-1);
-		socket.emit(eventToSend, prevIndex, dir, element);
-	}
-
-}
 
 function onDisplayPage(data){
 
 	init(data);
 
 	// Meta-data
-	// $('.meta-data .block-select').html('long text');
-	// $('.meta-data .file-select').html(data.longIndex+"/"+data.nbOfLong);
+	$('.meta-data .block-select').html('long text');
+	$('.meta-data .file-select').html((data.longIndex+1)+"/"+(data.nbOfLong+1));
 
 	// Content
 	$('.left .text-content')
