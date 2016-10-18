@@ -3,12 +3,10 @@ var gulp = require('gulp');
 
 // Include Our Plugins
 var concat = require('gulp-concat');
-// var jshint = require('gulp-jshint');
 var minifyCss = require('gulp-minify-css');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var sass = require('gulp-sass');
-// var uglify = require('gulp-uglify');
 
 // Compile Our Sass
 gulp.task('sass', function() {

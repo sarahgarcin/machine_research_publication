@@ -3,19 +3,19 @@ var fs = require('fs-extra'),
 	moment = require('moment'),
 	path = require("path"),
 	exec = require('child_process').exec,
-	easyimg = require('easyimage');
-	var phantom = require('phantom');
-	var _ph, _page, _outObj;
-	var frankenstein  = require('./content/settings.js');
+	phantom = require('phantom');
 
-	var chapterFolder = frankenstein.folder;
+	var _ph, _page, _outObj;
+	var settings  = require('./content/settings.js');
+
+	var chapterFolder = settings.folder;
 	var contentFolder = "content/";
-	var imagesFolder = "images";
+	// var imagesFolder = "images";
 	var longFolder = "long";
 	var shortFolder = "short";
 	var pdfFolder = "pdf";
 
-	var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
+	// var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
 	var longFolderPath = contentFolder+chapterFolder+longFolder;
 	var shortFolderPath = contentFolder+chapterFolder+shortFolder;
 	var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
@@ -36,10 +36,10 @@ module.exports = function(app, io){
 		socket.on('move', onMove);
 		socket.on('wordSpacing', onWordSpacing);
 		socket.on('changeText', onChangeText);
-		socket.on('changeImages', onChangeImages);
-		socket.on('countImages', onCountImages);
-		socket.on('glitch', onGlitch);
-		socket.on('glitchRemove', onGlitchRemove);
+		// socket.on('changeImages', onChangeImages);
+		// socket.on('countImages', onCountImages);
+		// socket.on('glitch', onGlitch);
+		// socket.on('glitchRemove', onGlitchRemove);
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
 		socket.on('changeFontColor', onChangeFontColor);
@@ -48,13 +48,7 @@ module.exports = function(app, io){
 
 		displayPage(socket);
 
-		// socket.on('savePDF', createPDF);
-		socket.on('removeBorders', onRemoveBorders);
-		socket.on('generate', generatePdf);
-
-		// DODOC part
-		socket.on("newMedia", onNewMedia);
-		socket.on("deleteMedia", onDeleteMedia);
+		socket.on('generate', generatePdf);;
 
 	});
 
@@ -65,9 +59,9 @@ module.exports = function(app, io){
 	function displayPage(socket){
 		var jsonFile = "data.json";
 
-		var images = readImagesDir(imageFolderPath);
-		var lastImg = images[images.length-1];
-		var indexImg = images.length-1;
+		// var images = readImagesDir(imageFolderPath);
+		// var lastImg = images[images.length-1];
+		// var indexImg = images.length-1;
 
 		var longtxt = readTxtDir(longFolderPath);
 		var lastlong = longtxt[longtxt.length-1];
@@ -86,10 +80,10 @@ module.exports = function(app, io){
 			shortPosX : 0,
 			shortPosY: 11,
 			space: 0,
-			image: lastImg,
-			imageIndex:indexImg,
-			nbOfImg : indexImg,
-			imagesglitch: [],
+			// image: lastImg,
+			// imageIndex:indexImg,
+			// nbOfImg : indexImg,
+			// imagesglitch: [],
 			txtlong: lastlong,
 			longIndex:indexLong,
 			nbOfLong : indexLong,
@@ -120,47 +114,8 @@ module.exports = function(app, io){
 	// reset 
 	function onReset(){
 		var jsonFile = "data.json";
-
-		// var images = readImagesDir(imageFolderPath);
-		// var lastImg = images[images.length-1];
-		// var indexImg = images.length-1;
-
-		// var longtxt = readTxtDir(longFolderPath);
-		// var lastlong = longtxt[longtxt.length-1];
-		// var indexLong = longtxt.length-1;
-
-		// var shorttxt = readTxtDir(shortFolderPath);
-		// var lastshort = shorttxt[shorttxt.length-1];
-		// var indexShort = shorttxt.length-1;
-
-
-		// var jsonObject = {
-		// 	zoom : 1,
-		// 	imgPosX : 0,
-		// 	imgPosY: 0,
-		// 	longPosX : 2,
-		// 	longPosY: 1,
-		// 	shortPosX : 0,
-		// 	shortPosY: 11,
-		// 	space: 0,
-		// 	image: lastImg,
-		// 	imageIndex:indexImg,
-		// 	nbOfImg : indexImg,
-		// 	imagesglitch: [],
-		// 	txtlong: lastlong,
-		// 	longIndex:indexLong,
-		// 	nbOfLong : indexLong,
-		// 	txtshort: lastshort,
-		// 	shortIndex:indexShort,
-		// 	nbOfShort : indexShort,
-		// 	fontwords: [],
-		// 	black: true
-		// }
-
-		// var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
 		fs.unlinkSync(jsonFile);
-		// fs.writeFileSync(jsonFile, dataToWrite);
-		// io.sockets.emit('displayPageEvents', jsonObject);
+
 		io.sockets.emit('pdfIsGenerated');
 
 	}
@@ -326,9 +281,6 @@ module.exports = function(app, io){
   }
 
 	//------------- PDF -------------------
-	function onRemoveBorders(){
-		io.sockets.emit('removingBoders');
-	}
 
 	function generatePdf(){	
 
@@ -364,57 +316,6 @@ module.exports = function(app, io){
 		  });
 		});
 
-	// CODE POUR LA CAPTURE D'ECRAN
-		// exec('screencapture -R 140,0,1010,715 -x pdf/'+date+'.png',function(error, stdout, stderr){ //Pour OSX
-		// 	console.log(error);
-		// 	console.log('success screencapture');
-		// 	// easyimg.resize({src:'pdf/'+date+'.png', dst: 'pdf/'+date+'-resize.png', width:3840, height:2160}).then(function (file) {
-		// 	// 	console.log('file resized');
-  //  //    });
-		// });
-	}
-
-// ------------- D O D O C -------------------
-	function onNewMedia( mediaData) {
-		// console.log(mediaData)
-		var newFileName = getCurrentDate();
-		var pathToFile = '';
-		var fileExtension;
-
-		var mediaPath = imageFolderPath;
-    pathToFile = mediaPath + '/' + newFileName;
-
-    fileExtension = '.jpg';
-    var imageBuffer = decodeBase64Image(mediaData.mediaData);
-
-    fs.writeFile( pathToFile + fileExtension, imageBuffer.data, function(err) {
-      if (err) reject( err);
-      console.log("Image added at path " + pathToFile);
-      sendEventWithContent( 'mediaCreated', {'path':pathToFile, 'file':newFileName});
-    });
-	}
-
-	function onDeleteMedia( mediaData) {
-		console.log(mediaData);
-
-		var mediaName = mediaData.mediaName;
-		var pathToMediaFolder = imageFolderPath;
-		var filesInMediaFolder = fs.readdirSync( pathToMediaFolder);
-		var delDir = pathToMediaFolder+'/deleted';
-
-    if (!fs.existsSync(delDir)){
-		  fs.mkdirSync(delDir);
-		}
-    
-    filesInMediaFolder.forEach( function( filename) {
-      var fileNameWithoutExtension = new RegExp( "(.+?)(\\.[^.]*$|$)", 'i').exec( filename)[1];
-      if( fileNameWithoutExtension === mediaName) {
-        var filePath = pathToMediaFolder + '/' + filename;
-        var newFilePath = pathToMediaFolder + '/deleted/' + filename;
-        fs.renameSync( filePath, newFilePath);
-        console.log( "A file will be deleted (actually, renamed but hidden from dodoc) : \n - " + filePath + "\n - " + newFilePath);
-      }
-    });
 	}
 
 	function sendEventWithContent( sendEvent, objectContent, socket) {
@@ -425,24 +326,6 @@ module.exports = function(app, io){
     return moment().format("YYYYMMDD_HHmmss");
   }
 
-  // Décode les images en base64
-	// http://stackoverflow.com/a/20272545
-	function decodeBase64Image(dataString) {
-
-  	console.log("Decoding base 64 image");
-
-		var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-		response = {};
-
-		if (matches.length !== 3) {
-			return new Error('Invalid input string');
-		}
-
-		response.type = matches[1];
-		response.data = new Buffer(matches[2], 'base64');
-
-		return response;
-	}
 
 // - - - END FUNCTIONS - - - 
 };

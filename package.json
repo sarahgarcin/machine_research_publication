@@ -1,7 +1,7 @@
 {
-  "name": "conference-tool",
+  "name": "machine-research-publication",
   "version": "1.0.0",
-  "description": "conference tool",
+  "description": "PJ Machine for Machine Research Publication",
   "main": "main.js",
   "scripts": {
     "test": "plop",
@@ -10,23 +10,19 @@
   "author": "Sarah Garcin",
   "license": "GPL-3.0",
   "dependencies": {
-    "easyimage": "^2.1.0",
     "express": "^4.13.4",
     "fs-extra": "^0.26.5",
     "glob": "^7.0.3",
-    "html2jade": "^0.8.4",
     "http": "0.0.0",
     "jade": "^1.11.0",
     "marked": "^0.3.6",
     "moment": "^2.13.0",
     "path": "^0.12.7",
     "phantom": "^2.1.8",
-    "phantom-html2pdf": "^2.0.2",
     "serve-favicon": "^2.3.0",
     "socket.io": "^1.4.5",
     "underscore": "^1.8.3",
-    "url": "^0.11.0",
-    "wkhtmltopdf": "^0.3.1"
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

@@ -2,19 +2,18 @@ var _ = require("underscore");
 var url = require('url'),
     path = require('path'),
     fs = require('fs-extra'),
-    marked = require('marked'),
-    html2jade = require('html2jade');
+    marked = require('marked');
 
-var frankenstein  = require('./content/settings.js');
+var settings  = require('./content/settings.js');
 
-  var chapterFolder = frankenstein.folder;
+  var chapterFolder = settings.folder;
   var contentFolder = "content/";
-  var imagesFolder = "images";
+  // var imagesFolder = "images";
   var longFolder = "long";
   var shortFolder = "short";
   var pdfFolder = "pdf";
 
-  var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
+  // var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
   var longFolderPath = contentFolder+chapterFolder+longFolder;
   var shortFolderPath = contentFolder+chapterFolder+shortFolder;
   var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
@@ -26,7 +25,6 @@ module.exports = function(app,io,m){
   * routing event
   */
   app.get("/", getIndex);
-  app.get("/dodoc", getDodoc);
 
   /**
   * routing functions
@@ -34,42 +32,38 @@ module.exports = function(app,io,m){
 
   // GET
   function getIndex(req, res) {
-    console.log(imageFolderPath);
+    // console.log(imageFolderPath);
     var longTextData = getText(longFolderPath);
     var shortTextData = getText(shortFolderPath);
-    var ImageData = getImages(imageFolderPath);
+    // var ImageData = getImages(imageFolderPath);
     
     var dataToSend = {
-      title: "Frankenstein Bot",
+      title: "Machine Research",
       longIndex: longTextData.index,
       longFile: longTextData.file,
       shortIndex: shortTextData.index,
       shortFile: shortTextData.file,
-      imageIndex: ImageData.index,
-      imageFile: ImageData.file
+      // imageIndex: ImageData.index,
+      // imageFile: ImageData.file
     }
     // console.log(dataToSend.longFile);
     res.render("index", dataToSend);
 
   };
 
-  function getDodoc(req, res) {
-    res.render("dodoc", {title : "Frankenstein Bot | Dodoc"});
-  };
-
-  function getImages(imageDir, callback) {
-    var fileType = ['.jpg', '.jpeg', '.png'],
-        files = [];
-    var arrayOfFiles = fs.readdirSync(imageDir);
-    arrayOfFiles.forEach( function (file) {
-      if(fileType.indexOf(path.extname(file))>-1) {
-        files.push(file); //store the file name into the array files
-      }
-    });
-    var randomIndex = files.length - 1;
-    var randomFile = files[randomIndex];
-    return {index: randomIndex, file: randomFile};
-  }
+  // function getImages(imageDir, callback) {
+  //   var fileType = ['.jpg', '.jpeg', '.png'],
+  //       files = [];
+  //   var arrayOfFiles = fs.readdirSync(imageDir);
+  //   arrayOfFiles.forEach( function (file) {
+  //     if(fileType.indexOf(path.extname(file))>-1) {
+  //       files.push(file); //store the file name into the array files
+  //     }
+  //   });
+  //   var randomIndex = files.length - 1;
+  //   var randomFile = files[randomIndex];
+  //   return {index: randomIndex, file: randomFile};
+  // }
 
   function getText(textDir){
     // List text

@@ -19,9 +19,9 @@ html
             div(class='text-content' data-index='#{longIndex}') 
               != longFile
           div.right
-            div.image-wrapper
-              div(class='image-content' data-index='#{imageIndex}')
-                img(src= 'images/#{imageFile}')
+            //- div.image-wrapper
+            //-   div(class='image-content' data-index='#{imageIndex}')
+            //-     img(src= 'images/#{imageFile}')
             div(class='small-text-content' data-index='#{shortIndex}') 
               != shortFile
 
@@ -30,6 +30,7 @@ html
     script(src='/bower_components/foundation/js/foundation.min.js')
     script(src='/bower_components/showdown/dist/showdown.min.js')
     script(src='/settings.js')
+    script(src='/js/plugins.js')
     script(src='/js/index.js')
 
 
