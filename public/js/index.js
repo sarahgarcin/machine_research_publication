@@ -22,6 +22,7 @@ var $text = $(".text-content");
 function onSocketConnect() {
 	sessionId = socket.io.engine.id;
 	console.log('Connected ' + sessionId);
+	socket.emit('listFiles');
 };
 
 function onSocketError(reason) {
@@ -152,6 +153,7 @@ function init(data){
 	$(document).on('keypress', function(e){
 		// console.log(e.keyCode);
 		var code = e.keyCode;
+		console.log('plop', code);
 
 		switch(code){
 		
@@ -218,22 +220,19 @@ function init(data){
 		// ------   M O V E    E L E M E N T S -----------
 		  //press "l" to move image on the right
 			case 113:
-				// if(posX < maxX){
+				for(i in elObj){
+					// if(partCount == i){
+
+					// }
 					if(partCount == 0){
 						longPosX += xStep;
 						socket.emit("move", longPosX, longPosY, partCount);
-					}
-					if(partCount == 1){
-						// imgPosX += xStep;
-						// socket.emit("move", imgPosX, imgPosY, partCount);
 					}
 					if(partCount == 2){
 						shortPosX += xStep;
 						socket.emit("move", shortPosX, shortPosY, partCount);
 					}
-					// posX += xStep;
-					// socket.emit("move", posX, posY, partCount);
-	      // }
+				}
 				break;
 			//press "j" to move image on the left
 			case 97:
@@ -336,6 +335,7 @@ function init(data){
 			
 			//Press T and generate PDF
 			case 116:
+
 				// var page = $('body').html();
 				// $('.page').css('border', 'none');
 				// $('.right').css('border', 'none');
@@ -349,91 +349,67 @@ function init(data){
 }
 
 
-function onDisplayPage(data){
+function onDisplayPage(foldersData){
+	$.each( foldersData, function( index, fdata) {
+  	var $folderContent = makeFolderContent( fdata);
+  	// console.log($folderContent);
+    return insertOrReplaceFolder( fdata.slugFolderName, $folderContent);
+  });
 
-	init(data);
+  var firstIndex = parseInt(foldersData[0].index) + 1;
+  var firstNbOfFiles= foldersData[0].nbOfFiles;
 
-	// Meta-data
-	$('.meta-data .block-select').html('long text');
-	$('.meta-data .file-select').html((data.longIndex+1)+"/"+(data.nbOfLong+1));
+  // Meta-data
+	$('.meta-data .block-select').html("text " + foldersData[0].slugFolderName);
+	$('.meta-data .file-select').html(firstIndex+"/"+firstNbOfFiles);
+}
 
-	// Content
-	$('.left .text-content')
-	.html(converter.makeHtml(data.txtlong))
-	.attr("data-index", data.longIndex);
-	$('.right .small-text-content')
-	.html(converter.makeHtml(data.txtshort))
-	.attr("data-index", data.shortIndex);
-	// $('.right .image-content img')
-	// .attr('src', 'images/'+data.image);
-	// $('.right .image-content').attr("data-index", data.imageIndex);
+function insertOrReplaceFolder( slugFolderName, $folderContent) {
+	console.log($folderContent);
+  $(".page-wrapper").append( $folderContent);
 
-	// Zoom 
-	$text.zoom(data.zoom);
-	// $cell.css('transform', 'scale('+data.zoom+')');
+  return "inserted";
+}
 
-	// ImagePos
-	// $cell.css({
-	// 	'left': data.imgPosX+'cm',
-	// 	'top':data.imgPosY+'cm',
-	// });
+// Display elements in HTML
+function makeFolderContent( projectData){
 
-	$('.right .small-text-content').css({
-			'left': data.shortPosX+'cm',
-			'top':data.shortPosY+'cm',
-	});
+	console.log(projectData)
+	
+	var index = projectData.index;
+	var folder = projectData.slugFolderName;
+	var txt = projectData.text;
 
-	$('.left .text-content').css({
-		'left': data.longPosX+'cm',
-		'top':data.longPosY+'cm',
-	});
 
-	// Word spacing
-	$text.css('word-spacing', ''+data.space +'px'); 
+	var newFolder = $(".js--templates > .content").clone(false);
 
-	// change font
-	if(data.fontwords.length != 0){
-		$('p').wrapInTag({
+	// customisation du projet
+	newFolder
+	  .attr( 'data-index', index)
+	  .attr( 'data-folder', folder)
+	  .html(txt)
+	  .css({
+	  	'transform': 'scale('+projectData.zoom+')',
+	  	'left': projectData.xPos+'cm',
+			'top':projectData.yPos+'cm',
+			'word-spacing': projectData.wordSpace +'px'
+	  })
+  ;
+
+  // change font
+	if(projectData.fontwords.length != 0){
+		newFolder.wrapInTag({
 		  tag: 'span',
 		  class: 'change-font',
-		  words: data.fontwords
+		  words: projectData.fontwords
 		});
 	}
 
-	// console.log('black '+data.black);
-	// change font color
-	if(data.black == true){
-		$('.text-content').addClass('black-color').removeClass('white-color');
-    $('.small-text-content').addClass('black-color').removeClass('white-color');
+		return newFolder;
 
-  }
-  else{
-  	$('.text-content').addClass('white-color').removeClass('black-color');
-    $('.small-text-content').addClass('white-color').removeClass('black-color');
-  }
-
-	// glitch images
-	// if(data.imagesglitch.length !=0){
-	// 	// console.log(data.imagesglitch);
-	// 	for(var a=0; a<data.imagesglitch.length; a++){
-	// 		// console.log(data.imagesglitch[a]);
-	// 		var glitch = data.imagesglitch[a];
-	// 		$('.right .image-wrapper').prepend('<div class="image-content wrapper'+glitch.count+' glitch"><img src="images/'+glitch.image+'"/></div>'); 
-	// 		$('.wrapper'+glitch.count).css({
-	// 			'top': glitch.pos+'px',
-	// 			'height':glitch.height+'px',
-	// 			'z-index':glitch.count +2
-	// 		}).find('img').css({
-	// 			'position':'absolute',
-	// 			'top': -glitch.pos+'px'
-	// 		});
-	// 	}
-	// }
-	// else{
-	// 	$('.glitch').remove();
-	// }
 
 }
+
 
 // not working
 function reset(){
