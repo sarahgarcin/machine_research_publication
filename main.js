@@ -36,11 +36,15 @@ module.exports = function(app, io){
 		//INDEX
 		createDataFile(socket);
 		socket.on( 'listFiles', function (data){ onListFolders(socket); });
+		
+		socket.on('changeText', onChangeText);
 
-		socket.on('zoom', onZoom);
+		socket.on('zoomIn', onZoomIn);
+		socket.on('zoomOut', onZoomOut);
+		
 		socket.on('move', onMove);
 		socket.on('wordSpacing', onWordSpacing);
-		socket.on('changeText', onChangeText);
+		
 		// socket.on('changeImages', onChangeImages);
 		// socket.on('countImages', onCountImages);
 		// socket.on('glitch', onGlitch);
@@ -78,7 +82,7 @@ module.exports = function(app, io){
 				var folderObj = {
 					path: folder,
 					txt : txt[txt.length-1],
-					index : i,
+					index : txt.length,
 					zoom : 1,
 					xPos : 0,
 					yPos : 0,
@@ -88,52 +92,13 @@ module.exports = function(app, io){
 				}
 				createNewData(folderObj).then(function(newpdata) {
 					console.log('newpdata: '+newpdata);
-		      // sendEventWithContent('displayPageEvents', newpdata);
+		      sendEventWithContent('displayPageEvents', newpdata);
 		    }, function(errorpdata) {
 		      console.log(errorpdata);
 
 		    });
 			}
 		}
-
-		// var jsonObject = {
-		// 	zoom : 1,
-		// 	imgPosX : 0,
-		// 	imgPosY: 0,
-		// 	longPosX : 2,
-		// 	longPosY: 1,
-		// 	shortPosX : 0,
-		// 	shortPosY: 11,
-		// 	space: 0,
-		// 	// image: lastImg,
-		// 	// imageIndex:indexImg,
-		// 	// nbOfImg : indexImg,
-		// 	// imagesglitch: [],
-		// 	txtlong: lastlong,
-		// 	longIndex:indexLong,
-		// 	nbOfLong : indexLong,
-		// 	txtshort: lastshort,
-		// 	shortIndex:indexShort,
-		// 	nbOfShort : indexShort,
-		// 	fontwords: [],
-		// 	black: true
-		// }
-
-		// if (! fs.existsSync(jsonFile)){
-		// 	console.log("File does not exist!");
-		// 	var dataToWrite = JSON.stringify(jsonObject, null, 4);//,null,4);
-		// 	try {
-		// 	  fs.writeFileSync(jsonFile, dataToWrite);
-		// 	  console.log("JSON saved to " + jsonFile);
-		// 	} 
-		// 	catch (err) {
-		// 	  return console.log(err);
-		// 	}
-		// }
-		// else{
-		// 	var obj = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
-		// 	io.sockets.emit('displayPageEvents', obj);
-		// }
 	}
 
 	// reset 
@@ -145,17 +110,95 @@ module.exports = function(app, io){
 
 	}
 	
-	// ------------- SYNCHRONISE FUNCTIONS -------------
-	function onZoom(zoom, element){
-		// save zoom in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.zoom = zoom;
+	function onChangeText(element){
+		var textArray = [];
+		var dir = element.path;
+    var arrayOfFiles = fs.readdirSync(dir);
+    var prevIndex = parseInt((element.index)-1);
+    console.log("ON CHANGE TEXT EVENTS");
 
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+    if(prevIndex < 0){
+    	prevIndex = arrayOfFiles.length - 1;
+    }
+
+    if(arrayOfFiles[prevIndex] == settings.confMetafilename + settings.metaFileext){
+    	prevIndex = prevIndex - 1;
+    	if(prevIndex < 0){
+	    	prevIndex = arrayOfFiles.length - 1;
+	    }
+    }
+
+    console.log(prevIndex, element.index);
+
+    var newData = {
+    	'text': fs.readFileSync(dir+'/'+arrayOfFiles[prevIndex], 'utf8'),
+    	'index': prevIndex,
+    	"slugFolderName" : element.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+    	console.log(currentDataJSON);
+      sendEventWithContent( 'changeTextEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+	} 
+	
+	function onZoomIn(data){
+		console.log("ON ZOOM IN");
+		var newZoom = zoomIn(parseFloat(data.zoom));
 		
-		// send to everyone
-		io.sockets.emit('zoomEvents', zoom, element);
 
+    var newData = {
+    	'zoom': newZoom, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'zoomEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+	}
+
+	function onZoomOut(data){
+		console.log("ON ZOOM OUT");
+		var zoom = zoomOut(parseFloat(data.zoom));
+
+    var newData = {
+    	'zoom': zoom,
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'zoomEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+	}
+
+	function zoomIn(zoom){
+	  var maxZoom = 3,
+	      zoomStep = 0.07, 
+	      newZoom = zoom;
+	  if(zoom > maxZoom){
+	  	var newZoom = zoom;
+	  }
+	  else{ 
+	  	var newZoom = zoom + zoomStep;
+	  }
+	  return newZoom;
+	}
+
+	function zoomOut(zoom){
+	  var minZoom = 0.3,
+	      zoomStep = 0.07;
+
+	  if(zoom < minZoom) zoom = zoom; 
+	  else zoom -= zoomStep; 
+	  return zoom;
 	}
 
 	function onMove(posX, posY, count){
@@ -198,52 +241,8 @@ module.exports = function(app, io){
 		io.sockets.emit('nbImages', countImg, clonecount);
 	}
 
-	function onGlitch(clonecount, pos, height, index){
-		var files = readImagesDir(imageFolderPath);
-		// save glitch in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.imagesglitch.push({image: files[index], pos: pos, height:height, count: clonecount });
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 
-		io.sockets.emit('glitchEvents', clonecount,files, pos, height, index);
-	}
 
-	function onGlitchRemove(){
-		// save glitch in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.imagesglitch = [];
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
-
-		io.sockets.emit('glitchRemEvents');
-	}
-
-	function onChangeText(prevIndex, dir, element){
-		var textArray = [];
-    var arrayOfFiles = fs.readdirSync(dir);
-
-    arrayOfFiles.forEach( function (file) {
-      var textInFile = fs.readFileSync(dir+'/'+file, 'utf8');
-      textArray.push(textInFile);
-    });
-
-    if(prevIndex < 0){
-    	prevIndex = arrayOfFiles.length - 1;
-    }
-
-    // save new text in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		if(dir == longFolderPath){
-			obj.txtlong = textArray[prevIndex];
-			obj.longIndex = prevIndex;
-		}
-		if(dir == shortFolderPath){
-			obj.txtshort = textArray[prevIndex];
-			obj.shortIndex = prevIndex;
-		}
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
-
-    io.sockets.emit('changeTextEvents', textArray, prevIndex, element);
-	} 
 
 	function onChangeImages(prevIndex, dir, element){
 		var files = readImagesDir(dir);
@@ -273,28 +272,6 @@ module.exports = function(app, io){
 		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
 
 		io.sockets.emit('removeFontEvents');
-	}
-
-	function onChangeFontColor(black){
-		// save change font color in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.black = black;
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
-
-		io.sockets.emit('changeFontColorEvents', black);
-	}
-
-	function readImagesDir(dir){
-		var fileType = ['.jpg', '.jpeg', '.png'],
-        files = [];
-    var arrayOfFiles = fs.readdirSync(dir);
-    arrayOfFiles.forEach( function (file) {
-    	// console.log(fileType.indexOf(path.extname(file))>-1, file);
-      if(fileType.indexOf(path.extname(file))>-1) {
-        files.push(file); //store the file name into the array files
-      }
-    });
-    return files;
 	}
 
 	function readTxtDir(textDir){
@@ -381,7 +358,6 @@ module.exports = function(app, io){
     	var path =  folderData.path;
 			var txt = folderData.txt;
 			var index = folderData.index;
-			console.log(folderData.nbOfFiles);
 
 			fs.access(getMetaFileOfFolder(path), fs.F_OK, function( err) {
 				if (err) {
@@ -408,6 +384,34 @@ module.exports = function(app, io){
         }
       });
 
+    });
+  }
+
+  function updateFolderMeta( folderData) {
+    return new Promise(function(resolve, reject) {
+      console.log( "COMMON — updateFolderMeta");
+      // console.log(folderData);
+      var slugFolderName = folderData.slugFolderName;
+      var folderPath = getFullPath( slugFolderName);
+      var newText = folderData.text;
+      var newIndex = folderData.index;
+      var newZoom = folderData.zoom;
+
+      // récupérer les infos sur le folder
+      var fmeta = getFolderMeta( slugFolderName);
+      if(newText != undefined)
+      	fmeta.text = newText;
+      if(newIndex != undefined)
+      	fmeta.index = newIndex;
+      if(newZoom != undefined)
+      fmeta.zoom = newZoom;
+      // console.log(fmeta);
+
+      // envoyer les changements dans le JSON du folder
+      storeData( getMetaFileOfFolder( folderPath), fmeta, "update").then(function( ufmeta) {
+        ufmeta.slugFolderName = slugFolderName;
+        resolve( ufmeta);
+      });
     });
   }
 

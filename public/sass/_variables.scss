@@ -1,4 +1,4 @@
-// F O N T 
+// I M P O R T    F O N T 
 @import "../fonts/volkorn/stylesheet.css";
 @import "../fonts/inknut/stylesheet.css";
 
@@ -8,44 +8,33 @@ $heightPage: 21cm;
 $margintop: 1cm;
 $marginleft: 2cm;
 
+
 // FONT SIZE
 $h1Size: 20pt;
 $h2Size: 15pt;
 $h3Size: 12pt;
 $h6Size: 80pt;
-$buttonFont: 1rem;
-$titlePopUpFont: 1.5em;
-// $h2Size: 1.8em;
+$textSize: 13pt;
 
-// T A I L L E S
-$margin: 16px;
-$marginrem: .9375rem;
-$t-navbarheight: 70px;
+// FONT FAMILY
+$titleFont : "inknut", sans-serif;
+$textFont: "vollkorn", sans-serif;
 
-// C O L O R S
-$bleumarine: #293275;
-$bleuvert: #48C2B5;
+@mixin titleStyle{
+	font-size: $h1Size;
+	font-family: $titleFont;
+	font-weight: bold;
+}
 
-$grisfonce: #535353;
-$grisclair: #B5B5B5;
-$gristresclair: #e5e5e5;
+@mixin textStyle{
+	font-size: $textSize;
+	font-family: $textFont;
+	font-weight: normal;
+}
 
-$orange: #FFB520;
-$rouge: #EF474B;
 
-// new colors
-$c-images: #FFB520;
-$c-videos: #fe414d;
-$c-sons: #09227c;
-$c-anim: #48c2b5;
 
-$c-dossier: #F56A4B; // #F56A4B
-$c-projet: #40beb3;
-$c-bibli: #293275;
-$c-capture: $orange;
-$c-publi: #EF4651;
 
-$c-separator: #DFDFDF;
 
 
 

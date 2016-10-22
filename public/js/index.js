@@ -35,9 +35,12 @@ socket.on('error', onSocketError);
 
 socket.on('displayPageEvents', onDisplayPage);
 
-socket.on('zoomEvents', function(zoom, element){ 
-	console.log(element);
-	$(element).zoom(zoom);
+socket.on('zoomEvents', function(data){ 
+	var $element = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+	console.log($element, data.zoom);
+	$element.zoom(data.zoom);
+	localStorage.setItem('data', JSON.stringify(data));
+	console.log(data);
 });
 
 socket.on('moveEvents', function(posX, posY, count){
@@ -66,15 +69,23 @@ socket.on('wordSpacingEvents', function(space){
 	$text.css('word-spacing', ''+space +'px'); 
 });
 
-socket.on('changeTextEvents', function(textArray, index, element){
-	var $textEl = $(element);
-	var newFile = textArray[index];
+socket.on('changeTextEvents', function(data){
 
-	// display the right index
-	$('.meta-data .file-select').html((index+1)+'/'+ textArray.length );
+	var $textEl = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+	// var $textEl = $('.content[data-folder="'+data.slugFolderName+'"]');
+	console.log($textEl);
+	var newText = data.text;
+	var newIndex = data.index;
+
+	$textEl
+	.attr('data-index', newIndex)
+	.html(converter.makeHtml(newText));
 	
-	$textEl.attr('data-index', index);
-	$textEl.html(converter.makeHtml(newFile));
+	localStorage.setItem('data', JSON.stringify(data));
+
+	// // display the right index
+	$('.meta-data .file-select').html((parseInt(data.index))+'/'+ data.nbOfFiles);
+	
 });
 
 socket.on('changeFontEvents', function(wordsCount){
@@ -102,257 +113,282 @@ jQuery(document).ready(function($) {
 });
 
 
-function init(data){
+function init(){
 
+
+	// console.log(data);
+	
 	// C H A N G E    C O N T E N T 
-	var partCount = 0;
-	var elObj = [];
-	// push element into array
-	$('.--js-content-el').each(function(i){
-		elObj[i] = $(this);
-		return elObj;
-	});
+	// var partCount = 0;
+	// var elObj = [];
+	// // push element into array
+	// $('.--js-content-el').each(function(i){
+	// 	elObj[i] = $(this);
+	// 	return elObj;
+	// });
 	
 	// Z O O M  var
-	var zoom = data.zoom,
-			minZoom = 0.3,
-			maxZoom = 3,
-			zoomStep = 0.07;
+	// var zoom = data.zoom,
+	// 		minZoom = 0.3,
+	// 		maxZoom = 3,
+	// 		zoomStep = 0.07;
 
-	// M O V E  var
-	var imgPosX  = data.imgPosX,
-			imgPosY = data.imgPosY,
-			longPosX  = data.longPosX,
-			longPosY = data.longPosY,
-			shortPosX  = data.shortPosX,
-			shortPosY = data.shortPosY,
-			maxX = 15,
-			minX = -20,
-			xStep = 0.4,
-			maxY = 18,
-			minY = -12,
-			yStep = 0.5;
+	// // M O V E  var
+	// var imgPosX  = data.imgPosX,
+	// 		imgPosY = data.imgPosY,
+	// 		longPosX  = data.longPosX,
+	// 		longPosY = data.longPosY,
+	// 		shortPosX  = data.shortPosX,
+	// 		shortPosY = data.shortPosY,
+	// 		maxX = 15,
+	// 		minX = -20,
+	// 		xStep = 0.4,
+	// 		maxY = 18,
+	// 		minY = -12,
+	// 		yStep = 0.5;
 
-	// W O R D   S P A C I N G var
-	var space= data.space,
-			spacePlus = 5,
-			spaceMoins = 3;
+	// // W O R D   S P A C I N G var
+	// var space= data.space,
+	// 		spacePlus = 5,
+	// 		spaceMoins = 3;
 
-	// G L I T C H  var
-	var clonecount =0;
+	// // G L I T C H  var
+	// var clonecount =0;
 
-	// C H A N G E  F O N T   var
-	var countRegex = 0;
-	var arrayWords = settings.words;
-	var wordsCount = [];
+	// // C H A N G E  F O N T   var
+	// var countRegex = 0;
+	// var arrayWords = settings.words;
+	// var wordsCount = [];
 
-	//Reset keypress
-	reset();
-
+	// //Reset keypress
+	// reset();
 
 	$(document).on('keypress', function(e){
-		// console.log(e.keyCode);
 		var code = e.keyCode;
-		console.log('plop', code);
-
-		switch(code){
+		// console.log(code);
+		// Retrieve the object from storage
+		var retrievedObject = localStorage.getItem('data');
+		var data = JSON.parse(retrievedObject);
+		console.log('retrievedObject: ', JSON.parse(retrievedObject));
 		
 		// ------   C H A N G E   C O N T E N T ---------
-
-			// v2 press "o" to change content (go prev)
-			case 111:
-				for(i in elObj){
-					if(partCount == i){
-						var folderName = elObj[i].attr('data-folder');
-						var folder = pageFolder + folderName;
-						prevContent(elObj[i], folder, 'changeText');
-					}
-				}
-				break;
-
-			// v2 press "p" to go to next part to change
-			case 112:
-				if(partCount < elObj.length-1){
-					partCount ++;
-				}
-				else{ partCount = 0; }
-
-				for(i in elObj){
-					if(partCount == i){
-						var type = elObj[i].attr('data-folder');
-						$('.meta-data .block-select').html(type + ' text');
-						if(type == 'long'){
-							$('.meta-data .file-select').html((data.longIndex+1) + '/' + (data.nbOfLong+1));
-						}
-						if(type == 'short'){
-							$('.meta-data .file-select').html((data.shortIndex+1) + '/' + (data.nbOfShort+1));
-						}
-					}
-				}
-				break;
-
-
-
-		// ------   Z O O M -----------
-			
-			//zoomIn press "u"
-			case 117:
-				for(i in elObj){
-					if(partCount == i){
-						var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
-						zoom = zoomIn(zoom, maxZoom, zoomStep);
-						socket.emit("zoom", zoom, elementClass);
-					}
-				}
-				break;
-			
-			//zoomOut press "space"
-			case 32:
-				for(i in elObj){
-					if(partCount == i){
-						var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
-						zoom = zoomOut(zoom, minZoom, zoomStep);
-						socket.emit("zoom", zoom, elementClass);
-					}
-				}
-				break;
-
-		// ------   M O V E    E L E M E N T S -----------
-		  //press "l" to move image on the right
-			case 113:
-				for(i in elObj){
-					// if(partCount == i){
-
-					// }
-					if(partCount == 0){
-						longPosX += xStep;
-						socket.emit("move", longPosX, longPosY, partCount);
-					}
-					if(partCount == 2){
-						shortPosX += xStep;
-						socket.emit("move", shortPosX, shortPosY, partCount);
-					}
-				}
-				break;
-			//press "j" to move image on the left
-			case 97:
-				// if(posX >= minX){
-					if(partCount == 0){
-						longPosX -= xStep;
-						socket.emit("move", longPosX, longPosY, partCount);
-					}
-					if(partCount == 1){
-						// imgPosX -= xStep;
-						// socket.emit("move", imgPosX, imgPosY, partCount);
-					}
-					if(partCount == 2){
-						shortPosX -= xStep;
-						socket.emit("move", shortPosX, shortPosY, partCount);
-					}
-					// posX -= xStep;
-					// socket.emit("move", posX, posY, partCount);
-				// }
-				break;
-			//press "k" to move image down
-			case 119:
-				// if(posY < maxY){
-					if(partCount == 0){
-						longPosY += yStep;
-						socket.emit("move", longPosX, longPosY, partCount);
-					}
-					if(partCount == 1){
-						// imgPosY += yStep;
-						// socket.emit("move", imgPosX, imgPosY, partCount);
-					}
-					if(partCount == 2){
-						shortPosY += yStep;
-						socket.emit("move", shortPosX, shortPosY, partCount);
-					}
-					// posY += yStep;
-					// socket.emit("move", posX, posY, partCount);
-				// }
-				break;
-			//press "i" to move image up
-			case 115:
-				// if(posY >= minY){
-					if(partCount == 0){
-						longPosY -= yStep;
-						socket.emit("move", longPosX, longPosY, partCount);
-					}
-					if(partCount == 1){
-						// imgPosY -= yStep;
-						// socket.emit("move", imgPosX, imgPosY, partCount);
-					}
-					if(partCount == 2){
-						shortPosY -= yStep;
-						socket.emit("move", shortPosX, shortPosY, partCount);
-					}
-					// posY -= yStep;
-					// socket.emit("move", posX, posY, partCount);
-				// }
-			break;
-
-		// ------   G L I T C H    I M A G E S -----------
-			// on "n" press glitch images
-			case 105:
-
-				break; 
-
-		// ------   C H A N G E    F O N T  ------ 
-
-			// "c" press -> change font-family 
-			case 101:
-				countRegex ++;
-				if(countRegex <= arrayWords.length){
-					for(var a =0; a<countRegex; a++){
-						wordsCount.push(arrayWords[a]);
-						console.log(arrayWords[a]);
-					}
-					socket.emit('changeFont', wordsCount);
-				}
-				else{
-					socket.emit('removeFont');
-					countRegex = 0;
-					wordsCount = [];
-				}
-				break;
-
-		// ------   W O R D    S P A C I N G  ------ 
-		 
-		  //press "s" to add space between each words
-			case 121:
-				space += spacePlus;
-				socket.emit('wordSpacing', space);
-				break;
-			
-			//press "q" to decrease space between each words
-			case 114:
-				space -= spaceMoins;
-		    socket.emit('wordSpacing', space);
-				break;
-
-		// ------   G E N E R A T E     P D F  ------ 
-			
-			//Press T and generate PDF
-			case 116:
-
-				// var page = $('body').html();
-				// $('.page').css('border', 'none');
-				// $('.right').css('border', 'none');
-				// socket.emit('removeBorders');
-				socket.emit('generate');
-				break;
-		}
+		changeText(data, code);
+		zoomEvents(data, code);
+		
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
+
+
+	// $(document).on('keypress', function(e){
+	// 	// console.log(e.keyCode);
+	// 	var code = e.keyCode;
+	// 	console.log('plop', code);
+
+	// 	switch(code){
+		
+
+	// 	// ------   Z O O M -----------
+			
+	// 		//zoomIn press "u"
+	// 		case 117:
+	// 			for(i in elObj){
+	// 				if(partCount == i){
+	// 					var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
+	// 					zoom = zoomIn(zoom, maxZoom, zoomStep);
+	// 					socket.emit("zoom", zoom, elementClass);
+	// 				}
+	// 			}
+	// 			break;
+			
+	// 		//zoomOut press "space"
+	// 		case 32:
+	// 			for(i in elObj){
+	// 				if(partCount == i){
+	// 					var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
+	// 					zoom = zoomOut(zoom, minZoom, zoomStep);
+	// 					socket.emit("zoom", zoom, elementClass);
+	// 				}
+	// 			}
+	// 			break;
+
+	// 	// ------   M O V E    E L E M E N T S -----------
+	// 	  //press "l" to move image on the right
+	// 		case 113:
+	// 			for(i in elObj){
+	// 				// if(partCount == i){
+
+	// 				// }
+	// 				if(partCount == 0){
+	// 					longPosX += xStep;
+	// 					socket.emit("move", longPosX, longPosY, partCount);
+	// 				}
+	// 				if(partCount == 2){
+	// 					shortPosX += xStep;
+	// 					socket.emit("move", shortPosX, shortPosY, partCount);
+	// 				}
+	// 			}
+	// 			break;
+	// 		//press "j" to move image on the left
+	// 		case 97:
+	// 			// if(posX >= minX){
+	// 				if(partCount == 0){
+	// 					longPosX -= xStep;
+	// 					socket.emit("move", longPosX, longPosY, partCount);
+	// 				}
+	// 				if(partCount == 1){
+	// 					// imgPosX -= xStep;
+	// 					// socket.emit("move", imgPosX, imgPosY, partCount);
+	// 				}
+	// 				if(partCount == 2){
+	// 					shortPosX -= xStep;
+	// 					socket.emit("move", shortPosX, shortPosY, partCount);
+	// 				}
+	// 				// posX -= xStep;
+	// 				// socket.emit("move", posX, posY, partCount);
+	// 			// }
+	// 			break;
+	// 		//press "k" to move image down
+	// 		case 119:
+	// 			// if(posY < maxY){
+	// 				if(partCount == 0){
+	// 					longPosY += yStep;
+	// 					socket.emit("move", longPosX, longPosY, partCount);
+	// 				}
+	// 				if(partCount == 1){
+	// 					// imgPosY += yStep;
+	// 					// socket.emit("move", imgPosX, imgPosY, partCount);
+	// 				}
+	// 				if(partCount == 2){
+	// 					shortPosY += yStep;
+	// 					socket.emit("move", shortPosX, shortPosY, partCount);
+	// 				}
+	// 				// posY += yStep;
+	// 				// socket.emit("move", posX, posY, partCount);
+	// 			// }
+	// 			break;
+	// 		//press "i" to move image up
+	// 		case 115:
+	// 			// if(posY >= minY){
+	// 				if(partCount == 0){
+	// 					longPosY -= yStep;
+	// 					socket.emit("move", longPosX, longPosY, partCount);
+	// 				}
+	// 				if(partCount == 1){
+	// 					// imgPosY -= yStep;
+	// 					// socket.emit("move", imgPosX, imgPosY, partCount);
+	// 				}
+	// 				if(partCount == 2){
+	// 					shortPosY -= yStep;
+	// 					socket.emit("move", shortPosX, shortPosY, partCount);
+	// 				}
+	// 				// posY -= yStep;
+	// 				// socket.emit("move", posX, posY, partCount);
+	// 			// }
+	// 		break;
+
+	// 	// ------   G L I T C H    I M A G E S -----------
+	// 		// on "n" press glitch images
+	// 		case 105:
+
+	// 			break; 
+
+	// 	// ------   C H A N G E    F O N T  ------ 
+
+	// 		// "c" press -> change font-family 
+	// 		case 101:
+	// 			countRegex ++;
+	// 			if(countRegex <= arrayWords.length){
+	// 				for(var a =0; a<countRegex; a++){
+	// 					wordsCount.push(arrayWords[a]);
+	// 					console.log(arrayWords[a]);
+	// 				}
+	// 				socket.emit('changeFont', wordsCount);
+	// 			}
+	// 			else{
+	// 				socket.emit('removeFont');
+	// 				countRegex = 0;
+	// 				wordsCount = [];
+	// 			}
+	// 			break;
+
+	// 	// ------   W O R D    S P A C I N G  ------ 
+		 
+	// 	  //press "s" to add space between each words
+	// 		case 121:
+	// 			space += spacePlus;
+	// 			socket.emit('wordSpacing', space);
+	// 			break;
+			
+	// 		//press "q" to decrease space between each words
+	// 		case 114:
+	// 			space -= spaceMoins;
+	// 	    socket.emit('wordSpacing', space);
+	// 			break;
+
+	// 	// ------   G E N E R A T E     P D F  ------ 
+			
+	// 		//Press T and generate PDF
+	// 		case 116:
+
+	// 			// var page = $('body').html();
+	// 			// $('.page').css('border', 'none');
+	// 			// $('.right').css('border', 'none');
+	// 			// socket.emit('removeBorders');
+	// 			socket.emit('generate');
+	// 			break;
+	// 	}
+	// 	e.preventDefault(); // prevent the default action (scroll / move caret)
+	// });
 	
+}
+// C H A N G E     T E X T     C O N T E N T
+function changeText(data, code){
+	var partCount = parseInt($('.page-wrapper').attr('data-part'));
+	var retrievedObject = localStorage.getItem('foldersdata');
+	var foldersdata = JSON.parse(retrievedObject);
+
+	if(code == 111){
+		socket.emit('changeText', data);
+	}
+
+	// v2 press "p" to go to next part to change
+	if(code == 112){
+		if(partCount < foldersdata.length-1){
+			partCount ++;
+			$('.page-wrapper').attr('data-part', partCount);
+		}
+		else{ 
+			partCount = 0; 
+			$('.page-wrapper').attr('data-part', partCount);
+		}
+		localStorage.setItem('data', JSON.stringify(foldersdata[partCount]));
+		var data = JSON.parse(localStorage.getItem('data'))
+		var type = data.slugFolderName;
+		$('.meta-data .block-select').html(type + ' text');
+		$('.meta-data .file-select').html((parseInt(data.index)+1) + '/' + parseInt(data.nbOfFiles));
+	}
+}
+
+// ------   Z O O M -----------
+function zoomEvents(data, code){
+
+	//zoomIn press "u"
+	if(code == 117){
+		console.log(data.zoom);
+		socket.emit("zoomIn", data);
+	}
+	
+	//zoomOut press "space"
+	if(code == 32){
+		socket.emit("zoomOut", data);
+	}
+
 }
 
 
 function onDisplayPage(foldersData){
 	$.each( foldersData, function( index, fdata) {
   	var $folderContent = makeFolderContent( fdata);
-  	// console.log($folderContent);
     return insertOrReplaceFolder( fdata.slugFolderName, $folderContent);
   });
 
@@ -362,10 +398,19 @@ function onDisplayPage(foldersData){
   // Meta-data
 	$('.meta-data .block-select').html("text " + foldersData[0].slugFolderName);
 	$('.meta-data .file-select').html(firstIndex+"/"+firstNbOfFiles);
+
+	var partCount = parseInt($('.page-wrapper').attr('data-part'));
+// console.log(partCount, foldersData);
+	data = foldersData[partCount];
+
+	// Put the object into storage
+	localStorage.setItem('foldersdata', JSON.stringify(foldersData));
+	localStorage.setItem('data', JSON.stringify(data));
+
+	init();
 }
 
 function insertOrReplaceFolder( slugFolderName, $folderContent) {
-	console.log($folderContent);
   $(".page-wrapper").append( $folderContent);
 
   return "inserted";
@@ -387,7 +432,7 @@ function makeFolderContent( projectData){
 	newFolder
 	  .attr( 'data-index', index)
 	  .attr( 'data-folder', folder)
-	  .html(txt)
+	  .html(converter.makeHtml(txt))
 	  .css({
 	  	'transform': 'scale('+projectData.zoom+')',
 	  	'left': projectData.xPos+'cm',
@@ -397,15 +442,15 @@ function makeFolderContent( projectData){
   ;
 
   // change font
-	if(projectData.fontwords.length != 0){
-		newFolder.wrapInTag({
-		  tag: 'span',
-		  class: 'change-font',
-		  words: projectData.fontwords
-		});
-	}
+	// if(projectData.fontwords.length != 0){
+	// 	newFolder.wrapInTag({
+	// 	  tag: 'span',
+	// 	  class: 'change-font',
+	// 	  words: projectData.fontwords
+	// 	});
+	// }
 
-		return newFolder;
+	return newFolder;
 
 
 }

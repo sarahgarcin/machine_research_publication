@@ -6753,11 +6753,12 @@ body, html {
 body {
   margin: 0;
   color: #000;
-  font-size: 12px;
-  font-family: 'vollkorn', serif; }
+  font-size: 13pt;
+  font-family: "vollkorn", sans-serif;
+  font-weight: normal; }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'savate', sans-serif;
+  font-family: "inknut", sans-serif, sans-serif;
   margin-bottom: 0.1cm; }
 
 h1 {
@@ -6783,7 +6784,7 @@ li {
   list-style: none; }
 
 p {
-  font-family: 'vollkorn', serif;
+  font-family: "vollkorn", sans-serif, serif;
   font-size: 10pt;
   line-height: 125%;
   padding-left: 0.5cm;
@@ -6805,12 +6806,6 @@ code {
 
 img {
   max-width: 100%; }
-
-.black-color p, .black-color h1, .black-color h2, .black-color h3, .black-color h4, .black-color h5, .black-color a, .black-color li {
-  color: #000; }
-
-.white-color p, .white-color h1, .white-color h2, .white-color h3, .white-color h4, .white-color h5, .white-color a, .white-color li {
-  color: #FFF; }
 
 .meta-data {
   width: auto;
@@ -6835,307 +6830,15 @@ img {
     margin: 1cm 2cm;
     width: 25.7cm;
     height: 19cm; }
-    .page .page-wrapper .left {
+    .page .page-wrapper .content {
       width: 12.2381cm;
       height: 19cm;
-      display: inline-block;
       padding-right: 0.5cm;
-      overflow: hidden; }
-      .page .page-wrapper .left .text-content {
-        position: absolute;
-        width: 12.2381cm; }
-    .page .page-wrapper .right {
-      width: 12.79cm;
-      height: 19cm;
-      display: inline-block;
-      position: relative; }
-      .page .page-wrapper .right .image-wrapper {
-        position: absolute;
-        width: 12.85cm;
-        height: 21cm;
-        max-height: 21cm;
-        overflow: hidden;
-        z-index: -1; }
-        .page .page-wrapper .right .image-wrapper .image-content {
-          position: absolute;
-          overflow: hidden;
-          width: 12.85cm; }
-          .page .page-wrapper .right .image-wrapper .image-content img {
-            width: 100%; }
-      .page .page-wrapper .right .small-text-content {
-        position: absolute;
-        bottom: 0cm;
-        width: 12.85cm; }
-        .page .page-wrapper .right .small-text-content p {
-          font-weight: bold;
-          font-size: 12pt; }
+      overflow: hidden;
+      position: absolute; }
   .page .change-font {
-    font-family: 'savate', sans-serif;
+    font-family: "inknut", sans-serif, sans-serif;
     font-size: 2em;
     line-height: 1; }
   .page .normal-font {
-    font-family: 'vollkorn', serif; }
-
-body.capture .mainContent {
-  max-width: none;
-  height: calc( 100vh - 70px);
-  overflow-x: hidden; }
-
-body.capture .container-inner {
-  position: relative;
-  margin: auto;
-  height: 100%; }
-
-body.capture .content-wrapper {
-  width: 100%;
-  height: 100%;
-  margin-top: 5%; }
-  body.capture .content-wrapper:before, body.capture .content-wrapper:after {
-    content: " ";
-    display: table; }
-  body.capture .content-wrapper:after {
-    clear: both; }
-
-.captureLeft {
-  margin: auto;
-  position: absolute;
-  background-color: #FFF;
-  z-index: 2;
-  margin-bottom: 25px;
-  padding: 10px;
-  height: auto;
-  max-width: 46%;
-  width: 50%;
-  left: 50%;
-  transform: translate3d(-50%, 0, 0);
-  transition: transform .4s ease-out; }
-  body[data-state="expanded"] .captureLeft {
-    transform: translate3d(-104%, 0, 0); }
-  body.is--fullscreen .captureLeft {
-    width: 100%;
-    left: 0 !important;
-    top: 0;
-    height: 100%;
-    padding: 2vh;
-    max-width: none;
-    transform: translate3d(0%, 0, 0); }
-  body.is--fullscreen[data-justcaptured="yes"] .captureLeft {
-    background-color: #FF4246; }
-  .captureLeft .video-view {
-    position: relative;
-    padding-bottom: 96px;
-    height: 100%;
-    width: 100%; }
-    body.is--fullscreen .captureLeft .video-view {
-      padding-bottom: 0; }
-  .captureLeft video {
-    height: auto;
-    max-height: 100%;
-    width: 100%; }
-  .captureLeft .btn-capture-wrapper {
-    z-index: 1000;
-    text-align: center;
-    position: absolute;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    height: 96px;
-    bottom: 0;
-    width: 100%;
-    overflow: hidden; }
-    .captureLeft .btn-capture-wrapper > div button {
-      outline: none !important;
-      border: none !important;
-      background: none !important;
-      margin: auto; }
-    .captureLeft .btn-capture-wrapper .btn.icon {
-      transform-origin: center center;
-      transition: transform .4s ease-out; }
-      .captureLeft .btn-capture-wrapper .btn.icon:hover {
-        transform: scale(1.1);
-        transition: transform .1s ease-out; }
-      .captureLeft .btn-capture-wrapper .btn.icon svg {
-        overflow: visible; }
-        .captureLeft .btn-capture-wrapper .btn.icon svg #FOND {
-          transform-origin: center;
-          transform: scale(1);
-          transition: transform .6s ease-out, fill .4s; }
-        body:not(.is--fullscreen)[data-justcaptured="yes"] .captureLeft .btn-capture-wrapper .btn.icon svg #FOND {
-          transform: scale(15);
-          fill: #FF4246;
-          transition: transform .2s ease-out, fill .3s; }
-        body:not(.is--fullscreen)[data-justcaptured="yes"][data-mode="stopmotion"] .captureLeft .btn-capture-wrapper .btn.icon svg #FOND {
-          fill: #48c2b5; }
-        body:not(.is--fullscreen)[data-videorecording="yes"] .captureLeft .btn-capture-wrapper .btn.icon svg #FOND,
-        body:not(.is--fullscreen)[data-audiorecording="yes"] .captureLeft .btn-capture-wrapper .btn.icon svg #FOND {
-          transform: scale(15);
-          fill: #FF4246;
-          transition: transform .2s ease-out, fill .3s; }
-        body:not(.is--fullscreen)[data-videorecording="yes"] .captureLeft .btn-capture-wrapper .btn.icon svg #CENTRE,
-        body:not(.is--fullscreen)[data-audiorecording="yes"] .captureLeft .btn-capture-wrapper .btn.icon svg #CENTRE {
-          fill: #FFB520; }
-    .captureLeft .btn-capture-wrapper .video-capture .video-save #stop-record-btn {
-      display: none; }
-    .captureLeft .btn-capture-wrapper .stopmotion-capture button {
-      display: inline-block; }
-    .captureLeft .btn-capture-wrapper .stopmotion-capture #capture-sm-btn {
-      display: none; }
-    .captureLeft .btn-capture-wrapper .audio-capture #stop-recording-btn {
-      display: none; }
-  .captureLeft .display-choice {
-    position: absolute;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none; }
-    .captureLeft .display-choice .choices {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      top: 0;
-      left: 0;
-      display: none; }
-      .captureLeft .display-choice .choices.image-choice {
-        background-color: #FFB520; }
-      .captureLeft .display-choice .choices.video-choice {
-        background-color: #fe414d; }
-      .captureLeft .display-choice .choices.stopmotion-choice {
-        background-color: #48c2b5; }
-      .captureLeft .display-choice .choices.audio-choice {
-        background-color: #09227c; }
-      .captureLeft .display-choice .choices .caption {
-        font-size: 3em;
-        text-align: center;
-        padding: 30px;
-        color: white;
-        top: 50%;
-        left: 50%;
-        width: 100%;
-        transform: translate(-50%, -58%);
-        position: absolute;
-        word-wrap: break-word; }
-  .captureLeft #canvas-audio {
-    display: none;
-    width: 100%; }
-  .captureLeft .full-screen-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0; }
-  .captureLeft .button-wrapper_gofullscreen .btn.icon, .captureLeft .button-wrapper_leavefullscreen .btn.icon {
-    border: 4px solid #EFEFEF;
-    padding: 0; }
-  .captureLeft .button-wrapper_gofullscreen:hover .btn.icon, .captureLeft .button-wrapper_leavefullscreen:hover .btn.icon {
-    border: 0px solid transparent !important; }
-  .captureLeft .button-wrapper_gofullscreen {
-    margin-right: -20px;
-    margin-top: -20px; }
-    body.is--fullscreen .captureLeft .button-wrapper_gofullscreen {
-      display: none; }
-    body[data-mode="audio"] .captureLeft .button-wrapper_gofullscreen {
-      display: none; }
-  .captureLeft .button-wrapper_leavefullscreen {
-    margin-right: 20px;
-    margin-top: 20px; }
-    body:not([class*=is--fullscreen]) .captureLeft .button-wrapper_leavefullscreen {
-      display: none; }
-  .captureLeft .recording-feedback {
-    position: absolute;
-    z-index: 100;
-    top: 10px;
-    left: 10px; }
-    .captureLeft .recording-feedback .record-feedback {
-      width: 15px;
-      height: 15px;
-      background-color: #EF474B;
-      border-radius: 50%;
-      display: inline-block;
-      vertical-align: middle; }
-    .captureLeft .recording-feedback .time-feedback {
-      display: inline-block;
-      vertical-align: middle;
-      margin-bottom: 2px;
-      margin-left: 10px;
-      color: #fff;
-      text-shadow: 0px 0px 2px #999; }
-
-.captureRight {
-  background-color: #FFF;
-  position: absolute;
-  z-index: 1;
-  display: block;
-  overflow: hidden;
-  opacity: 0;
-  padding: 10px;
-  height: auto;
-  max-width: 46%;
-  width: 50%;
-  left: 50%;
-  transform: translate3d(-50%, 0, 0);
-  transition: transform .4s ease-out, opacity .6s ease-out; }
-  body[data-state="expanded"] .captureRight {
-    opacity: 1;
-    transform: translate3d(4%, 0, 0); }
-  .captureRight .flash {
-    height: 100%;
-    background-color: #FFF;
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 150; }
-    body[data-mode="photo"] .captureRight .flash {
-      background-color: #FFB520; }
-    body[data-mode="video"] .captureRight .flash {
-      background-color: #fe414d; }
-    body[data-mode="stopmotion"] .captureRight .flash {
-      background-color: #48c2b5; }
-    body[data-mode="audio"] .captureRight .flash {
-      background-color: #09227c; }
-  .captureRight .mode-instructions {
-    width: 100%;
-    padding: 40px;
-    display: none; }
-    .captureRight .mode-instructions .icone-stopmotion {
-      min-width: 0;
-      width: 70%;
-      margin: 0 auto 40px; }
-    .captureRight .mode-instructions h4 {
-      font-size: 1em; }
-  .captureRight .output[src=''] {
-    display: none; }
-  .captureRight .preview {
-    position: relative; }
-    .captureRight .preview .output {
-      padding-bottom: 10px; }
-  .captureRight .preview_stopmotion video.output:not([src='']) ~ .mode-instructions {
-    display: none; }
-  .captureRight .preview_stopmotion .preview_stopmotion--container:empty ~ .mode-instructions {
-    display: block; }
-  .captureRight .preview_stopmotion .preview_stopmotion--container:empty ~ .button-wrapper_finishStopmotion {
-    display: none; }
-  .captureRight .preview_stopmotion .button-wrapper_finishStopmotion {
-    display: block;
-    float: right; }
-  .captureRight .preview_stopmotion .stopmotion_lastImagePreview {
-    padding: 16px;
-    background-color: #fff; }
-    .captureRight .preview_stopmotion .stopmotion_lastImagePreview:not(:first-of-type) {
-      position: absolute;
-      top: 0;
-      left: 0; }
-  .captureRight .preview_stopmotion .meta-stopmotion {
-    margin-top: 10px; }
-    .captureRight .preview_stopmotion .meta-stopmotion .count-image {
-      display: inline-block;
-      vertical-align: top; }
-  .captureRight .son {
-    display: none;
-    padding-left: 27px;
-    margin-top: 60px;
-    margin-bottom: 40px; }
-  .captureRight #video-stream {
-    display: none;
-    width: 100%; }
-  .captureRight #stop-sm {
-    display: none;
-    float: right;
-    width: 48px; }
+    font-family: "vollkorn", sans-serif, serif; }
