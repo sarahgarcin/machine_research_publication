@@ -3,20 +3,7 @@ var socket = io.connect();
 var dataTextLong;
 var converter = new showdown.Converter();
 
-var chapterFolder = settings.folder;
-var contentFolder = "content/";
-var longFolder = "long";
-var shortFolder = "short";
-var pdfFolder = "pdf";
-
-var pageFolder = contentFolder+chapterFolder;
-
-var longFolderPath = pageFolder + longFolder;
-var shortFolderPath = pageFolder + shortFolder;
-var pdfFolderPath = pageFolder + pdfFolder;
-
-// html elements
-var $text = $(".text-content");
+var countRegex = 0;
 
 /* sockets */
 function onSocketConnect() {
@@ -52,15 +39,17 @@ socket.on('moveEvents', function(data){
 	console.log(data);
 });
 
-socket.on('wordSpacingEvents', function(space){
-	$text.css('word-spacing', ''+space +'px'); 
+socket.on('wordSpacingEvents', function(data){
+	var $element = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+
+	$element.wordSpacing(data.wordSpace);
+	localStorage.setItem('data', JSON.stringify(data));
+
 });
 
 socket.on('changeTextEvents', function(data){
 
 	var $textEl = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
-	// var $textEl = $('.content[data-folder="'+data.slugFolderName+'"]');
-	console.log($textEl);
 	var newText = data.text;
 	var newIndex = data.index;
 
@@ -102,28 +91,6 @@ jQuery(document).ready(function($) {
 
 function init(){
 
-	// // M O V E  var
-	// var imgPosX  = data.imgPosX,
-	// 		imgPosY = data.imgPosY,
-	// 		longPosX  = data.longPosX,
-	// 		longPosY = data.longPosY,
-	// 		shortPosX  = data.shortPosX,
-	// 		shortPosY = data.shortPosY,
-	// 		maxX = 15,
-	// 		minX = -20,
-	// 		xStep = 0.4,
-	// 		maxY = 18,
-	// 		minY = -12,
-	// 		yStep = 0.5;
-
-	// // W O R D   S P A C I N G var
-	// var space= data.space,
-	// 		spacePlus = 5,
-	// 		spaceMoins = 3;
-
-	// // G L I T C H  var
-	// var clonecount =0;
-
 	// // C H A N G E  F O N T   var
 	// var countRegex = 0;
 	// var arrayWords = settings.words;
@@ -140,10 +107,13 @@ function init(){
 		var data = JSON.parse(retrievedObject);
 		// console.log('retrievedObject: ', JSON.parse(retrievedObject));
 		
-		// ------   C H A N G E   C O N T E N T ---------
+		// CALL FUNCTION YOU NEED HERE 
+		// CHANGE THE KEYPRESS CODE IN EACH FUNCTION
 		changeText(data, code);
 		zoomEvents(data, code);
 		moveEvents(data, code);
+		wordSpacing(data, code);
+		changeFontFamily(data, code);
 		
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
@@ -155,88 +125,6 @@ function init(){
 	// 	console.log('plop', code);
 
 	// 	switch(code){
-		
-
-	// 	// ------   M O V E    E L E M E N T S -----------
-	// 	  //press "l" to move image on the right
-	// 		case 113:
-	// 			for(i in elObj){
-	// 				// if(partCount == i){
-
-	// 				// }
-	// 				if(partCount == 0){
-	// 					longPosX += xStep;
-	// 					socket.emit("move", longPosX, longPosY, partCount);
-	// 				}
-	// 				if(partCount == 2){
-	// 					shortPosX += xStep;
-	// 					socket.emit("move", shortPosX, shortPosY, partCount);
-	// 				}
-	// 			}
-	// 			break;
-	// 		//press "j" to move image on the left
-	// 		case 97:
-	// 			// if(posX >= minX){
-	// 				if(partCount == 0){
-	// 					longPosX -= xStep;
-	// 					socket.emit("move", longPosX, longPosY, partCount);
-	// 				}
-	// 				if(partCount == 1){
-	// 					// imgPosX -= xStep;
-	// 					// socket.emit("move", imgPosX, imgPosY, partCount);
-	// 				}
-	// 				if(partCount == 2){
-	// 					shortPosX -= xStep;
-	// 					socket.emit("move", shortPosX, shortPosY, partCount);
-	// 				}
-	// 				// posX -= xStep;
-	// 				// socket.emit("move", posX, posY, partCount);
-	// 			// }
-	// 			break;
-	// 		//press "k" to move image down
-	// 		case 119:
-	// 			// if(posY < maxY){
-	// 				if(partCount == 0){
-	// 					longPosY += yStep;
-	// 					socket.emit("move", longPosX, longPosY, partCount);
-	// 				}
-	// 				if(partCount == 1){
-	// 					// imgPosY += yStep;
-	// 					// socket.emit("move", imgPosX, imgPosY, partCount);
-	// 				}
-	// 				if(partCount == 2){
-	// 					shortPosY += yStep;
-	// 					socket.emit("move", shortPosX, shortPosY, partCount);
-	// 				}
-	// 				// posY += yStep;
-	// 				// socket.emit("move", posX, posY, partCount);
-	// 			// }
-	// 			break;
-	// 		//press "i" to move image up
-	// 		case 115:
-	// 			// if(posY >= minY){
-	// 				if(partCount == 0){
-	// 					longPosY -= yStep;
-	// 					socket.emit("move", longPosX, longPosY, partCount);
-	// 				}
-	// 				if(partCount == 1){
-	// 					// imgPosY -= yStep;
-	// 					// socket.emit("move", imgPosX, imgPosY, partCount);
-	// 				}
-	// 				if(partCount == 2){
-	// 					shortPosY -= yStep;
-	// 					socket.emit("move", shortPosX, shortPosY, partCount);
-	// 				}
-	// 				// posY -= yStep;
-	// 				// socket.emit("move", posX, posY, partCount);
-	// 			// }
-	// 		break;
-
-	// 	// ------   G L I T C H    I M A G E S -----------
-	// 		// on "n" press glitch images
-	// 		case 105:
-
-	// 			break; 
 
 	// 	// ------   C H A N G E    F O N T  ------ 
 
@@ -255,20 +143,6 @@ function init(){
 	// 				countRegex = 0;
 	// 				wordsCount = [];
 	// 			}
-	// 			break;
-
-	// 	// ------   W O R D    S P A C I N G  ------ 
-		 
-	// 	  //press "s" to add space between each words
-	// 		case 121:
-	// 			space += spacePlus;
-	// 			socket.emit('wordSpacing', space);
-	// 			break;
-			
-	// 		//press "q" to decrease space between each words
-	// 		case 114:
-	// 			space -= spaceMoins;
-	// 	    socket.emit('wordSpacing', space);
 	// 			break;
 
 	// 	// ------   G E N E R A T E     P D F  ------ 
@@ -293,12 +167,16 @@ function changeText(data, code){
 	var retrievedObject = localStorage.getItem('foldersdata');
 	var foldersdata = JSON.parse(retrievedObject);
 
-	if(code == 111){
+	// press "o" to go to next part to change
+	var nextKey = 111; 
+	// press "p" to go to next part to change
+	var submitKey = 112;
+
+	if(code == nextKey){
 		socket.emit('changeText', data);
 	}
 
-	// v2 press "p" to go to next part to change
-	if(code == 112){
+	if(code == submitKey){
 		if(partCount < foldersdata.length-1){
 			partCount ++;
 			$('.page-wrapper').attr('data-part', partCount);
@@ -319,16 +197,18 @@ function changeText(data, code){
 function zoomEvents(data, code){
 
 	//zoomIn press "u"
-	if(code == 117){
+	var zoomInKey = 117; 
+	//zoomOut press "space"
+	var zoomOutKey = 32; 
+
+	if(code == zoomInKey){
 		console.log(data.zoom);
 		socket.emit("zoomIn", data);
 	}
 	
-	//zoomOut press "space"
 	if(code == 32){
 		socket.emit("zoomOut", data);
 	}
-
 }
 
 // ------   M O V E    E L E M E N T S -----------
@@ -345,7 +225,6 @@ function moveEvents(data, code){
 
   
 	if(code == right){
-		console.log('plop');
 		socket.emit("moveRight", data);
 	}
 	
@@ -360,6 +239,67 @@ function moveEvents(data, code){
 	if(code == up){
 		socket.emit("moveUp", data);
 	}
+}
+
+// ------   W O R D    S P A C I N G  ------ 
+function wordSpacing(data, code){
+
+	//press "y" to add space between each words
+	var increaseKey = 121;
+	//press "r" to decrease space between each words
+	var decreaseKey = 114;
+
+	if(code == increaseKey){
+		console.log('plop');
+		socket.emit('increaseWordSpacing', data);
+	}
+
+	if(code == decreaseKey){
+		socket.emit('decreaseWordSpacing', data);
+	}
+}
+
+// ------   C H A N G E    F O N T    F A M I L Y  ------ 
+function changeFontFamily(data, code){
+	// "e" press -> change font-family 
+	var fontKey = 101;
+	var words = settings.words;
+	var text = data.text;
+
+	if(code == fontKey){
+
+		if(countRegex < words.length -1){
+			// console.log(text.indexOf(words[countRegex]));
+			if(text.indexOf(words[countRegex]) != -1){
+			  console.log(words[countRegex] + " found");
+			  socket.emit('changeFont', data, words[countRegex]);
+			  countRegex ++;
+			}
+			else{
+				countRegex ++;
+				console.log(words[countRegex] + " not found");
+			}
+			
+		}
+		else{
+			countRegex = 0;
+			socket.emit('removeFont', data);
+		}
+		// for(var i in words){
+		// 	// console.log(words[i]);
+		// 	if(text.indexOf(words[i]) != -1){
+		// 	  console.log(words[i] + " found");
+		// 	}
+		// }
+		// var str1 = "Lorem ipsum youpi blablabla ";
+		// var str2 = "Lorem";
+		// if(str1.indexOf(str2) != -1){
+		//     console.log(str2 + " found");
+		// }
+
+		// socket.emit('changeFont', data);
+	}
+
 }
 
 
@@ -377,7 +317,6 @@ function onDisplayPage(foldersData){
 	$('.meta-data .file-select').html(firstIndex+"/"+firstNbOfFiles);
 
 	var partCount = parseInt($('.page-wrapper').attr('data-part'));
-// console.log(partCount, foldersData);
 	data = foldersData[partCount];
 
 	// Put the object into storage
@@ -428,10 +367,7 @@ function makeFolderContent( projectData){
 	// }
 
 	return newFolder;
-
-
 }
-
 
 // not working
 function reset(){

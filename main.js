@@ -48,15 +48,17 @@ module.exports = function(app, io){
 		socket.on('moveUp', onMoveUp);
 
 
-
-		socket.on('wordSpacing', onWordSpacing);
+		socket.on('increaseWordSpacing', onIncreaseWordSpacing);
+		socket.on('decreaseWordSpacing', onDecreaseWordSpacing);
 		
 		// socket.on('changeImages', onChangeImages);
 		// socket.on('countImages', onCountImages);
 		// socket.on('glitch', onGlitch);
 		// socket.on('glitchRemove', onGlitchRemove);
+		
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
+		
 		// socket.on('changeFontColor', onChangeFontColor);
 
 		socket.on('reset', onReset);
@@ -290,41 +292,49 @@ module.exports = function(app, io){
 
 // -------  E N D       M O V E     F U N C T I O N S ----------- 
 
-
+// -------  W O R D    S P A C I N G     F U N C T I O N S -----------
 	
-	// function onMove(posX, posY, count){
-	// 	// save pos in json
-	// 	var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-	// 	console.log(count, posX, posY);
-	// 	if(count == 0){
-	// 		obj.longPosX = posX;
-	// 		obj.longPosY = posY;
-	// 	}
-	// 	if(count == 1){
-	// 		obj.imgPosX = posX;
-	// 		obj.imgPosY = posY;
-	// 	}
-	// 	if(count == 2){
-	// 		obj.shortPosX = posX;
-	// 		obj.shortPosY = posY;
-	// 	}
+	function onIncreaseWordSpacing(data){
+		console.log("ON INCREASE WORDSPACING");
+		console.log(data.wordSpace)
+		var spacePlus = settings.spacePlus;
 
-	// 	fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+		var newSpace = parseFloat(data.wordSpace) + spacePlus;
 
-	// 	// send to everyone
-	// 	io.sockets.emit('moveEvents', posX, posY, count);
-	// }
+    var newData = {
+    	'wordSpace': newSpace, 
+    	"slugFolderName" : data.slugFolderName
+    }
 
-	function onWordSpacing(space){
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'wordSpacingEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
 
-		// save space in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.space = space;
-
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
-
-		io.sockets.emit('wordSpacingEvents', space);
 	}
+
+	function onDecreaseWordSpacing(data){
+		console.log("ON DECREASE WORDSPACING");
+		var spaceMinus = settings.spaceMinus;
+
+		var newSpace = parseFloat(data.wordSpace) - spaceMinus;
+
+    var newData = {
+    	'wordSpace': newSpace, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'wordSpacingEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+
+	}
+
+// ------- E N D        W O R D    S P A C I N G     F U N C T I O N S -----------
 
 	function onCountImages(clonecount){
 		var files = readImagesDir(imageFolderPath);
@@ -335,19 +345,7 @@ module.exports = function(app, io){
 
 
 
-	function onChangeImages(prevIndex, dir, element){
-		var files = readImagesDir(dir);
-
-		// save new text in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.image = files[prevIndex];
-		obj.imageIndex = prevIndex;
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
-
-    io.sockets.emit('changeImagesEvents', files, prevIndex, element);
-	}
-
-	function onChangeFont(words){
+	function onChangeFont(data, word){
 		// save change font in json
 		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 		obj.fontwords = words;
@@ -489,6 +487,7 @@ module.exports = function(app, io){
       var newZoom = folderData.zoom;
       var newXPos = folderData.xPos;
       var newYPos = folderData.yPos;
+      var newSpace = folderData.wordSpace;
 
       // récupérer les infos sur le folder
       var fmeta = getFolderMeta( slugFolderName);
@@ -502,6 +501,8 @@ module.exports = function(app, io){
       	fmeta.xPos = newXPos;
       if(newYPos != undefined)
       	fmeta.yPos = newYPos;
+      if(newSpace != undefined)
+      	fmeta.wordSpace = newSpace;
       // console.log(fmeta);
 
       // envoyer les changements dans le JSON du folder

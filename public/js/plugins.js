@@ -14,6 +14,12 @@
     });
 
   };
+
+  $.fn.wordSpacing = function( space ) {
+
+    return this.css('word-spacing', ''+space +'px');
+
+  };
  
 }( jQuery ));
 
