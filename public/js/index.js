@@ -43,26 +43,13 @@ socket.on('zoomEvents', function(data){
 	console.log(data);
 });
 
-socket.on('moveEvents', function(posX, posY, count){
-	console.log(count);
-	if(count == 0){
-		$('.left .text-content').css({
-			'left': posX+'cm',
-			'top':posY+'cm',
-		});
-	}
-	if(count == 1){
-		// $cell.css({
-		// 	'left': posX+'cm',
-		// 	'top':posY+'cm',
-		// });
-	}
-	if(count == 2){
-		$('.right .small-text-content').css({
-			'left': posX+'cm',
-			'top':posY+'cm',
-		});
-	}
+socket.on('moveEvents', function(data){
+
+	var $element = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+
+	$element.move(data.xPos, data.yPos);
+	localStorage.setItem('data', JSON.stringify(data));
+	console.log(data);
 });
 
 socket.on('wordSpacingEvents', function(space){
@@ -115,24 +102,6 @@ jQuery(document).ready(function($) {
 
 function init(){
 
-
-	// console.log(data);
-	
-	// C H A N G E    C O N T E N T 
-	// var partCount = 0;
-	// var elObj = [];
-	// // push element into array
-	// $('.--js-content-el').each(function(i){
-	// 	elObj[i] = $(this);
-	// 	return elObj;
-	// });
-	
-	// Z O O M  var
-	// var zoom = data.zoom,
-	// 		minZoom = 0.3,
-	// 		maxZoom = 3,
-	// 		zoomStep = 0.07;
-
 	// // M O V E  var
 	// var imgPosX  = data.imgPosX,
 	// 		imgPosY = data.imgPosY,
@@ -165,15 +134,16 @@ function init(){
 
 	$(document).on('keypress', function(e){
 		var code = e.keyCode;
-		// console.log(code);
+		console.log(code);
 		// Retrieve the object from storage
 		var retrievedObject = localStorage.getItem('data');
 		var data = JSON.parse(retrievedObject);
-		console.log('retrievedObject: ', JSON.parse(retrievedObject));
+		// console.log('retrievedObject: ', JSON.parse(retrievedObject));
 		
 		// ------   C H A N G E   C O N T E N T ---------
 		changeText(data, code);
 		zoomEvents(data, code);
+		moveEvents(data, code);
 		
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
@@ -186,30 +156,6 @@ function init(){
 
 	// 	switch(code){
 		
-
-	// 	// ------   Z O O M -----------
-			
-	// 		//zoomIn press "u"
-	// 		case 117:
-	// 			for(i in elObj){
-	// 				if(partCount == i){
-	// 					var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
-	// 					zoom = zoomIn(zoom, maxZoom, zoomStep);
-	// 					socket.emit("zoom", zoom, elementClass);
-	// 				}
-	// 			}
-	// 			break;
-			
-	// 		//zoomOut press "space"
-	// 		case 32:
-	// 			for(i in elObj){
-	// 				if(partCount == i){
-	// 					var elementClass = '.'+elObj[i].attr('class').toString().split(' ')[0];
-	// 					zoom = zoomOut(zoom, minZoom, zoomStep);
-	// 					socket.emit("zoom", zoom, elementClass);
-	// 				}
-	// 			}
-	// 			break;
 
 	// 	// ------   M O V E    E L E M E N T S -----------
 	// 	  //press "l" to move image on the right
@@ -383,6 +329,37 @@ function zoomEvents(data, code){
 		socket.emit("zoomOut", data);
 	}
 
+}
+
+// ------   M O V E    E L E M E N T S -----------
+function moveEvents(data, code){
+	
+	//press "q" to move image on the right
+	var right = 113;
+	//press "a" to move image on the left
+	var left = 97; 
+	//press "w" to move image down
+	var down = 119;
+	//press "s" to move image up
+	var up = 115;
+
+  
+	if(code == right){
+		console.log('plop');
+		socket.emit("moveRight", data);
+	}
+	
+	if(code == left){
+		socket.emit("moveLeft", data);
+	}
+
+	if(code == down){
+		socket.emit("moveDown", data);
+	}
+
+	if(code == up){
+		socket.emit("moveUp", data);
+	}
 }
 
 

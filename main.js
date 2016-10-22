@@ -42,7 +42,13 @@ module.exports = function(app, io){
 		socket.on('zoomIn', onZoomIn);
 		socket.on('zoomOut', onZoomOut);
 		
-		socket.on('move', onMove);
+		socket.on('moveRight', onMoveRight);
+		socket.on('moveLeft', onMoveLeft);
+		socket.on('moveDown', onMoveDown);
+		socket.on('moveUp', onMoveUp);
+
+
+
 		socket.on('wordSpacing', onWordSpacing);
 		
 		// socket.on('changeImages', onChangeImages);
@@ -142,7 +148,9 @@ module.exports = function(app, io){
     }, function(error) {
       console.error("Failed to update a folder! Error: ", error);
     });
-	} 
+	}
+
+// -------  Z O O M     F U N C T I O N S ----------- 
 	
 	function onZoomIn(data){
 		console.log("ON ZOOM IN");
@@ -180,49 +188,132 @@ module.exports = function(app, io){
 	}
 
 	function zoomIn(zoom){
-	  var maxZoom = 3,
-	      zoomStep = 0.07, 
-	      newZoom = zoom;
+	  var maxZoom = settings.maxZoom,
+	      zoomStep = settings.zoomStep;
+	  
 	  if(zoom > maxZoom){
-	  	var newZoom = zoom;
+	  	zoom = zoom;
 	  }
 	  else{ 
-	  	var newZoom = zoom + zoomStep;
+	  	zoom += zoomStep;
 	  }
-	  return newZoom;
+	  return zoom;
 	}
 
 	function zoomOut(zoom){
-	  var minZoom = 0.3,
-	      zoomStep = 0.07;
+	  var minZoom = settings.minZoom, 
+	      zoomStep = settings.zoomStep;
 
 	  if(zoom < minZoom) zoom = zoom; 
 	  else zoom -= zoomStep; 
 	  return zoom;
 	}
 
-	function onMove(posX, posY, count){
-		// save pos in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		console.log(count, posX, posY);
-		if(count == 0){
-			obj.longPosX = posX;
-			obj.longPosY = posY;
-		}
-		if(count == 1){
-			obj.imgPosX = posX;
-			obj.imgPosY = posY;
-		}
-		if(count == 2){
-			obj.shortPosX = posX;
-			obj.shortPosY = posY;
-		}
+// -------  E N D       Z O O M     F U N C T I O N S ----------- 
 
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+// -------  M O V E     F U N C T I O N S ----------- 
 
-		// send to everyone
-		io.sockets.emit('moveEvents', posX, posY, count);
+	function onMoveRight(data){
+		console.log("ON MOVE RIGHT");
+		var xStep = settings.xStep;
+
+		var newXPos = parseFloat(data.xPos) + xStep;
+
+    var newData = {
+    	'xPos': newXPos, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'moveEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
 	}
+
+	function onMoveLeft(data){
+		console.log("ON MOVE RIGHT");
+		var xStep = settings.xStep;
+
+		var newXPos = parseFloat(data.xPos) - xStep;
+
+    var newData = {
+    	'xPos': newXPos, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'moveEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+	}
+
+	function onMoveDown(data){
+		console.log("ON MOVE RIGHT");
+		var yStep = settings.yStep;
+
+		var newYPos = parseFloat(data.yPos) + yStep;
+
+    var newData = {
+    	'yPos': newYPos, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'moveEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+	}
+
+	function onMoveUp(data){
+		console.log("ON MOVE RIGHT");
+		var yStep = settings.yStep;
+
+		var newYPos = parseFloat(data.yPos) - yStep;
+
+    var newData = {
+    	'yPos': newYPos, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'moveEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+	}
+
+// -------  E N D       M O V E     F U N C T I O N S ----------- 
+
+
+	
+	// function onMove(posX, posY, count){
+	// 	// save pos in json
+	// 	var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+	// 	console.log(count, posX, posY);
+	// 	if(count == 0){
+	// 		obj.longPosX = posX;
+	// 		obj.longPosY = posY;
+	// 	}
+	// 	if(count == 1){
+	// 		obj.imgPosX = posX;
+	// 		obj.imgPosY = posY;
+	// 	}
+	// 	if(count == 2){
+	// 		obj.shortPosX = posX;
+	// 		obj.shortPosY = posY;
+	// 	}
+
+	// 	fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+
+	// 	// send to everyone
+	// 	io.sockets.emit('moveEvents', posX, posY, count);
+	// }
 
 	function onWordSpacing(space){
 
@@ -396,6 +487,8 @@ module.exports = function(app, io){
       var newText = folderData.text;
       var newIndex = folderData.index;
       var newZoom = folderData.zoom;
+      var newXPos = folderData.xPos;
+      var newYPos = folderData.yPos;
 
       // récupérer les infos sur le folder
       var fmeta = getFolderMeta( slugFolderName);
@@ -404,7 +497,11 @@ module.exports = function(app, io){
       if(newIndex != undefined)
       	fmeta.index = newIndex;
       if(newZoom != undefined)
-      fmeta.zoom = newZoom;
+      	fmeta.zoom = newZoom;
+      if(newXPos != undefined)
+      	fmeta.xPos = newXPos;
+      if(newYPos != undefined)
+      	fmeta.yPos = newYPos;
       // console.log(fmeta);
 
       // envoyer les changements dans le JSON du folder
