@@ -51,17 +51,10 @@ module.exports = function(app, io){
 		socket.on('increaseWordSpacing', onIncreaseWordSpacing);
 		socket.on('decreaseWordSpacing', onDecreaseWordSpacing);
 		
-		// socket.on('changeImages', onChangeImages);
-		// socket.on('countImages', onCountImages);
-		// socket.on('glitch', onGlitch);
-		// socket.on('glitchRemove', onGlitchRemove);
-		
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
-		
-		// socket.on('changeFontColor', onChangeFontColor);
 
-		socket.on('reset', onReset);
+		socket.on('reset', function(){onReset(socket)});
 
 		socket.on('generate', generatePdf);;
 
@@ -80,11 +73,13 @@ module.exports = function(app, io){
 	}
 
 	// save data in json file
-	function createDataFile(socket){
-		var jsonFile = "data.json";
-
+	function createDataFile(socket, event){
 		for(var i in settings.architecture){
 			var folder = contentFolder+chapterFolder+settings.architecture[i][0];
+			if(event == 'reset'){
+				fs.unlinkSync(folder + '/' + settings.confMetafilename+ settings.metaFileext);
+				io.sockets.emit('pdfIsGenerated');
+			}
 			if(settings.architecture[i][1] == 'text'){
 				var txt = readTxtDir(folder);
 				var folderObj = {
@@ -96,7 +91,6 @@ module.exports = function(app, io){
 					yPos : 0,
 					wordSpace : 0, 
 					nbOfFiles : txt.length, 
-					fontwords: settings.words
 				}
 				createNewData(folderObj).then(function(newpdata) {
 					console.log('newpdata: '+newpdata);
@@ -110,12 +104,8 @@ module.exports = function(app, io){
 	}
 
 	// reset 
-	function onReset(){
-		var jsonFile = "data.json";
-		fs.unlinkSync(jsonFile);
-
-		io.sockets.emit('pdfIsGenerated');
-
+	function onReset(socket){
+		createDataFile(socket, 'reset');
 	}
 	
 	function onChangeText(element){
@@ -296,7 +286,7 @@ module.exports = function(app, io){
 	
 	function onIncreaseWordSpacing(data){
 		console.log("ON INCREASE WORDSPACING");
-		console.log(data.wordSpace)
+
 		var spacePlus = settings.spacePlus;
 
 		var newSpace = parseFloat(data.wordSpace) + spacePlus;
@@ -330,52 +320,66 @@ module.exports = function(app, io){
     }, function(error) {
       console.error("Failed to update a folder! Error: ", error);
     });
-
-
 	}
 
 // ------- E N D        W O R D    S P A C I N G     F U N C T I O N S -----------
 
-	function onCountImages(clonecount){
-		var files = readImagesDir(imageFolderPath);
-		var countImg = files.length;
-		io.sockets.emit('nbImages', countImg, clonecount);
-	}
-
-
-
+// -------  C H A N G E    F O N T    F U N C T I O N S -----------
 
 	function onChangeFont(data, word){
-		// save change font in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.fontwords = words;
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
+		console.log("ON CHANGE FONT");
+		var newTextWTags = wrapInTag('span', 'change-font', word, data);
+		
 
-		io.sockets.emit('changeFontEvents', words);
-	}
+    var newData = {
+    	'text': newTextWTags, 
+    	"slugFolderName" : data.slugFolderName
+    }
 
-	function onRemoveFont(words){
-		// save remove font in json
-		var obj = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-		obj.fontwords = [];
-		fs.writeFileSync('data.json', JSON.stringify(obj,null, 4));
-
-		io.sockets.emit('removeFontEvents');
-	}
-
-	function readTxtDir(textDir){
-    // List text
-    var textArray = [];
-    var arrayOfFiles = fs.readdirSync(textDir);
-
-    arrayOfFiles.forEach( function (file) {
-      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
-      textArray.push(textInFile);
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'changeFontEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
     });
-    return textArray;
-  }
+	}
 
-	//------------- PDF -------------------
+	function wrapInTag(tag, className, word, data){
+		var tag = tag, 
+	  regex = RegExp(word, 'gi'), // case insensitive
+	  classname = className || 'none',
+	  replacement = '<'+ tag +' class="'+classname+'">$&</'+ tag +'>';
+	  console.log(regex, replacement);
+
+	  return data.text.replace(regex, replacement);
+
+	}
+
+	function onRemoveFont(data){
+		console.log("ON REMOVE FONT STYLE");
+		
+		var tag = 'span', 
+		classname = 'change-font',
+		regex = RegExp('<'+ tag +' class="'+classname+'">', 'gi'), 
+		spanRegex = RegExp('</'+ tag +'>', 'gi'), 
+		newText = data.text.replace(regex, '').replace(spanRegex, '');
+		
+		console.log(newText);
+
+    var newData = {
+    	'text': newText, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'changeFontEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+	}
+
+// -------  E N D      C H A N G E    F O N T    F U N C T I O N S -----------
+
+//------------- PDF -------------------
 
 	function generatePdf(){	
 		console.log('generate pdf');
@@ -412,6 +416,21 @@ module.exports = function(app, io){
 		});
 
 	}
+//------ E N D        P D F -------------------
+
+// -------------- Folders method !! ------------
+	
+	function readTxtDir(textDir){
+    // List text
+    var textArray = [];
+    var arrayOfFiles = fs.readdirSync(textDir);
+
+    arrayOfFiles.forEach( function (file) {
+      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
+      textArray.push(textInFile);
+    });
+    return textArray;
+  }
 
 	function listAllFolders() {
     return new Promise(function(resolve, reject) {
@@ -440,7 +459,6 @@ module.exports = function(app, io){
     });
 	}
 
-	// Folders method !!
 	function createNewData(folderData) {
     return new Promise(function(resolve, reject) {
     	console.log("COMMON — create data file of folder");
@@ -460,7 +478,6 @@ module.exports = function(app, io){
 						"yPos" : folderData.yPos,
 						"wordSpace" : folderData.wordSpace, 
 						"nbOfFiles" : folderData.nbOfFiles, 
-						"fontwords": folderData.fontwords,
 		        "text" : txt
 		      };
 		      storeData( getMetaFileOfFolder(path), fmeta, "create").then(function( meta) {
@@ -503,7 +520,6 @@ module.exports = function(app, io){
       	fmeta.yPos = newYPos;
       if(newSpace != undefined)
       	fmeta.wordSpace = newSpace;
-      // console.log(fmeta);
 
       // envoyer les changements dans le JSON du folder
       storeData( getMetaFileOfFolder( folderPath), fmeta, "update").then(function( ufmeta) {

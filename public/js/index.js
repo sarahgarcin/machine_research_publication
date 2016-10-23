@@ -4,6 +4,7 @@ var dataTextLong;
 var converter = new showdown.Converter();
 
 var countRegex = 0;
+
 var grid = false;
 
 
@@ -66,16 +67,15 @@ socket.on('changeTextEvents', function(data){
 	
 });
 
-socket.on('changeFontEvents', function(wordsCount){
-	$('p').wrapInTag({
-	  tag: 'span',
-	  class: 'change-font',
-	  words: wordsCount
-	});
-});
+socket.on('changeFontEvents', function(data){
+	var $textEl = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+	var newText = data.text;
 
-socket.on('removeFontEvents', function(){
-	$('p').find('.change-font').attr("class","normal-font");
+	$textEl
+	.html(converter.makeHtml(newText));
+
+	localStorage.setItem('data', JSON.stringify(data));
+
 });
 
 socket.on('pdfIsGenerated', function(){
@@ -91,13 +91,8 @@ jQuery(document).ready(function($) {
 
 function init(){
 
-	// // C H A N G E  F O N T   var
-	// var countRegex = 0;
-	// var arrayWords = settings.words;
-	// var wordsCount = [];
-
-	// //Reset keypress
-	// reset();
+	// Reset everything
+	reset();
 
 	$(document).on('keypress', function(e){
 		var code = e.keyCode;
@@ -120,48 +115,6 @@ function init(){
 		
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
-
-
-	// $(document).on('keypress', function(e){
-	// 	// console.log(e.keyCode);
-	// 	var code = e.keyCode;
-	// 	console.log('plop', code);
-
-	// 	switch(code){
-
-	// 	// ------   C H A N G E    F O N T  ------ 
-
-	// 		// "c" press -> change font-family 
-	// 		case 101:
-	// 			countRegex ++;
-	// 			if(countRegex <= arrayWords.length){
-	// 				for(var a =0; a<countRegex; a++){
-	// 					wordsCount.push(arrayWords[a]);
-	// 					console.log(arrayWords[a]);
-	// 				}
-	// 				socket.emit('changeFont', wordsCount);
-	// 			}
-	// 			else{
-	// 				socket.emit('removeFont');
-	// 				countRegex = 0;
-	// 				wordsCount = [];
-	// 			}
-	// 			break;
-
-	// 	// ------   G E N E R A T E     P D F  ------ 
-			
-	// 		//Press T and generate PDF
-	// 		case 116:
-
-	// 			// var page = $('body').html();
-	// 			// $('.page').css('border', 'none');
-	// 			// $('.right').css('border', 'none');
-	// 			// socket.emit('removeBorders');
-	// 			socket.emit('generate');
-	// 			break;
-	// 	}
-	// 	e.preventDefault(); // prevent the default action (scroll / move caret)
-	// });
 	
 }
 // C H A N G E     T E X T     C O N T E N T
@@ -264,6 +217,7 @@ function wordSpacing(data, code){
 
 // ------   C H A N G E    F O N T    F A M I L Y  ------ 
 function changeFontFamily(data, code){
+	
 	// "e" press -> change font-family 
 	var fontKey = 101;
 	var words = settings.words;
@@ -271,36 +225,19 @@ function changeFontFamily(data, code){
 
 	if(code == fontKey){
 
-		if(countRegex < words.length -1){
-			// console.log(text.indexOf(words[countRegex]));
-			if(text.indexOf(words[countRegex]) != -1){
-			  console.log(words[countRegex] + " found");
-			  socket.emit('changeFont', data, words[countRegex]);
+		if(countRegex < words.length -1 ){
+			while(text.indexOf(words[countRegex]) == -1 && countRegex < words.length -1 ){
+			  console.log(words[countRegex] + " not found");
 			  countRegex ++;
 			}
-			else{
-				countRegex ++;
-				console.log(words[countRegex] + " not found");
-			}
-			
+			socket.emit('changeFont', data, words[countRegex] );
+			countRegex ++;
 		}
 		else{
 			countRegex = 0;
+			console.log('plop');
 			socket.emit('removeFont', data);
 		}
-		// for(var i in words){
-		// 	// console.log(words[i]);
-		// 	if(text.indexOf(words[i]) != -1){
-		// 	  console.log(words[i] + " found");
-		// 	}
-		// }
-		// var str1 = "Lorem ipsum youpi blablabla ";
-		// var str2 = "Lorem";
-		// if(str1.indexOf(str2) != -1){
-		//     console.log(str2 + " found");
-		// }
-
-		// socket.emit('changeFont', data);
 	}
 
 }
@@ -372,19 +309,14 @@ function makeFolderContent( projectData){
 	  })
   ;
 
-  // change font
-	// if(projectData.fontwords.length != 0){
-	// 	newFolder.wrapInTag({
-	// 	  tag: 'span',
-	// 	  class: 'change-font',
-	// 	  words: projectData.fontwords
-	// 	});
-	// }
-
 	return newFolder;
 }
 
 // not working
+function reset(){
+
+}
+
 function reset(){
 	// press o and p in the same time
 	var down = {};
@@ -416,19 +348,6 @@ function gridDisplayer(code){
 		}
 	}
 }
-
-$.fn.wrapInTag = function(opts) {
-
-  var tag = opts.tag, 
-  words = opts.words || [],
-  regex = RegExp(words.join('|'), 'gi'), // case insensitive
-  classname = opts.class || 'none',
-  replacement = '<'+ tag +' class="'+classname+'">$&</'+ tag +'>';
-
-  return this.html(function() {
-    return $(this).text().replace(regex, replacement);
-  });
-};
 
 
 
