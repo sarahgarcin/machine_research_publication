@@ -6842,3 +6842,14 @@ img {
     line-height: 1; }
   .page .normal-font {
     font-family: "vollkorn", sans-serif, serif; }
+
+.grid {
+  height: 19cm;
+  width: 100%;
+  border: 1px solid #00AADA;
+  display: none; }
+  .grid div {
+    height: 100%;
+    border-right: 1px solid #DA0097; }
+    .grid div:last-child {
+      border: none; }

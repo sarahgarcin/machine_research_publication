@@ -15,6 +15,10 @@ html
         //-   div.rond-haut
         //-   div.rond-bas
         div(class="page-wrapper" data-part="0")
+          div.grid.row
+            - for (var i = 0; i < 12; ++i) {
+              div.small-1.columns
+            - }
           //- div.left
           //-   div(class='text-content --js-content-el' data-index='#{longIndex}' data-folder='long')
           //-     != longFile

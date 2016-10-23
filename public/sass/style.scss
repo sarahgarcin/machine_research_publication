@@ -110,3 +110,15 @@ img{
     font-family: $textFont, serif;
    }
 }
+
+.grid{
+  height: $heightPage - ($margintop * 2);
+  width: 100%;
+  border: 1px solid #00AADA;
+  display:none;
+  div{
+    height:100%;
+    border-right: 1px solid #DA0097;
+    &:last-child{border:none;}
+  }
+}

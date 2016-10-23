@@ -378,7 +378,7 @@ module.exports = function(app, io){
 	//------------- PDF -------------------
 
 	function generatePdf(){	
-
+		console.log('generate pdf');
 		var date = getCurrentDate();
 		// console.log(date);
 
@@ -389,7 +389,7 @@ module.exports = function(app, io){
 	  '--local-to-remote-url-access=yes'
 		]).then(function(ph) {
 		  ph.createPage().then(function(page) {
-		  	page.open('https://localhost:8080/')
+		  	page.open('http://localhost:8080/')
 		  	.then(function(){
 		  		page.property('viewportSize', {width: 1280, height: 800});
 		  		// page.property('paperSize', {format: 'A4', orientation: 'landscape'})

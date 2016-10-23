@@ -4,6 +4,8 @@ var dataTextLong;
 var converter = new showdown.Converter();
 
 var countRegex = 0;
+var grid = false;
+
 
 /* sockets */
 function onSocketConnect() {
@@ -83,8 +85,6 @@ socket.on('pdfIsGenerated', function(){
 
 jQuery(document).ready(function($) {
 	$(document).foundation();
-	// init();
-	gridDisplayer();
 
 });
 
@@ -114,6 +114,9 @@ function init(){
 		moveEvents(data, code);
 		wordSpacing(data, code);
 		changeFontFamily(data, code);
+		generatePDF(data, code);
+
+		gridDisplayer(code);
 		
 		e.preventDefault(); // prevent the default action (scroll / move caret)
 	});
@@ -302,6 +305,18 @@ function changeFontFamily(data, code){
 
 }
 
+// ------   G E N E R A T E      P D F ------ 
+function generatePDF(data, code){
+
+	// press "t" to generate pdf
+	var pdf = 116;
+	
+	if(code == pdf){
+		socket.emit('generate');	
+	}
+	
+}
+
 
 function onDisplayPage(foldersData){
 	$.each( foldersData, function( index, fdata) {
@@ -385,27 +400,21 @@ function reset(){
 }
 
 
-function gridDisplayer(){
-	var grid = true;
-	$(document).on('keypress',function(e){
-		// console.log(grid);
-		if(e.keyCode == '60'){
-			if(grid == true){
-				$('.page').css('border', 'none');
-				$('.page-wrapper').css('border', 'none');
-				$('.page-wrapper .left').css('border', 'none');
-				$('.page-wrapper .right').css('border', 'none');
-				grid = false;
-			}
-			else{
-				$('.page').css('border', '1px solid #000');
-				$('.page-wrapper').css('border', '1px solid #E100B6');
-				$('.page-wrapper .left').css('border-right', '1px solid #00E17B');
-				$('.page-wrapper .right').css('border-left', '1px solid #00E17B');
-				grid = true;
-			}
+function gridDisplayer(code){
+
+	//press > to display / hide grid
+	var gridKey = 60;
+	
+	if(code == gridKey){
+		if(grid == true){
+			$('.grid').hide();
+			grid = false;
 		}
-	});
+		else{
+			$('.grid').show();
+			grid = true;
+		}
+	}
 }
 
 $.fn.wrapInTag = function(opts) {
