@@ -2,7 +2,10 @@
  
   $.fn.zoom = function( zoom ) {
 
-    return this.css('transform', 'scale('+zoom+')');
+    return this.css({
+      'transform': 'scale('+zoom+')',
+      'transform-origin': '0 0',
+    });
 
   };
 
