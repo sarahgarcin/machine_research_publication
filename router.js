@@ -32,17 +32,13 @@ module.exports = function(app,io,m){
 
   // GET
   function getIndex(req, res) {
-    // console.log(imageFolderPath);
-    var longTextData = getText(longFolderPath);
-    var shortTextData = getText(shortFolderPath);
-    // var ImageData = getImages(imageFolderPath);
     
     var dataToSend = {
       title: "Machine Research",
-      longIndex: longTextData.index,
-      longFile: longTextData.file,
-      shortIndex: shortTextData.index,
-      shortFile: shortTextData.file,
+      // longIndex: longTextData.index,
+      // longFile: longTextData.file,
+      // shortIndex: shortTextData.index,
+      // shortFile: shortTextData.file,
       // imageIndex: ImageData.index,
       // imageFile: ImageData.file
     }

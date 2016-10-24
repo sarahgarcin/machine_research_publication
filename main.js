@@ -12,16 +12,6 @@ var fs = require('fs-extra'),
 
 	var chapterFolder = settings.folder;
 	var contentFolder = "content/";
-	// var imagesFolder = "images";
-	var longFolder = "long";
-	var shortFolder = "short";
-	var pdfFolder = "pdf";
-
-	// var imageFolderPath = contentFolder+chapterFolder+imagesFolder;
-	var longFolderPath = contentFolder+chapterFolder+longFolder;
-	var shortFolderPath = contentFolder+chapterFolder+shortFolder;
-	var pdfFolderPath = contentFolder+chapterFolder+pdfFolder;
-
 
 
 module.exports = function(app, io){
@@ -77,30 +67,52 @@ module.exports = function(app, io){
 	function createDataFile(socket, event){
 		for(var i in settings.architecture){
 			var folder = contentFolder+chapterFolder+settings.architecture[i][0];
+			var left = parseInt(settings.marginleft) + ((parseInt(settings.widthPage) /2.2)* i) ;
+		
 			if(event == 'reset'){
 				fs.unlinkSync(folder + '/' + settings.confMetafilename+ settings.metaFileext);
 				io.sockets.emit('pdfIsGenerated');
 			}
 			if(settings.architecture[i][1] == 'text'){
+				console.log('TEXT');
+				console.log(settings.architecture[i][1]);
 				var txt = readTxtDir(folder);
 				var folderObj = {
 					path: folder,
 					txt : txt[txt.length-1],
 					index : txt.length,
 					zoom : 1,
-					xPos : 0,
-					yPos : 0,
+					xPos : left,
+					yPos : 1,
 					wordSpace : 0, 
 					nbOfFiles : txt.length, 
 				}
-				createNewData(folderObj).then(function(newpdata) {
-					console.log('newpdata: '+newpdata);
-		      sendEventWithContent('displayPageEvents', newpdata);
-		    }, function(errorpdata) {
-		      console.log(errorpdata);
-
-		    });
 			}
+			// if(settings.architecture[i][1] == 'img'){
+			// 	console.log('IMAGE');
+			// 	console.log(settings.architecture[i][1]);
+			// 	var images = readImagesDir(folder);
+			// 	var folderObj = {
+			// 		path: folder,
+			// 		currentImage : images[images.length-1],
+			// 		images: images,
+			// 		index : images.length,
+			// 		zoom : 1,
+			// 		xPos : left,
+			// 		yPos : 1,
+			// 		wordSpace : 0, 
+			// 		nbOfFiles : images.length, 
+			// 	}
+			// }
+
+			// console.log(folderObj);
+			createNewData(folderObj).then(function(newpdata) {
+				console.log('newpdata: '+newpdata);
+	      sendEventWithContent('displayPageEvents', newpdata);
+	    }, function(errorpdata) {
+	      console.log(errorpdata);
+
+	    });
 		}
 	}
 
@@ -431,6 +443,22 @@ module.exports = function(app, io){
     return textArray;
   }
 
+ 	function readImagesDir(dir){
+ 		console.log('COMMON - Read images files');
+		var fileType = ['.jpg', '.jpeg', '.png'],
+        files = [];
+    var arrayOfFiles = fs.readdirSync(dir);
+    var arrayOfFiles = arrayOfFiles.filter(junk.not);
+    arrayOfFiles.forEach( function (file) {
+    	// console.log(fileType.indexOf(path.extname(file))>-1, file);
+      if(fileType.indexOf(path.extname(file))>-1) {
+        files.push(file); //store the file name into the array files
+      }
+    });
+    console.log(files);
+    return files;
+	}
+
 	function listAllFolders() {
     return new Promise(function(resolve, reject) {
   		fs.readdir(settings.contentDir, function (err, filenames) {
@@ -468,17 +496,33 @@ module.exports = function(app, io){
 			fs.access(getMetaFileOfFolder(path), fs.F_OK, function( err) {
 				if (err) {
 					console.log("New data file created");
-					var fmeta =
-		      {
-		        "path" : path,
-		        "index" : index,
-		        "zoom" : folderData.zoom,
-						"xPos" : folderData.xPos,
-						"yPos" : folderData.yPos,
-						"wordSpace" : folderData.wordSpace, 
-						"nbOfFiles" : folderData.nbOfFiles, 
-		        "text" : txt
-		      };
+					if(txt != undefined){
+						var fmeta =
+			      {
+			        "path" : path,
+			        "index" : index,
+			        "zoom" : folderData.zoom,
+							"xPos" : folderData.xPos,
+							"yPos" : folderData.yPos,
+							"wordSpace" : folderData.wordSpace, 
+							"nbOfFiles" : folderData.nbOfFiles, 
+			        "text" : txt
+			      };
+			    }
+			   //  if(folderData.currentImage != undefined){
+			   //  	var fmeta =
+			   //    {
+				  //   	"path" : path,
+			   //      "index" : index,
+			   //      "zoom" : folderData.zoom,
+						// 	"xPos" : folderData.xPos,
+						// 	"yPos" : folderData.yPos,
+						// 	"wordSpace" : folderData.wordSpace, 
+						// 	"nbOfFiles" : folderData.nbOfFiles, 
+			   //      "currentImage" : folderData.currentImage,
+						// 	'images': folderData.images,
+				  //   };
+				  // }
 		      storeData( getMetaFileOfFolder(path), fmeta, "create").then(function( meta) {
 		      	// console.log('sucess ' + meta)
 		        resolve( meta);

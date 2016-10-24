@@ -10,6 +10,12 @@ html
       div.meta-data
         p.block-select
         p.file-select
+      div.page-function
+        div.zoomFunction
+          span.plusButton + 
+          span.zoom-value 50%
+          span.minusButton - 
+        div.gridButton grid
       div#page-content.page
         //- div.ronds-left.ronds
         //-   div.rond-haut
@@ -30,7 +36,7 @@ html
           //-     != shortFile
 
     .js--templates
-      div.content.--js-content-el
+      div.content.--js-content-el.small-push-1
 
     script(src='/socket.io/socket.io.js')
     script(src='/bower_components/jquery/dist/jquery.min.js')

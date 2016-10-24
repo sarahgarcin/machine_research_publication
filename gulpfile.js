@@ -2,11 +2,15 @@
 var gulp = require('gulp');
 
 // Include Our Plugins
+var file = require('gulp-file');
 var concat = require('gulp-concat');
 var minifyCss = require('gulp-minify-css');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var sass = require('gulp-sass');
+var jsonSass = require('gulp-json-sass');
+
+// var page  = require('content/page.js');
 
 // Compile Our Sass
 gulp.task('sass', function() {
@@ -21,6 +25,20 @@ gulp.task('sass', function() {
     .pipe(gulp.dest('public/css'));
 });
 
+// gulp.task('hello', function(){
+//   return file('page.json', JSON.stringify(page))
+//     .pipe(gulp.dest('content'));
+// });
+
+
+gulp.task('jsontosass', function(){
+  return gulp
+  .src('content/page.json')
+  .pipe(jsonSass())
+  .pipe(concat('settings.scss'))
+  .pipe(gulp.dest('public/sass'));
+});
+
 // Concatenate & Minify CSS
 gulp.task('css', function() {
   return gulp.src('pubic/css/*.css')
@@ -33,8 +51,11 @@ gulp.task('css', function() {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
+  gulp.watch('content/page.json', ['jsontosass', 'sass', 'css']);
   gulp.watch('public/sass/*.scss', ['sass', 'css']);
 });
 
 // Default Task
-gulp.task('default', ['sass', 'css', 'watch']);
+gulp.task('default', ['jsontosass', 'sass', 'css', 'watch']);
+// gulp.task('default', ['jsontosass', 'watch']);
+

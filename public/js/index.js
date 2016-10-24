@@ -28,7 +28,7 @@ socket.on('displayPageEvents', onDisplayPage);
 socket.on('zoomEvents', function(data){ 
 	var $element = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
 	console.log($element, data.zoom);
-	$element.zoom(data.zoom);
+	$element.zoom(data.zoom, '0 0');
 	localStorage.setItem('data', JSON.stringify(data));
 	console.log(data);
 });
@@ -91,7 +91,26 @@ jQuery(document).ready(function($) {
 
 function init(){
 
-	// Reset everything
+	$.ajax({
+    url: "page.json",
+    success: function (data) {
+      var obj = data;
+      var scale = obj.page.scale;
+     	$('.plusButton').on('click', function(){
+				scale = (parseFloat(scale) + 0.1);
+				$(".page").zoom(scale, '50% 0');
+				$('.zoom-value').html(parseInt(scale*100) + '%');
+			});
+
+			$('.minusButton').on('click', function(){
+				scale = (parseFloat(scale) - 0.1);
+				$(".page").zoom(scale, '50% 0');
+				$('.zoom-value').html(parseInt(scale*100) + '%');
+			});
+    }
+	});;
+
+	// Key press to reset everything
 	reset();
 
 	$(document).on('keypress', function(e){
@@ -114,6 +133,10 @@ function init(){
 		gridDisplayer(code);
 		
 		e.preventDefault(); // prevent the default action (scroll / move caret)
+	});
+
+	$('.gridButton').on('click', function(){
+		gridDisplayer(60);
 	});
 	
 }
@@ -144,8 +167,8 @@ function changeText(data, code){
 		localStorage.setItem('data', JSON.stringify(foldersdata[partCount]));
 		var data = JSON.parse(localStorage.getItem('data'))
 		var type = data.slugFolderName;
-		$('.meta-data .block-select').html(type + ' text');
-		$('.meta-data .file-select').html((parseInt(data.index)+1) + '/' + parseInt(data.nbOfFiles));
+		$('.meta-data .block-select').html(type + ' folder:');
+		// $('.meta-data .file-select').html((parseInt(data.index)+1) + '/' + parseInt(data.nbOfFiles));
 	}
 }
 
@@ -158,7 +181,6 @@ function zoomEvents(data, code){
 	var zoomOutKey = 32; 
 
 	if(code == zoomInKey){
-		console.log(data.zoom);
 		socket.emit("zoomIn", data);
 	}
 	
@@ -265,7 +287,7 @@ function onDisplayPage(foldersData){
   var firstNbOfFiles= foldersData[0].nbOfFiles;
 
   // Meta-data
-	$('.meta-data .block-select').html(foldersData[0].slugFolderName + " text");
+	$('.meta-data .block-select').html(foldersData[0].slugFolderName + " folder:");
 	$('.meta-data .file-select').html(firstIndex+"/"+firstNbOfFiles);
 
 	var partCount = parseInt($('.page-wrapper').attr('data-part'));
@@ -292,6 +314,7 @@ function makeFolderContent( projectData){
 	var index = projectData.index;
 	var folder = projectData.slugFolderName;
 	var txt = projectData.text;
+	var image = projectData.currentImage;
 
 
 	var newFolder = $(".js--templates > .content").clone(false);
@@ -300,7 +323,6 @@ function makeFolderContent( projectData){
 	newFolder
 	  .attr( 'data-index', index)
 	  .attr( 'data-folder', folder)
-	  .html(converter.makeHtml(txt))
 	  .css({
 	  	'transform': 'scale('+projectData.zoom+')',
 	  	'left': projectData.xPos+'cm',
@@ -309,12 +331,14 @@ function makeFolderContent( projectData){
 	  })
   ;
 
+  if(txt == 'undefined'){
+		newFolder.html('<img src="'+image+'">');
+  }
+  else{
+  	newFolder.html(converter.makeHtml(txt));
+  }
+
 	return newFolder;
-}
-
-// not working
-function reset(){
-
 }
 
 function reset(){
@@ -340,10 +364,12 @@ function gridDisplayer(code){
 	if(code == gridKey){
 		if(grid == true){
 			$('.grid').hide();
+			$('.gridButton').removeClass('active');
 			grid = false;
 		}
 		else{
 			$('.grid').show();
+			$('.gridButton').addClass('active');
 			grid = true;
 		}
 	}
