@@ -6777,7 +6777,7 @@ h4 {
 h6 {
   position: absolute;
   font-size: 80pt;
-  max-width: 10.85cm;
+  max-width: 8cm;
   line-height: 110%; }
 
 li {
@@ -6818,21 +6818,23 @@ img {
     font-family: arial, sans-serif; }
 
 .page {
-  width: 29.7cm;
-  height: 21cm;
+  width: 24cm;
+  height: 34cm;
   border-right: 1px solid #000;
   border-bottom: 1px solid #000;
-  border-top: 1px solid #FFF;
-  border-left: 1px solid #FFF;
-  margin: 0px 0;
-  position: relative; }
+  border-top: 1px solid #000;
+  border-left: 1px solid #000;
+  margin: 10px auto;
+  position: relative;
+  transform: scale(0.5);
+  transform-origin: 50% 0; }
   .page .page-wrapper {
     margin: 1cm 2cm;
-    width: 25.7cm;
-    height: 19cm; }
+    width: 20cm;
+    height: 32cm; }
     .page .page-wrapper .content {
-      width: 12.2381cm;
-      height: 19cm;
+      width: 9.52381cm;
+      height: 32cm;
       padding-right: 0.5cm;
       overflow: hidden;
       position: absolute; }
@@ -6844,7 +6846,7 @@ img {
     font-family: "vollkorn", sans-serif, serif; }
 
 .grid {
-  height: 19cm;
+  height: 32cm;
   width: 100%;
   border: 1px solid #00AADA;
   display: none; }

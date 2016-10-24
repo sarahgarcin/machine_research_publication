@@ -83,10 +83,12 @@ img{
   height: $heightPage;
   border-right: 1px solid #000;
   border-bottom: 1px solid #000;
-  border-top: 1px solid #FFF;
-  border-left: 1px solid #FFF;
-  margin: 0px 0;
+  border-top: 1px solid #000;
+  border-left: 1px solid #000;
+  margin: 10px auto;
   position: relative;
+  transform: scale($scale);
+  transform-origin : 50% 0;
   .page-wrapper{
     margin: $margintop $marginleft;
     width: $widthPage - ($marginleft * 2);

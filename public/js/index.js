@@ -265,7 +265,7 @@ function onDisplayPage(foldersData){
   var firstNbOfFiles= foldersData[0].nbOfFiles;
 
   // Meta-data
-	$('.meta-data .block-select').html("text " + foldersData[0].slugFolderName);
+	$('.meta-data .block-select').html(foldersData[0].slugFolderName + " text");
 	$('.meta-data .file-select').html(firstIndex+"/"+firstNbOfFiles);
 
 	var partCount = parseInt($('.page-wrapper').attr('data-part'));

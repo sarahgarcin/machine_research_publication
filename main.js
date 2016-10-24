@@ -1,4 +1,5 @@
 var fs = require('fs-extra'),
+	junk = require('junk'),
 	glob = require("glob"),
 	moment = require('moment'),
 	path = require("path"),
@@ -109,9 +110,9 @@ module.exports = function(app, io){
 	}
 	
 	function onChangeText(element){
-		var textArray = [];
 		var dir = element.path;
-    var arrayOfFiles = fs.readdirSync(dir);
+		var arrayOfFiles = readTxtDir(dir);
+
     var prevIndex = parseInt((element.index)-1);
     console.log("ON CHANGE TEXT EVENTS");
 
@@ -119,17 +120,10 @@ module.exports = function(app, io){
     	prevIndex = arrayOfFiles.length - 1;
     }
 
-    if(arrayOfFiles[prevIndex] == settings.confMetafilename + settings.metaFileext){
-    	prevIndex = prevIndex - 1;
-    	if(prevIndex < 0){
-	    	prevIndex = arrayOfFiles.length - 1;
-	    }
-    }
-
     console.log(prevIndex, element.index);
 
     var newData = {
-    	'text': fs.readFileSync(dir+'/'+arrayOfFiles[prevIndex], 'utf8'),
+    	'text': arrayOfFiles[prevIndex],
     	'index': prevIndex,
     	"slugFolderName" : element.slugFolderName
     }
@@ -422,12 +416,17 @@ module.exports = function(app, io){
 	
 	function readTxtDir(textDir){
     // List text
+    console.log('COMMON - Read text files');
     var textArray = [];
     var arrayOfFiles = fs.readdirSync(textDir);
+    var arrayOfFiles = arrayOfFiles.filter(junk.not);
 
     arrayOfFiles.forEach( function (file) {
-      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
-      textArray.push(textInFile);
+    	if(file != settings.confMetafilename + settings.metaFileext){
+	      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
+	      console.log('file: '+file);
+	      textArray.push(textInFile);
+	    }
     });
     return textArray;
   }
