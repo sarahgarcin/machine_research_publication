@@ -63,7 +63,7 @@ socket.on('changeTextEvents', function(data){
 	localStorage.setItem('data', JSON.stringify(data));
 
 	// // display the right index
-	$('.meta-data .file-select').html((parseInt(data.index))+'/'+ data.nbOfFiles);
+	$('.meta-data .file-select').html((parseInt(data.index)+1)+'/'+ data.nbOfFiles);
 	
 });
 
@@ -261,7 +261,7 @@ function onDisplayPage(foldersData){
     return insertOrReplaceFolder( fdata.slugFolderName, $folderContent);
   });
 
-  var firstIndex = parseInt(foldersData[0].index) + 1;
+  var firstIndex = parseInt(foldersData[0].index) + 1 ;
   var firstNbOfFiles= foldersData[0].nbOfFiles;
 
   // Meta-data
