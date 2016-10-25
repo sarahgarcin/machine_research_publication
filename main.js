@@ -9,9 +9,12 @@ var fs = require('fs-extra'),
 
 	var _ph, _page, _outObj;
 	var settings  = require('./content/settings.js');
+	var readPageSettings = fs.readFileSync('./content/page.json', 'utf-8');
+	var pageSettings = JSON.parse(readPageSettings)
 
 	var chapterFolder = settings.folder;
 	var contentFolder = "content/";
+	var pdfFolderPath = contentFolder+chapterFolder+'pdf';
 
 
 module.exports = function(app, io){
@@ -47,7 +50,10 @@ module.exports = function(app, io){
 
 		socket.on('reset', function(){onReset(socket)});
 
-		socket.on('generate', generatePdf);;
+		socket.on('cleanForPrint', onCleanPrint);
+		socket.on('printSecondPage', onPrintSecondPage);
+		socket.on('resetPrint', onPrintReset);
+		socket.on('generate', generatePdf);
 
 	});
 
@@ -55,6 +61,9 @@ module.exports = function(app, io){
 // ------------- F U N C T I O N S -------------------
 	function onListFolders( socket){
 		console.log( "EVENT - onListFolders");
+		var printVar = getFolderMeta('');
+		sendEventWithContent('displayPrintPage', printVar);
+
     listAllFolders().then(function( allFoldersData) {
     	// console.log(allFoldersData)
       sendEventWithContent( 'displayPageEvents', allFoldersData, socket);
@@ -67,15 +76,13 @@ module.exports = function(app, io){
 	function createDataFile(socket, event){
 		for(var i in settings.architecture){
 			var folder = contentFolder+chapterFolder+settings.architecture[i][0];
-			var left = parseInt(settings.marginleft) + ((parseInt(settings.widthPage) /2.2)* i) ;
-		
-			if(event == 'reset'){
-				fs.unlinkSync(folder + '/' + settings.confMetafilename+ settings.metaFileext);
-				io.sockets.emit('pdfIsGenerated');
-			}
+			var left = parseInt(pageSettings.page.marginleft) + ((parseInt(pageSettings.page.widthPage) /3.8)* i) ;
 			if(settings.architecture[i][1] == 'text'){
+				if(event == 'reset'){
+					fs.unlinkSync(folder + '/' + settings.confMetafilename+ settings.metaFileext);
+					io.sockets.emit('pdfIsGenerated');
+				}
 				console.log('TEXT');
-				console.log(settings.architecture[i][1]);
 				var txt = readTxtDir(folder);
 				var folderObj = {
 					path: folder,
@@ -387,10 +394,59 @@ module.exports = function(app, io){
 
 //------------- PDF -------------------
 
-	function generatePdf(){	
+	function onCleanPrint(){
+		console.log("ON CLEAN PRINT");
+
+    var newData = {
+    	'sidebar': true, 
+    	"slugFolderName" : ''
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'cleanForPrintEv', currentDataJSON);
+      generatePdf(false);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+	}
+
+	function onPrintSecondPage(){
+		console.log("ON PRINT SECOND PAGE");
+    var newData = {
+    	'print': true, 
+    	"slugFolderName" : ''
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      // sendEventWithContent( 'printSecondPage', currentDataJSON);
+      generatePdf(true);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+	}
+
+	function onPrintReset(){
+		console.log("ON RESET PRINT");
+    var newData = {
+    	'print': false, 
+    	'sidebar': false,
+    	"slugFolderName" : ''
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+    	console.log('Print Reset')
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+
+	}
+
+	function generatePdf(pdf){	
 		console.log('generate pdf');
 		var date = getCurrentDate();
-		// console.log(date);
+		var url = 'http://localhost:1337/';
+		var filePath = pdfFolderPath+'/'+date+'.pdf';
 
 		phantom.create([
 	  '--ignore-ssl-errors=yes',
@@ -399,18 +455,27 @@ module.exports = function(app, io){
 	  '--local-to-remote-url-access=yes'
 		]).then(function(ph) {
 		  ph.createPage().then(function(page) {
-		  	page.open('http://localhost:8080/')
+		  	// 	page.property('clipRect',{
+					//     top:    0,
+					//     left:   1365,
+					//     width:  1365,
+					//     height: 1970
+					// });
+		  	page.open(url)
 		  	.then(function(){
-		  		page.property('viewportSize', {width: 1280, height: 800});
+		  		// page.property('viewportSize', {width: 600, height: 	});
 		  		// page.property('paperSize', {format: 'A4', orientation: 'landscape'})
-		  		page.property('paperSize', {width: 1120, height: 792})
+		  		page.property('paperSize', {width: 1365, height: 1970})
+		  		// page.property('clipRect', {top: 0, left: 1000, width:3000,height:890})
 		  		.then(function() {
 			  		return page.property('content')
 			    	.then(function() {
 				      setTimeout(function(){
-					      page.render(pdfFolderPath+'/'+date+'.pdf').then(function() {
-					      	console.log('success');
-					      	io.sockets.emit('pdfIsGenerated');
+					      page.render(filePath).then(function() {
+					      	console.log('success', pdf);
+					      	if(pdf == true){
+					      		io.sockets.emit('pdfIsGenerated');
+					      	}
 					      	page.close();
 						    	ph.exit();
 					      });
@@ -506,7 +571,7 @@ module.exports = function(app, io){
 							"yPos" : folderData.yPos,
 							"wordSpace" : folderData.wordSpace, 
 							"nbOfFiles" : folderData.nbOfFiles, 
-			        "text" : txt
+			        "text" : txt,
 			      };
 			    }
 			   //  if(folderData.currentImage != undefined){
@@ -548,6 +613,9 @@ module.exports = function(app, io){
       var newXPos = folderData.xPos;
       var newYPos = folderData.yPos;
       var newSpace = folderData.wordSpace;
+      var newPrint = folderData.print;
+      var newBar = folderData.sidebar;
+
 
       // récupérer les infos sur le folder
       var fmeta = getFolderMeta( slugFolderName);
@@ -563,6 +631,10 @@ module.exports = function(app, io){
       	fmeta.yPos = newYPos;
       if(newSpace != undefined)
       	fmeta.wordSpace = newSpace;
+     	if(newPrint != undefined)
+      	fmeta.print = newPrint;
+      if(newBar != undefined)
+      	fmeta.sidebar = newBar;
 
       // envoyer les changements dans le JSON du folder
       storeData( getMetaFileOfFolder( folderPath), fmeta, "update").then(function( ufmeta) {

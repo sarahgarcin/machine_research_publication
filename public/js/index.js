@@ -6,6 +6,7 @@ var converter = new showdown.Converter();
 var countRegex = 0;
 
 var grid = false;
+var pdfCount = false;
 
 
 /* sockets */
@@ -24,6 +25,7 @@ socket.on('connect', onSocketConnect);
 socket.on('error', onSocketError);
 
 socket.on('displayPageEvents', onDisplayPage);
+socket.on('displayPrintPage', onDisplayPrintPage);
 
 socket.on('zoomEvents', function(data){ 
 	var $element = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
@@ -78,8 +80,30 @@ socket.on('changeFontEvents', function(data){
 
 });
 
+socket.on('cleanForPrintEv', function(data){
+	setTimeout(function(){
+		socket.emit('printSecondPage');
+	}, 2000);
+	
+});
+
+
+
 socket.on('pdfIsGenerated', function(){
+	console.log('pdfIsGenerated');
 	location.reload();
+	socket.emit('resetPrint');
+	// if(pdf != true){
+	// 	$('#page-content').addClass('print');
+	// 	// setTimeout(function(){
+	// 	// 	socket.emit('generate', true);
+	// 	// }, 4000);
+	// }
+	// else{
+	// 	location.reload();
+	// }
+	
+	// location.reload();
 });
 
 
@@ -98,13 +122,13 @@ function init(){
       var scale = obj.page.scale;
      	$('.plusButton').on('click', function(){
 				scale = (parseFloat(scale) + 0.1);
-				$(".page").zoom(scale, '50% 0');
+				$(".page").zoom(scale, '0 0');
 				$('.zoom-value').html(parseInt(scale*100) + '%');
 			});
 
 			$('.minusButton').on('click', function(){
 				scale = (parseFloat(scale) - 0.1);
-				$(".page").zoom(scale, '50% 0');
+				$(".page").zoom(scale, '0 0');
 				$('.zoom-value').html(parseInt(scale*100) + '%');
 			});
     }
@@ -169,6 +193,11 @@ function changeText(data, code){
 		var type = data.slugFolderName;
 		$('.meta-data .block-select').html(type + ' folder:');
 		// $('.meta-data .file-select').html((parseInt(data.index)+1) + '/' + parseInt(data.nbOfFiles));
+		var $textEl = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+		$textEl.css('border', '1px solid red');
+		setTimeout(function(){
+			$textEl.css('border', 'none');
+		}, 1000);
 	}
 }
 
@@ -271,7 +300,19 @@ function generatePDF(data, code){
 	var pdf = 116;
 	
 	if(code == pdf){
-		socket.emit('generate');	
+
+		// $('.sidebar').addClass('print');
+			// socket.emit('generate');
+			socket.emit('cleanForPrint');	
+			// if(pdfCount == false){
+			// 	socket.emit('cleanForPrint');	
+			// 	pdfCount = true;
+			// }
+			// else{
+			// 	socket.emit('generate', true);
+			// 	pdfCount = false;
+			// }
+					
 	}
 	
 }
@@ -283,7 +324,7 @@ function onDisplayPage(foldersData){
     return insertOrReplaceFolder( fdata.slugFolderName, $folderContent);
   });
 
-  var firstIndex = parseInt(foldersData[0].index) + 1 ;
+  var firstIndex = parseInt(foldersData[0].index);
   var firstNbOfFiles= foldersData[0].nbOfFiles;
 
   // Meta-data
@@ -298,6 +339,14 @@ function onDisplayPage(foldersData){
 	localStorage.setItem('data', JSON.stringify(data));
 
 	init();
+}
+
+function onDisplayPrintPage(data){
+	var print = data.print;
+	if(print == "true"){
+		$('.sidebar').addClass('print');
+		$('#page-content').addClass('print');
+	}
 }
 
 function insertOrReplaceFolder( slugFolderName, $folderContent) {

@@ -7,23 +7,26 @@ html
 
 
     div.content-wrapper
-      div.meta-data
-        p.block-select
-        p.file-select
-      div.page-function
-        div.zoomFunction
-          span.plusButton + 
-          span.zoom-value 50%
-          span.minusButton - 
-        div.gridButton grid
+      div.sidebar
+        div.meta-data
+          p.block-select
+          p.file-select
+        div.page-function
+          div.zoomFunction
+            span.plusButton + 
+            span.zoom-value 50%
+            span.minusButton - 
+          div.gridButton grid
       div#page-content.page
+        div.middle
         //- div.ronds-left.ronds
         //-   div.rond-haut
         //-   div.rond-bas
         div(class="page-wrapper" data-part="0")
+
           div.grid.row
-            - for (var i = 0; i < 12; ++i) {
-              div.small-1.columns
+            - for (var i = 0; i < 24; ++i) {
+              div.grid-el.columns
             - }
           //- div.left
           //-   div(class='text-content --js-content-el' data-index='#{longIndex}' data-folder='long')

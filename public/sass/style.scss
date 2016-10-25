@@ -40,7 +40,7 @@ h6{
 li{list-style: none;}
 p{
   font-family: $textFont, serif;
-  font-size: 10pt;
+  font-size: $textSize;
   line-height: 125%;
   word-wrap: break-word;
   &:first-child{
@@ -64,18 +64,29 @@ img{
   max-width: 100%;
 }
 
-.meta-data{
-  width: 200px;
-  position:absolute;
-  top: 0px;
-  right: 20px;
-  text-transform: uppercase;
-  border: 0.5px solid #A6A6A6;
-  padding: 15px 20px 0px 20px;
-  background: #FFF;
+.row{
+  max-width: 100%;
+}
+
+.sidebar{
+  position:fixed;
+  bottom: 0px;
+  right: 0;
+  background-color: #FFF;
   z-index: 999;
+
+  width: 190px;
+  border: 0.5px solid #A6A6A6;
+  padding: 10px 10px 20px 15px;
+  text-transform: uppercase;
+  &.print{
+    display:none;
+  }
+}
+
+.meta-data{
   p{
-    font-size:14px;
+    font-size:12px;
     color: #5E5B5D;
     font-family:$titleFont  ;
     padding: 0 5px;
@@ -84,16 +95,8 @@ img{
 }
 
 .page-function{
-  width: 200px;
-  position:absolute;
-  top: 70px;
-  right: 20px;
-  border: 0.5px solid #A6A6A6;
-  padding: 15px 20px 15px 20px;
-  text-transform: uppercase;
-  background: #FFF;
-  z-index: 999;
   .gridButton{
+    font-size:12px;
     text-align: center;
     margin-top: 10px;
     padding: 5px 15px;
@@ -132,10 +135,13 @@ img{
   border-bottom: 1px solid #000;
   border-top: 1px solid #000;
   border-left: 1px solid #000;
-  margin: 10px auto;
+  margin: 0 auto;
   position: relative;
   transform: scale($scale);
-  transform-origin: 50% 0;
+  transform-origin: 0 0;
+  &.print{
+    left: -1365px;
+  }
   .page-wrapper{
     margin: $margintop $marginleft;
     width: $widthPage - ($marginleft * 2);
@@ -146,6 +152,12 @@ img{
       padding-right: 0.5cm;
       overflow:hidden;
       position:absolute;
+      &[data-folder="long"], &[data-folder="long2"]{
+        width: 25%;
+      }
+      &[data-folder="short"], &[data-folder="short2"]{
+        width: 15%;
+      }
     }
 
   }
@@ -168,7 +180,16 @@ img{
   display:none;
   div{
     height:100%;
+    width: 4.165%;
     border-right: 1px solid #DA0097;
     &:last-child{border:none;}
   }
+}
+
+.middle{
+  height: $heightPage;
+  width: 1px;
+  border: 1px solid #000;
+  left:50%;
+  position:absolute;
 }

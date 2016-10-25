@@ -6753,7 +6753,7 @@ body, html {
 body {
   margin: 0;
   color: #000;
-  font-size: 13pt;
+  font-size: 12pt;
   font-family: "vollkorn", sans-serif;
   font-weight: normal; }
 
@@ -6777,7 +6777,7 @@ h4 {
 h6 {
   position: absolute;
   font-size: 80pt;
-  max-width: 8cm;
+  max-width: 32cm;
   line-height: 110%; }
 
 li {
@@ -6785,7 +6785,7 @@ li {
 
 p {
   font-family: "vollkorn", sans-serif, serif;
-  font-size: 10pt;
+  font-size: 12pt;
   line-height: 125%;
   word-wrap: break-word; }
   p:first-child {
@@ -6806,78 +6806,82 @@ code {
 img {
   max-width: 100%; }
 
-.meta-data {
-  width: 200px;
-  position: absolute;
-  top: 0px;
-  right: 20px;
-  text-transform: uppercase;
-  border: 0.5px solid #A6A6A6;
-  padding: 15px 20px 0px 20px;
-  background: #FFF;
-  z-index: 999; }
-  .meta-data p {
-    font-size: 14px;
-    color: #5E5B5D;
-    font-family: "inknut", sans-serif;
-    padding: 0 5px;
-    display: inline-block; }
+.row {
+  max-width: 100%; }
 
-.page-function {
-  width: 200px;
-  position: absolute;
-  top: 70px;
-  right: 20px;
+.sidebar {
+  position: fixed;
+  bottom: 0px;
+  right: 0;
+  background-color: #FFF;
+  z-index: 999;
+  width: 190px;
   border: 0.5px solid #A6A6A6;
-  padding: 15px 20px 15px 20px;
-  text-transform: uppercase;
-  background: #FFF;
-  z-index: 999; }
-  .page-function .gridButton {
+  padding: 10px 10px 20px 15px;
+  text-transform: uppercase; }
+  .sidebar.print {
+    display: none; }
+
+.meta-data p {
+  font-size: 12px;
+  color: #5E5B5D;
+  font-family: "inknut", sans-serif;
+  padding: 0 5px;
+  display: inline-block; }
+
+.page-function .gridButton {
+  font-size: 12px;
+  text-align: center;
+  margin-top: 10px;
+  padding: 5px 15px;
+  width: 80px;
+  border: 0.5px solid #A6A6A6;
+  color: #5E5B5D;
+  cursor: pointer; }
+  .page-function .gridButton.active {
+    background-color: #5E5B5D;
+    color: #FFF; }
+
+.page-function .zoomFunction {
+  color: #5E5B5D; }
+  .page-function .zoomFunction .minusButton, .page-function .zoomFunction .plusButton {
     text-align: center;
-    margin-top: 10px;
-    padding: 5px 15px;
-    width: 80px;
+    padding: 5px 10px;
     border: 0.5px solid #A6A6A6;
-    color: #5E5B5D;
     cursor: pointer; }
-    .page-function .gridButton.active {
+    .page-function .zoomFunction .minusButton:hover, .page-function .zoomFunction .minusButton:active, .page-function .zoomFunction .plusButton:hover, .page-function .zoomFunction .plusButton:active {
       background-color: #5E5B5D;
       color: #FFF; }
-  .page-function .zoomFunction {
-    color: #5E5B5D; }
-    .page-function .zoomFunction .minusButton, .page-function .zoomFunction .plusButton {
-      text-align: center;
-      padding: 5px 10px;
-      border: 0.5px solid #A6A6A6;
-      cursor: pointer; }
-      .page-function .zoomFunction .minusButton:hover, .page-function .zoomFunction .minusButton:active, .page-function .zoomFunction .plusButton:hover, .page-function .zoomFunction .plusButton:active {
-        background-color: #5E5B5D;
-        color: #FFF; }
-    .page-function .zoomFunction .zoom-value {
-      margin: 0 10px; }
+  .page-function .zoomFunction .zoom-value {
+    margin: 0 10px; }
 
 .page {
-  width: 24cm;
-  height: 34cm;
+  width: 72cm;
+  height: 52cm;
   border-right: 1px solid #000;
   border-bottom: 1px solid #000;
   border-top: 1px solid #000;
   border-left: 1px solid #000;
-  margin: 10px auto;
+  margin: 0 auto;
   position: relative;
   transform: scale(0.5);
-  transform-origin: 50% 0; }
+  transform-origin: 0 0; }
+  .page.print {
+    left: -1365px; }
   .page .page-wrapper {
     margin: 1cm 2cm;
-    width: 20cm;
-    height: 32cm; }
+    width: 68cm;
+    height: 50cm; }
     .page .page-wrapper .content {
-      width: 9.52381cm;
-      height: 32cm;
+      width: 32.38095cm;
+      height: 50cm;
       padding-right: 0.5cm;
       overflow: hidden;
       position: absolute; }
+      .page .page-wrapper .content[data-folder="long"], .page .page-wrapper .content[data-folder="long2"] {
+        width: 25%; }
+      .page .page-wrapper .content[data-folder="short"], .page .page-wrapper .content[data-folder="short2"] {
+        width: 15%; }
   .page .change-font {
     font-family: "inknut", sans-serif, sans-serif;
     font-size: 2em;
@@ -6886,12 +6890,20 @@ img {
     font-family: "vollkorn", sans-serif, serif; }
 
 .grid {
-  height: 32cm;
+  height: 50cm;
   width: 100%;
   border: 1px solid #00AADA;
   display: none; }
   .grid div {
     height: 100%;
+    width: 4.165%;
     border-right: 1px solid #DA0097; }
     .grid div:last-child {
       border: none; }
+
+.middle {
+  height: 52cm;
+  width: 1px;
+  border: 1px solid #000;
+  left: 50%;
+  position: absolute; }
