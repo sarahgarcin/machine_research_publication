@@ -1,7 +1,7 @@
 /* VARIABLES */
 var socket = io.connect();
 var dataTextLong;
-var converter = new showdown.Converter();
+var converter = new showdown.Converter({'tables':true});
 
 var countRegex = 0;
 
@@ -80,6 +80,16 @@ socket.on('changeFontEvents', function(data){
 
 });
 
+socket.on('changeBlockSizeEvents', function(data){ 
+	var $element = $(".page-wrapper").find("[data-folder='" + data.slugFolderName + "']");
+	console.log($element, data.blockSize);
+	$element.blockSize(data.blockSize);
+	localStorage.setItem('data', JSON.stringify(data));
+	console.log(data);
+});
+
+
+
 socket.on('cleanForPrintEv', function(data){
 	setTimeout(function(){
 		socket.emit('printSecondPage');
@@ -152,6 +162,7 @@ function init(){
 		moveEvents(data, code);
 		wordSpacing(data, code);
 		changeFontFamily(data, code);
+		changeBlockSize(data, code);
 		generatePDF(data, code);
 
 		gridDisplayer(code);
@@ -266,6 +277,18 @@ function wordSpacing(data, code){
 	}
 }
 
+// -------   C H A N G E     B L O C K     S I Z E ---------
+function changeBlockSize(data, code){
+	// press 'i' to change Block Size
+	var blockSizeKey = 105;
+	var blockSize = data.blockSize;
+
+
+	if(code == blockSizeKey){
+		socket.emit("changeBlockSize", data);
+	}
+}
+
 // ------   C H A N G E    F O N T    F A M I L Y  ------ 
 function changeFontFamily(data, code){
 	
@@ -323,7 +346,7 @@ function onDisplayPage(foldersData){
   	var $folderContent = makeFolderContent( fdata);
     return insertOrReplaceFolder( fdata.slugFolderName, $folderContent);
   });
-
+	console.log(foldersData);
   var firstIndex = parseInt(foldersData[0].index);
   var firstNbOfFiles= foldersData[0].nbOfFiles;
 

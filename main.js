@@ -14,8 +14,8 @@ var fs = require('fs-extra'),
 
 	var chapterFolder = settings.folder;
 	var contentFolder = "content/";
-	var pdfFolderPath = contentFolder+chapterFolder+'pdf';
-
+	var pdfFolderPath = contentFolder+'/pdf';
+	console.log(pdfFolderPath);
 
 module.exports = function(app, io){
 
@@ -48,6 +48,8 @@ module.exports = function(app, io){
 		socket.on('changeFont', onChangeFont);
 		socket.on('removeFont', onRemoveFont);
 
+		socket.on('changeBlockSize', onChangeBlockSize);
+
 		socket.on('reset', function(){onReset(socket)});
 
 		socket.on('cleanForPrint', onCleanPrint);
@@ -61,8 +63,10 @@ module.exports = function(app, io){
 // ------------- F U N C T I O N S -------------------
 	function onListFolders( socket){
 		console.log( "EVENT - onListFolders");
-		var printVar = getFolderMeta('');
+		var printVar = getBaseFolderMeta('');
 		sendEventWithContent('displayPrintPage', printVar);
+
+
 
     listAllFolders().then(function( allFoldersData) {
     	// console.log(allFoldersData)
@@ -75,7 +79,7 @@ module.exports = function(app, io){
 	// save data in json file
 	function createDataFile(socket, event){
 		for(var i in settings.architecture){
-			var folder = contentFolder+chapterFolder+settings.architecture[i][0];
+			var folder = contentFolder+chapterFolder+'/'+settings.architecture[i][0];
 			var left = parseInt(pageSettings.page.marginleft) + ((parseInt(pageSettings.page.widthPage) /3.8)* i) ;
 			if(settings.architecture[i][1] == 'text'){
 				if(event == 'reset'){
@@ -93,6 +97,7 @@ module.exports = function(app, io){
 					yPos : 1,
 					wordSpace : 0, 
 					nbOfFiles : txt.length, 
+					blockSize: 10
 				}
 			}
 			// if(settings.architecture[i][1] == 'img'){
@@ -392,6 +397,41 @@ module.exports = function(app, io){
 
 // -------  E N D      C H A N G E    F O N T    F U N C T I O N S -----------
 
+// -------  C H A N G E    B L O C K   S I Z E   F U N C T I O N S -----------
+
+	function onChangeBlockSize(data){
+		console.log("ON CHANGE BLOCK SIZE");
+		
+		var newBlockSize = changeSizeFunction(parseFloat(data.blockSize));
+
+    var newData = {
+    	'blockSize': newBlockSize, 
+    	"slugFolderName" : data.slugFolderName
+    }
+
+    updateFolderMeta(newData).then(function( currentDataJSON) {
+      sendEventWithContent( 'changeBlockSizeEvents', currentDataJSON);
+    }, function(error) {
+      console.error("Failed to update a folder! Error: ", error);
+    });
+	}
+
+	function changeSizeFunction(size){
+		var maxBlockSize = 29;
+		var minBlockSize = 3;
+		var sizeStep = 3;
+	  
+	  if(size > maxBlockSize){
+	  	size = minBlockSize;
+	  }
+	  else{ 
+	  	size += sizeStep;
+	  }
+	  return size;
+	}
+
+// -------  E N D      C H A N G E   B L O C K   S I Z E    F U N C T I O N S -----------
+
 //------------- PDF -------------------
 
 	function onCleanPrint(){
@@ -402,7 +442,7 @@ module.exports = function(app, io){
     	"slugFolderName" : ''
     }
 
-    updateFolderMeta(newData).then(function( currentDataJSON) {
+    updateFolderMeta(newData, 'print').then(function( currentDataJSON) {
       sendEventWithContent( 'cleanForPrintEv', currentDataJSON);
       generatePdf(false);
     }, function(error) {
@@ -417,7 +457,7 @@ module.exports = function(app, io){
     	"slugFolderName" : ''
     }
 
-    updateFolderMeta(newData).then(function( currentDataJSON) {
+    updateFolderMeta(newData, 'print').then(function( currentDataJSON) {
       // sendEventWithContent( 'printSecondPage', currentDataJSON);
       generatePdf(true);
     }, function(error) {
@@ -434,7 +474,7 @@ module.exports = function(app, io){
     	"slugFolderName" : ''
     }
 
-    updateFolderMeta(newData).then(function( currentDataJSON) {
+    updateFolderMeta(newData, 'print').then(function( currentDataJSON) {
     	console.log('Print Reset')
     }, function(error) {
       console.error("Failed to update a folder! Error: ", error);
@@ -446,7 +486,7 @@ module.exports = function(app, io){
 		console.log('generate pdf');
 		var date = getCurrentDate();
 		var url = 'http://localhost:1337/';
-		var filePath = pdfFolderPath+'/'+date+'.pdf';
+		var filePath = pdfFolderPath+'/'+date+'-'+chapterFolder+'.pdf';
 
 		phantom.create([
 	  '--ignore-ssl-errors=yes',
@@ -497,12 +537,15 @@ module.exports = function(app, io){
     var textArray = [];
     var arrayOfFiles = fs.readdirSync(textDir);
     var arrayOfFiles = arrayOfFiles.filter(junk.not);
-
+    console.log(arrayOfFiles);
     arrayOfFiles.forEach( function (file) {
     	if(file != settings.confMetafilename + settings.metaFileext){
-	      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
-	      console.log('file: '+file);
-	      textArray.push(textInFile);
+    		console.log(path.extname(file));
+    		if(path.extname(file) == '.txt'){
+		      var textInFile = fs.readFileSync(textDir+'/'+file, 'utf8');
+		      console.log('file: '+file);
+		      textArray.push(textInFile);
+	      }
 	    }
     });
     return textArray;
@@ -526,7 +569,7 @@ module.exports = function(app, io){
 
 	function listAllFolders() {
     return new Promise(function(resolve, reject) {
-  		fs.readdir(settings.contentDir, function (err, filenames) {
+  		fs.readdir(settings.contentDir+'/'+settings.folder, function (err, filenames) {
         if (err) return console.log( 'Couldn\'t read content dir : ' + err);
 
         var folders = filenames.filter( function(slugFolderName){ return new RegExp("^([^.]+)$", 'i').test( slugFolderName); });
@@ -535,6 +578,7 @@ module.exports = function(app, io){
   	    var foldersProcessed = 0;
   	    var allFoldersData = [];
   		  folders.forEach( function( slugFolderName) {
+  		  	console.log(slugFolderName);
   		    if( new RegExp("^([^.]+)$", 'i').test( slugFolderName) && slugFolderName != 'pdf'){
           	var fmeta = getFolderMeta( slugFolderName);
           	fmeta.slugFolderName = slugFolderName;
@@ -572,6 +616,7 @@ module.exports = function(app, io){
 							"wordSpace" : folderData.wordSpace, 
 							"nbOfFiles" : folderData.nbOfFiles, 
 			        "text" : txt,
+			        'blockSize': folderData.blockSize
 			      };
 			    }
 			   //  if(folderData.currentImage != undefined){
@@ -601,12 +646,18 @@ module.exports = function(app, io){
     });
   }
 
-  function updateFolderMeta( folderData) {
+  function updateFolderMeta( folderData, print) {
     return new Promise(function(resolve, reject) {
       console.log( "COMMON — updateFolderMeta");
       // console.log(folderData);
       var slugFolderName = folderData.slugFolderName;
-      var folderPath = getFullPath( slugFolderName);
+      if(print == 'print'){
+      	var folderPath = getFullBasePath( slugFolderName);
+      }
+      else{
+      	var folderPath = getFullPath( slugFolderName);
+      }
+      
       var newText = folderData.text;
       var newIndex = folderData.index;
       var newZoom = folderData.zoom;
@@ -615,10 +666,16 @@ module.exports = function(app, io){
       var newSpace = folderData.wordSpace;
       var newPrint = folderData.print;
       var newBar = folderData.sidebar;
+      var newBlockSize = folderData.blockSize;
 
 
       // récupérer les infos sur le folder
-      var fmeta = getFolderMeta( slugFolderName);
+      if(print == 'print'){
+      	var fmeta = getBaseFolderMeta( slugFolderName);
+      }
+      else{
+      	var fmeta = getFolderMeta( slugFolderName);
+      }
       if(newText != undefined)
       	fmeta.text = newText;
       if(newIndex != undefined)
@@ -635,6 +692,8 @@ module.exports = function(app, io){
       	fmeta.print = newPrint;
       if(newBar != undefined)
       	fmeta.sidebar = newBar;
+      if(newBlockSize != undefined)
+      	fmeta.blockSize = newBlockSize;
 
       // envoyer les changements dans le JSON du folder
       storeData( getMetaFileOfFolder( folderPath), fmeta, "update").then(function( ufmeta) {
@@ -687,7 +746,6 @@ module.exports = function(app, io){
 
 	function getFolderMeta( slugFolderName) {
 		console.log( "COMMON — getFolderMeta");
-
     var folderPath = getFullPath( slugFolderName);
   	var folderMetaFile = getMetaFileOfFolder( folderPath);
 
@@ -695,6 +753,18 @@ module.exports = function(app, io){
 		var folderMetadata = parseData( folderData);
 
     return folderMetadata;
+  }
+
+  function getBaseFolderMeta(slugFolderName){
+  	console.log( "COMMON — getBaseFolderMeta", slugFolderName);
+    var folderPath = getFullBasePath( slugFolderName);
+  	var folderMetaFile = getMetaFileOfFolder( folderPath);
+
+		var folderData = fs.readFileSync( folderMetaFile, settings.textEncoding);
+		var folderMetadata = parseData( folderData);
+
+    return folderMetadata;
+
   }
 
 	function getMetaFileOfFolder( folderPath) {
@@ -706,7 +776,11 @@ module.exports = function(app, io){
   }
 
   function getFullPath( path) {
-    return settings.contentDir + "/" + path;
+    return settings.contentDir +'/'+ settings.folder + '/'+ path;
+  }
+
+   function getFullBasePath( path) {
+    return settings.contentDir +'/'+ path;
   }
 
 	function getCurrentDate() {

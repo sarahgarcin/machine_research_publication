@@ -23,6 +23,14 @@
     return this.css('word-spacing', ''+space +'px');
 
   };
+
+  $.fn.blockSize = function( size) {
+
+    return this.css({
+      'width': size + 'cm',
+    });
+
+  };
  
 }( jQuery ));
 
